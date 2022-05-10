@@ -1,0 +1,43 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=mauikit-texteditor
+pkgver=2.1.0
+pkgrel=0
+pkgdesc="MauiKit Text Editor components"
+# armhf blocked by qt5-qtdeclarative
+# mips64, s390x and riscv64 blocked by mauikit
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://mauikit.org/"
+license="GPL-2.0-or-later"
+depends="kirigami2"
+makedepends="
+	extra-cmake-modules
+	kcoreaddons-dev
+	ki18n-dev
+	syntax-highlighting-dev
+	mauikit
+	mauikit-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	"
+source="https://download.kde.org/stable/maui/mauikit-texteditor/$pkgver/mauikit-texteditor-$pkgver.tar.xz"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+12ddad633e3e89dfdd05b194e4b3e35100063b074dc42fbb9f9cb415a7513658b5a9bef95ec7bd2cd7e60491f11ef9e855ddd71ebabe6b7bda5cec8193a24850  mauikit-texteditor-2.1.0.tar.xz
+"

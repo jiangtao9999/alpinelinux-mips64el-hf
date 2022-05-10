@@ -1,0 +1,32 @@
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=mkinitfs
+pkgver=3.6.0
+# shellcheck disable=SC2034 # used for git versions, keep around for next time
+_ver=${pkgver%_git*}
+pkgrel=0
+pkgdesc="Tool to generate initramfs images for Alpine"
+url="https://gitlab.alpinelinux.org/alpine/mkinitfs"
+arch="all"
+license="GPL-2.0-only"
+# currently we do not ship any testsuite
+options="!check"
+makedepends_host="busybox kmod-dev util-linux-dev cryptsetup-dev linux-headers"
+makedepends="$makedepends_host"
+depends="busybox>=1.28.2-r1 apk-tools>=2.9.1 lddtree>=1.25 kmod"
+subpackages="$pkgname-doc"
+install="$pkgname.pre-upgrade $pkgname.post-install $pkgname.post-upgrade"
+triggers="$pkgname.trigger=/usr/share/kernel/*"
+source="https://gitlab.alpinelinux.org/alpine/mkinitfs/-/archive/$pkgver/mkinitfs-$pkgver.tar.gz
+	"
+
+build() {
+	make VERSION=$pkgver-r$pkgrel
+}
+
+package() {
+	make install DESTDIR="$pkgdir"
+}
+
+sha512sums="
+8fa8d616cebe53b986d44c511807e43151ffd139acef65e68c748fb60980a965d93b4ac4b35c98157d2216d37929f77e6f8636d0b109425af1e96e8cd9db4de6  mkinitfs-3.6.0.tar.gz
+"

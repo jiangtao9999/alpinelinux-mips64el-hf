@@ -1,0 +1,50 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=artikulate
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by qt5-qtdeclarative
+# s390x, mips64 and riscv64 blocked by polkit -> knewstuff
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://edu.kde.org/artikulate"
+pkgdesc="Improve your pronunciation by listening to native speakers"
+license="(GPL-2.0-only OR GPL-3.0-only) AND GFDL-1.2-only"
+depends="kirigami2"
+makedepends="
+	extra-cmake-modules
+	karchive-dev
+	kconfig-dev
+	kcrash-dev
+	kdoctools-dev
+	ki18n-dev
+	kirigami2-dev
+	knewstuff-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	qt5-qtmultimedia-dev
+	qt5-qtxmlpatterns-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/artikulate-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+c0642fad8a85b0d0e3e9b52ae684f4d6026fe70710f946ec14c6923a6c56805c9026508da58c29e1820deeb4b392c5f2b8146f150707ccf9010a4704ff146dd0  artikulate-21.08.3.tar.xz
+"

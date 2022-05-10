@@ -1,0 +1,67 @@
+# Maintainer: Drew DeVault <sir@cmpwn.com>
+pkgname=alacritty
+pkgver=0.9.0
+pkgrel=2
+pkgdesc="cross-platform, GPU-accelerated terminal emulator"
+url="https://github.com/jwilm/alacritty"
+arch="x86_64 armv7 armhf aarch64 x86 ppc64le" # limited by rust/cargo
+license="Apache-2.0"
+depends="ncurses-terminfo-base wayland-libs-egl"
+makedepends="
+	rust
+	cargo
+	cmake
+	fontconfig-dev
+	freetype-dev
+	libxkbcommon-dev
+	libxcb-dev
+	python3
+	"
+subpackages="
+	$pkgname-doc
+	$pkgname-bash-completion
+	$pkgname-fish-completion
+	$pkgname-zsh-completion
+	"
+options="net"
+source="$pkgname-$pkgver.tar.gz::https://github.com/jwilm/alacritty/archive/v$pkgver.tar.gz
+	"
+export CARGO_HOME="$srcdir"/cargo
+export RUSTFLAGS="-C target-feature=-crt-static"
+
+build() {
+	cargo build --release --verbose
+}
+
+check() {
+	cargo test --all --release --verbose
+}
+
+package() {
+	install -Dm755 target/release/alacritty "$pkgdir"/usr/bin/alacritty
+	install -Dm644 extra/alacritty.man "$pkgdir"/usr/share/man/man1/alacritty.1
+	install -Dm644 alacritty.yml "$pkgdir"/etc/alacritty/alacritty.yml
+
+	# Install addition documentation files.
+	install -Dm644 -t "$pkgdir"/usr/share/doc/$pkgname \
+		README.md CHANGELOG.md docs/*
+
+	# Install desktop files.
+	install -Dm644 extra/linux/Alacritty.desktop -t "$pkgdir"/usr/share/applications
+	install -Dm644 extra/logo/alacritty-term.svg "$pkgdir"/usr/share/pixmaps/Alacritty.svg
+	install -Dm644 extra/linux/io.alacritty.Alacritty.appdata.xml \
+		"$pkgdir"/usr/share/metainfo/io.alacritty.Alacritty.metainfo.xml
+
+	# Install completion files.
+	install -Dm644 extra/completions/alacritty.bash \
+		"$pkgdir"/usr/share/bash-completion/completions/"$pkgname"
+	install -Dm644 extra/completions/alacritty.fish \
+		"$pkgdir"/usr/share/fish/completions/"$pkgname".fish
+	install -Dm644 extra/completions/_alacritty \
+		"$pkgdir"/usr/share/zsh/site-functions/_"$pkgname"
+}
+
+
+sha512sums="
+17b53a1f98e8435a3ab120e39040c591d96a05d793b78030732f5624e2b717ab6a06c8de67fb25c6a502f3f3064f08a2a3c64cf7a1b7f3f7fda699e7fd95f931  alacritty-0.9.0.tar.gz
+"

@@ -1,0 +1,52 @@
+# Contributor: James Bowes <jbowes@repl.ca>
+# Contributor: Jan Segre <jan@segre.in>
+# Contributor: Lars Kuhtz <lakuhtz@gmail.com>
+# Maintainer:
+pkgname=rocksdb
+pkgver=6.23.3 # version 6.24 and above is not compatible with electrs
+pkgrel=0
+pkgdesc="persistent key-value store for fast storage environments"
+url="https://rocksdb.org"
+# ppc64le: fatal error: sys/platform/ppc.h: No such file or directory
+arch="x86 x86_64 aarch64" # fails to build on other archs
+license="Apache-2.0 OR GPL-2.0-only"
+depends_dev="bzip2-dev gflags-dev lz4-dev snappy-dev zlib-dev zstd-dev"
+depends_static="bzip2-static gflags-dev lz4-static snappy-static zlib-static zstd-static"
+makedepends="$depends_dev linux-headers bash perl"
+subpackages="$pkgname-dev $pkgname-doc"
+options="!check" # no upstream/available test-suite
+source="$pkgname-$pkgver.tar.gz::https://github.com/facebook/rocksdb/archive/v$pkgver.tar.gz
+	ppc64le-determine-platform.patch
+	10-support-busybox-install.patch
+	"
+build() {
+	make \
+		shared_lib \
+		DISABLE_WARNING_AS_ERROR=1
+	make \
+		static_lib \
+		DISABLE_WARNING_AS_ERROR=1
+}
+
+package() {
+		DESTDIR="$pkgdir" \
+		PREFIX=/usr \
+		LIBDIR=/usr/lib make install-shared
+		DESTDIR="$pkgdir" \
+		PREFIX=/usr \
+		LIBDIR=/usr/lib make install-static
+	strip  "$pkgdir"/usr/lib/librocksdb.a
+	chmod 664 "$pkgdir"/usr/lib/librocksdb.a
+	install -Dm644 COPYING "$pkgdir"/usr/share/licenses/$pkgname/COPYING
+	install -Dm644 LICENSE.Apache "$pkgdir"/usr/share/licenses/$pkgname/LICENSE.Apache
+	mkdir -p "$pkgdir"/usr/share/doc
+	cp -a docs "$pkgdir"/usr/share/doc/$pkgname
+	install -Dm644 README.md "$pkgdir"/usr/share/doc/$pkgname/README.md
+	install -Dm644 HISTORY.md "$pkgdir"/usr/share/doc/$pkgname/HISTORY.md
+}
+
+sha512sums="
+30ad0d297cdaf5b5d9b9ec327006f963a0b69db890012d0f7de1d3f27d6dde538f26434815bd56914680d20354c9da99460d4f4b714b6afe5c75cda0056bad4b  rocksdb-6.23.3.tar.gz
+835e7bb5e8e76aa264d7dbe55d44a01af4bcec7e61fc0aa8be173d28e302e9b368da064bd4b4a0020fa97bd46a51f3d8fc015db8a4af37890e0ba7924eb01ed0  ppc64le-determine-platform.patch
+fa98c289b465808c1bdda390d891d6430bb65096c39d2c327f7a82cdae1eeba8f3a47c6434eb4988b0c0c25d0e4900e92da28afe67c71b0b112b38b9a9f58887  10-support-busybox-install.patch
+"

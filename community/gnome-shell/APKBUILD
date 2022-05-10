@@ -1,0 +1,88 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-shell
+pkgver=41.1
+pkgrel=0
+pkgdesc="GNOME shell"
+url="https://wiki.gnome.org/Projects/GnomeShell"
+arch="all !mips64 !s390x !riscv64" # rust
+license="GPL-2.0-or-later"
+depends="accountsservice
+	caribou
+	elogind
+	gsettings-desktop-schemas
+	upower
+	ibus
+	librsvg
+	gnome-bluetooth
+	gnome-control-center
+	font-adobe-source-code-pro
+	ttf-cantarell
+	adwaita-icon-theme
+	gnome-themes-standard
+	unzip
+	"
+makedepends="gnome-desktop-dev>=3.35.91
+	libxml2-dev
+	libcanberra-dev
+	gobject-introspection-dev
+	startup-notification-dev
+	libsoup-dev
+	polkit-dev
+	gcr-dev
+	gjs-dev>=1.64.0
+	mutter-dev>=3.36.0
+	pulseaudio-dev
+	evolution-data-server-dev evolution-dev
+	python3
+	meson
+	libxml2-utils
+	ibus-dev
+	sassc
+	networkmanager-dev
+	libnma-dev
+	gnome-control-center-dev
+	py3-setuptools
+	gnome-bluetooth-dev
+	gstreamer-dev
+	gnome-autoar-dev
+	asciidoc
+	elogind-dev
+	pipewire-dev
+	gtk4.0-dev
+	"
+checkdepends="
+	xvfb-run
+	mesa-dri-gallium
+	"
+	# gdm is also needed but introduces circular dep
+subpackages="$pkgname-lang $pkgname-doc $pkgname-dbg"
+source="https://download.gnome.org/sources/gnome-shell/${pkgver%.*}/gnome-shell-$pkgver.tar.xz
+	disable-telepathy-integration.patch
+	"
+options="!check" # Tests have circular dependency 'gnome-shell <-> gdm'
+
+# secfixes:
+#   0:
+#     - CVE-2019-3820
+
+build() {
+	abuild-meson \
+		-Dsystemd=false \
+		-Dtests=false \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	xvfb-run meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+b9a5064c6d66d34c86b2fcd1ac2748072b094eb149e5ba3deb5b271e6ada2b6793c5422c4a80ce407f5a6cf52160d2d76fcf0ab752ee7cb27d9f246e8e024827  gnome-shell-41.1.tar.xz
+2ca70115fab957fdf276b7f0772786e1afd56b0b22bcfd92f5b5f1d29676dc97c19cfb079434d0dbf7b459f1d133dbd8d1faa0d88f7b94846040a23856f951f8  disable-telepathy-integration.patch
+"

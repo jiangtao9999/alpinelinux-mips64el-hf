@@ -1,0 +1,78 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+#
+# TODO: Unbundle gombo-parser.
+pkgname=ruby-nokogiri
+_gemname=${pkgname#ruby-}
+pkgver=1.12.5
+pkgrel=0
+pkgdesc="An HTML, XML, SAX, and Reader parser"
+url="https://nokogiri.org/"
+arch="all !s390x"
+license="MIT"
+depends="ruby"
+makedepends="
+	libxml2-dev
+	libxslt-dev
+	ruby-dev
+	ruby-mini_portile2
+	"
+checkdepends="ruby-minitest ruby-test-unit"
+source="https://github.com/sparklemotion/$_gemname/archive/v$pkgver/$_gemname-$pkgver.tar.gz
+	gemspec-fix-deps.patch
+	extconf-relax-mini_portile2-version.patch
+	test-helper-remove-unnecessary-deps.patch
+	"
+builddir="$srcdir/$_gemname-$pkgver"
+
+# secfixes:
+#   1.11.6-r0:
+#     - CVE-2020-26247
+#   1.10.4-r0:
+#     - CVE-2019-5477
+
+build() {
+	gem build $_gemname.gemspec
+	gem install \
+		--local \
+		--install-dir dist \
+		--ignore-dependencies \
+		--no-document \
+		--verbose \
+		$_gemname-$pkgver.gem -- \
+			--use-system-libraries
+
+	# Remove unnecessary files and rubbish...
+	find dist/extensions/ -name mkmf.log -delete
+	cd dist/gems/$_gemname-$pkgver/
+	rm -rf ext/ patches/
+	rm ./*.md ./*.yml
+	rm lib/*.jar
+	rm lib/nokogiri/*.so
+	rm lib/nokogiri/css/*.rex lib/nokogiri/css/*.y
+}
+
+check() {
+	local extpath=$(dirname dist/extensions/*/*/$_gemname-$pkgver/gem_make.out)
+
+	# Note: This is based on Fedora package.
+	LANG="C.UTF-8" RUBYLIB=".:dist/gems/$_gemname-$pkgver/lib:test:$extpath" ruby \
+		-e 'require "test/helper"' \
+		-e 'Dir.glob("test/**/test_*.rb") {|f| require f }'
+}
+
+package() {
+	local gemdir="$pkgdir/$(ruby -e 'puts Gem.default_dir')"
+
+	cd "$builddir"/dist
+
+	mkdir -p "$gemdir"
+	cp -r bin extensions gems specifications "$gemdir"/
+}
+
+sha512sums="
+36d233df250213c4614c34d045c4fbea099e81e991a6da49067c165bc95f36b281c58cc79deb3b6a8aaccc50743a79efa27969e067cc2b546bef7615b139d79b  nokogiri-1.12.5.tar.gz
+99820797977aad4c91050e331ea2b5ef7e108e109707f69252a8aa08bdbae36286db7e0afb8be2ad4905b48e1ea93aa00c069b70d0010fde559e7045739b64b3  gemspec-fix-deps.patch
+5b1bd6bb2838d33c6785c2b2df184304d24a5dd3cfedc08fb12f66f5c9fa812ac2b369aa092299111fca25b2b77fb3a8cdde44ceeeacf0bde276e38eb910b15b  extconf-relax-mini_portile2-version.patch
+81c05ac93387a5f6f0b3e7389f7c14cc9398344f91061e2cf57682a53979cecbf5c0f05913d8f1b320887fa123fa18421fea8043bb757a9bcca692e4fec84448  test-helper-remove-unnecessary-deps.patch
+"

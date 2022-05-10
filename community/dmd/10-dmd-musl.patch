@@ -1,0 +1,26 @@
+Add dependency to libexecinfo and the associated version for backtraces.
+
+diff -Nurp a/dmd/src/dmd/link.d b/dmd/src/dmd/link.d
+--- a/dmd/src/dmd/link.d
++++ b/dmd/src/dmd/link.d
+@@ -746,6 +747,8 @@
+             argv.push("-lrt");
+             // Link against libdl for phobos usage of dlopen
+             argv.push("-ldl");
++            // Musl
++            argv.push("-lunwind");
+         }
+         if (global.params.verbose)
+         {
+diff --Nurp a/dmd/src/dmd/target.d b/dmd/src/dmd/target.d
+--- a/dmd/src/dmd/target.d
++++ b/dmd/src/dmd/target.d
+@@ -1253,7 +1253,7 @@ struct TargetC
+         case DigitalMars: return predef("CRuntime_DigitalMars");
+         case Glibc:       return predef("CRuntime_Glibc");
+         case Microsoft:   return predef("CRuntime_Microsoft");
+-        case Musl:        return predef("CRuntime_Musl");
++        case Musl:        return predef("CRuntime_Musl"), predef("DRuntime_Use_Libunwind");
+         case Newlib:      return predef("CRuntime_Newlib");
+         case UClibc:      return predef("CRuntime_UClibc");
+         case WASI:        return predef("CRuntime_WASI");

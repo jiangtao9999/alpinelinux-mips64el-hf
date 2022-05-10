@@ -1,0 +1,31 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer: Michał Polański <michal@polanski.me>
+pkgname=gtk-layer-shell
+pkgver=0.6.0
+pkgrel=0
+pkgdesc="Create panels and other desktop components in Wayland using the Layer Shell protocol"
+url="https://github.com/wmww/gtk-layer-shell"
+arch="all"
+license="MIT"
+makedepends="meson wayland-dev gtk+3.0-dev gobject-introspection-dev"
+subpackages="$pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/wmww/gtk-layer-shell/archive/v$pkgver.tar.gz"
+
+build() {
+	abuild-meson \
+		-Dexamples=false \
+		-Ddocs=false \
+		-Dtests=true \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="ca5367b5f1637a07c28c772e79e5ac84219ff069091077f83c5edbc88be084538a925b3c76e6cc9dcd8d2826ae340b79605875e87209ee4f4d5e27dc4e93a523  gtk-layer-shell-0.6.0.tar.gz"

@@ -1,0 +1,31 @@
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=webalizer
+pkgver=2.23.08
+_pkgver="2.23-08"
+pkgrel=6
+pkgdesc="web server log file analysis program producing HTML reports"
+url="http://www.webalizer.org/"
+arch="all"
+license="GPL-2.0-or-later"
+makedepends="gd-dev libpng-dev zlib-dev bzip2-dev"
+# site is gone, using debian source
+source="$pkgname-$pkgver.tar.gz::http://ftp.debian.org/debian/pool/main/w/webalizer/webalizer_$pkgver.orig.tar.gz"
+builddir="$srcdir"/$pkgname-$_pkgver
+
+build() {
+	./configure \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--datarootdir=/usr/share \
+		--enable-bz2
+	  make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+219cae51d2e938e2d9327ce52c9c814e7436c821b05cb528dc88f548bdfbd7a6ad69c235b078d6af194c3a1d38029fde7dde9e8b81ad6fd93c236ca76a49811b  webalizer-2.23.08.tar.gz
+"

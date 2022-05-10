@@ -1,0 +1,46 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Contributor: Łukasz Jendrysik <scadu@yandex.com>
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=libmicrohttpd
+pkgver=0.9.73
+pkgrel=0
+pkgdesc="small C library that is supposed to make it easy to run an HTTP server as part of another application"
+url="https://www.gnu.org/software/libmicrohttpd/"
+arch="all"
+license="LGPL-2.1-or-later"
+makedepends="autoconf automake curl-dev gettext-dev gnutls-dev libgcrypt-dev libtool"
+subpackages="$pkgname-static $pkgname-dev $pkgname-doc"
+source="https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-$pkgver.tar.gz"
+
+prepare() {
+	default_prepare
+	autoreconf -fi
+}
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info \
+		--enable-largefile \
+		--enable-curl \
+		--enable-https \
+		--enable-messages
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	install -Dm644 "$builddir"/src/include/platform.h \
+		"$pkgdir"/usr/include/platform.h
+}
+
+sha512sums="473996b087ac6734ab577a1c7681c6c0b0136e04e34e13c3b50fd758358c1516017ad79097e0c57792786f6dd0208834374c09238113efed13bb4be11ef649d3  libmicrohttpd-0.9.73.tar.gz"

@@ -1,0 +1,36 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=lxqt-admin
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="LXQt system administration tool"
+url="https://github.com/lxqt/lxqt-admin"
+# armhf, mips64: blocked by liblxqt and kwindowsystem
+# s390x, riscv64: blocked by polkit-qt
+arch="all !armhf !s390x !mips64 !riscv64"
+license="LGPL-2.0-or-later"
+makedepends="
+	cmake lxqt-build-tools liblxqt-dev kwindowsystem-dev
+	polkit-qt-1-dev qt5-qttools-dev
+	"
+options="!check" # No testsuite
+source="https://github.com/lxqt/lxqt-admin/releases/download/$pkgver/lxqt-admin-$pkgver.tar.xz"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+af1cbdd0e04116ad575b652b4eef0fd0a403b37e169961797cc365fe69e5655c6291205165baab4bb3337506785d70149f2b6175758448bd06800fa6f4eb4617  lxqt-admin-1.0.0.tar.xz
+"

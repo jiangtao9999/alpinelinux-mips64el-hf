@@ -1,0 +1,47 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Maintainer: Sören Tempel <soeren+alpine@soeren-tempel.net>
+pkgname=pcc
+pkgver=20211109
+pkgrel=0
+pkgdesc="The portable C compiler."
+url="http://pcc.ludd.ltu.se/"
+arch="x86 x86_64"
+license="BSD"
+depends="pcc-libs-dev>=$pkgver-r0"
+makedepends="byacc flex"
+subpackages="$pkgname-doc"
+source="ftp://pcc.ludd.ltu.se/pub/pcc/pcc-$pkgver.tgz"
+
+prepare() {
+	default_prepare
+	update_config_sub
+
+	sed -i -e 's/AC_CHECK_PROG(strip,strip,yes,no)//' \
+		configure.ac
+	sed -i -e 's/AC_SUBST(strip)//' \
+		configure.ac
+}
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var \
+		--disable-stripping
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+
+	# Don't conflict with gcc-doc.
+	mv "$pkgdir"/usr/share/man/man1/cpp.1 \
+		"$pkgdir"/usr/share/man/man1/$pkgname-cpp.1
+}
+
+sha512sums="
+4875e2d2e4639ac18788deac3bc5c58631df085c9622f188e4d1be585f6b10cd2c8f698162fd3c08b4025eddd260b2336bd532a7553afaa88393bbcc1fc17d52  pcc-20211109.tgz
+"

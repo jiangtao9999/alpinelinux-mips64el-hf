@@ -1,0 +1,60 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kosmindoormap
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by qt5-qtdeclarative
+arch="all !armhf"
+url="https://invent.kde.org/libraries/kosmindoormap"
+pkgdesc="OSM multi-floor indoor map renderer"
+license="BSD-2-Clause AND BSD-3-Clause MIT AND LGPL-2.0-or-later"
+depends_dev="
+	ki18n-dev
+	kpublictransport-dev
+	protobuf-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	zlib-dev
+	"
+makedepends="$depends_dev
+	bison
+	extra-cmake-modules
+	flex
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kosmindoormap-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+
+	local skipped_tests="("
+	local tests="
+		"
+	if [ "$CARCH" = "x86" ]; then
+		tests="$tests
+			levelparser
+			platformfinder
+			"
+	fi
+	for test in $tests; do
+		skipped_tests="$skipped_tests|$test"
+	done
+	skipped_tests="$skipped_tests)test"
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest -E "$skipped_tests"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+3a2337b433c25c16f2e69ab1a42e9324e8e176eaf85094a08d95a542af479e65637544a8486d481a3fe811e5c90aee1bcf803d92f3225db7c53c75840247e642  kosmindoormap-21.08.3.tar.xz
+"

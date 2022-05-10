@@ -1,0 +1,25 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-beetle-pce-fast
+pkgver=0_git20210412
+pkgrel=1
+_commit="b29972b83e54599239781efd6c0c2d77ad65f3b7"
+pkgdesc="standalone fork of Mednafen PCE Fast to libretro"
+url="https://github.com/libretro/beetle-pce-fast-libretro"
+arch="all"
+license="GPL-2.0-only"
+makedepends="zlib-dev"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/beetle-pce-fast-libretro/archive/$_commit.tar.gz"
+builddir="$srcdir/beetle-pce-fast-libretro-$_commit"
+options="!check" # No tests
+
+build() {
+	rm -rf deps/zlib*
+	make SYSTEM_ZLIB=1
+}
+
+package() {
+	install -Dm644 mednafen_pce_fast_libretro.so "$pkgdir"/usr/lib/libretro/mednafen_pce_fast_libretro.so
+}
+
+sha512sums="409222bdfdf95da9b47a68f64e3d6a543ad79678e2b2f6771d8fe38713b082844942fe3f4b4f410aff43616a3e7b6746c5a08901b65ad2fb942bb19772999456  libretro-beetle-pce-fast-b29972b83e54599239781efd6c0c2d77ad65f3b7.tar.gz"

@@ -1,0 +1,46 @@
+# Contributor: Leon Marz <main@lmarz.org>
+# Maintainer: Leon Marz <main@lmarz.org>
+pkgname=embree
+pkgver=3.13.2
+pkgrel=0
+pkgdesc="High Performance Ray Tracing Kernels"
+url="https://www.embree.org/"
+arch="aarch64 x86_64" # embree needs sse2 and 64 bit
+license="Apache-2.0"
+makedepends="cmake libtbb-dev"
+subpackages="$pkgname-static $pkgname-dev $pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/embree/embree/archive/v$pkgver.tar.gz"
+options="!check" # no tests provided
+
+build() {
+	# build static library
+	cmake -B build-static \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_BUILD_TYPE=None \
+		-DEMBREE_ISPC_SUPPORT=OFF \
+		-DEMBREE_TUTORIALS=OFF \
+		-DEMBREE_RAY_MASK=ON \
+		-DEMBREE_STATIC_LIB=ON
+	cmake --build build-static -j4
+
+	# build shared library
+	cmake -B build-shared \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		-DCMAKE_BUILD_TYPE=None \
+		-DEMBREE_ISPC_SUPPORT=OFF \
+		-DEMBREE_TUTORIALS=OFF \
+		-DEMBREE_RAY_MASK=ON
+	cmake --build build-shared -j4
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build-static
+	DESTDIR="$pkgdir" cmake --install build-shared
+}
+
+sha512sums="
+9e4912f52c503d8d1fe0c3c81bf8108f1af044bf08d76111e4c1ab434c6a38d33bae9aacfd60c874da76bcc2f909ad1f3f171d458adb7973644cdbfd3693dc0f  embree-3.13.2.tar.gz
+"

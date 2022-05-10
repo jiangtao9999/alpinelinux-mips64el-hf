@@ -1,0 +1,33 @@
+# Contributor: Breno Leitao <breno.leitao@gmail.com>
+# Maintainer:
+pkgname=ed
+pkgver=1.17
+pkgrel=0
+pkgdesc="line-oriented text editor used to create, display, modify and otherwise manipulate text files"
+url="https://www.gnu.org/software/ed/"
+arch="all"
+license="GPL-3.0-only"
+subpackages="$pkgname-doc"
+source="https://ftp.gnu.org/gnu/ed/ed-$pkgver.tar.lz"
+
+
+build() {
+	# bindir needs correspond with busybox location
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--bindir=/bin \
+		--mandir=/usr/share/man
+	make all
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="fbceac0d3c01880a57776aaf3a3c02ce177bcf1e021f237ed7b6fc84f88471dd36cd0385b80b3a2de58640d8ef3ca07b4c5755803854ab52e4e9f636e5544dbf  ed-1.17.tar.lz"

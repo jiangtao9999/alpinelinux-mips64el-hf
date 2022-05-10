@@ -1,0 +1,41 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kapidox
+pkgver=5.88.0
+pkgrel=0
+arch="noarch !armhf" # armhf blocked by extra-cmake-modules
+pkgdesc="Scripts and data for building API documentation (dox) in a standard format and style"
+url="https://community.kde.org/Frameworks"
+license="BSD-3-Clause"
+depends="
+	doxygen
+	py3-jinja2
+	py3-yaml
+	python3
+	"
+makedepends="
+	extra-cmake-modules
+	py3-setuptools
+	python3-dev
+	"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/kapidox-$pkgver.tar.xz"
+subpackages="$pkgname-doc"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+aeef95e9069c7da82ee1650492384b0f89685826547466e77152e06593d02505e49bf6c8b49add6a001811bc6e6130ebc4d6b184f2b9c9edafb347cc307f56f1  kapidox-5.88.0.tar.xz
+"

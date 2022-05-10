@@ -1,0 +1,28 @@
+# Maintainer: Ariadne Conill <ariadne@dereferenced.org>
+pkgname=witchery
+pkgver=0.0.3
+pkgrel=0
+pkgdesc="build distroless images with Alpine tools"
+url="https://github.com/kaniini/witchery"
+arch="noarch"
+license="ISC"
+depends="alpine-sdk"
+makedepends=""
+checkdepends=""
+install=""
+subpackages=""
+source="https://github.com/kaniini/witchery/archive/v$pkgver/witchery-$pkgver.tar.gz"
+builddir="$srcdir/witchery-$pkgver"
+options="!check" # No test suite.
+
+build() {
+	:
+}
+
+package() {
+	DESTDIR="$pkgdir" make install
+}
+
+sha512sums="
+713c130e2a7059a49f4c672a73614cd8413aa0fc9dcd8ec5a7ff6f9e7b7b3839aafe0403bb3a3214ba0534d0e143d2764a377dd19c0c86db7fd86b335bb1309b  witchery-0.0.3.tar.gz
+"

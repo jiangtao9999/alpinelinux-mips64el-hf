@@ -1,0 +1,23 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-beetle-lynx
+pkgver=0_git20210324
+pkgrel=0
+_commit="26cb625d1f1c27137ce8069d155231f5a5c68bda"
+pkgdesc="standalone port of Mednafen Lynx to libretro"
+url="https://github.com/libretro/libretro-beetle-lynx"
+arch="all"
+license="GPL-2.0-only AND Zlib"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/beetle-lynx-libretro/archive/$_commit.tar.gz"
+builddir="$srcdir/beetle-lynx-libretro-$_commit"
+options="!check" # No tests
+
+build() {
+	make
+}
+
+package() {
+	install -Dm644 mednafen_lynx_libretro.so "$pkgdir"/usr/lib/libretro/mednafen_lynx_libretro.so
+}
+
+sha512sums="4b02e12041182bd837c8e7e4a60ec3186b2c27a451480df844d74337da387f8f68ee773fbaf278678df01b10a6167cc579c15d7a6741d1b0886f21ca6cb461b5  libretro-beetle-lynx-26cb625d1f1c27137ce8069d155231f5a5c68bda.tar.gz"

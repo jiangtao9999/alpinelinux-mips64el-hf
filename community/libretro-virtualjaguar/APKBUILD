@@ -1,0 +1,23 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-virtualjaguar
+pkgver=0_git20210314
+pkgrel=0
+_commit="2069160f316d09a2713286bd9bf4d5c2805bd143"
+pkgdesc="port of Virtual Jaguar to Libretro"
+url="https://github.com/libretro/virtualjaguar-libretro"
+arch="all"
+license="GPL-3.0-only"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/virtualjaguar-libretro/archive/$_commit.tar.gz"
+builddir="$srcdir/virtualjaguar-libretro-$_commit"
+options="!check" # No tests
+
+build() {
+	make
+}
+
+package() {
+	install -Dm644 virtualjaguar_libretro.so "$pkgdir"/usr/lib/libretro/virtualjaguar_libretro.so
+}
+
+sha512sums="ac6cdb7794b6b82b4a4855dd5ccb7ea8d7b8c3404ce2cb6e3aa3b9b4669721e3c1a12dd8ff481e54aaed2685363d02c3531e81a7ea8bcf7165935f59a0658bab  libretro-virtualjaguar-2069160f316d09a2713286bd9bf4d5c2805bd143.tar.gz"

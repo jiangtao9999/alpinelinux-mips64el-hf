@@ -1,0 +1,38 @@
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=xmltv
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Set of utilities to download tv listings and format them in xml"
+url="http://xmltv.org/wiki"
+arch="noarch"
+license="GPL-2.0"
+depends="perl-libwww perl-xml-parser perl-xml-twig perl-date-manip perl-xml-writer
+	perl-timedate perl-unicode-string perl-term-readkey perl-file-slurp perl-xml-libxml
+	perl-lingua-en-numbers-ordinate perl-lingua-preferred perl-compress-raw-zlib perl-io-gzip
+	perl-term-progressbar perl-xml-treepp"
+makedepends="perl-dev"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/XMLTV/$pkgname/archive/v$pkgver.tar.gz"
+builddir="$srcdir"/xmltv-$pkgver
+
+build() {
+	cd "$builddir"
+	PERL_MM_USE_DEFAULT=1 yes | perl Makefile.PL INSTALLDIRS=vendor
+	make
+}
+
+check() {
+	cd "$builddir"
+	make test
+}
+
+package() {
+	cd "$builddir"
+	make DESTDIR="$pkgdir" install
+	find "$pkgdir" \( -name perllocal.pod -o -name .packlist \) -delete
+}
+
+sha512sums="
+72df61cbcdfa7ba31d899b37e7f5308e845d263d8b9402c067bbd5761a7502ad7d272604a1d132337041a4d6bb2afa58a93b324239879294431108c1ac0ef09b  xmltv-1.0.0.tar.gz
+"

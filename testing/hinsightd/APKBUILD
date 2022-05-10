@@ -1,0 +1,62 @@
+# Contributor: Alexandru Campeanu <tiotags1@gmail.com>
+# Maintainer: Alexandru Campeanu <tiotags1@gmail.com>
+pkgname=hinsightd
+pkgver=0.9.11_git20210831
+pkgrel=0
+pkgdesc="hinsightd a http/1.1 webserver with (hopefully) minimal goals"
+url="https://gitlab.com/tiotags/hin9"
+arch="all"
+license="BSD-3-Clause"
+makedepends="cmake libcap lua-dev openssl-dev zlib-dev liburing-dev linux-headers"
+options="!check" # no test suite
+pkgusers="$pkgname"
+pkggroups="$pkgname"
+subpackages="$pkgname-dbg $pkgname-openrc"
+_commit="f04d7703f6cdbd2e33f8a7289d80a01dba5e970f"
+source="
+	https://gitlab.com/tiotags/hin9/-/archive/$_commit/hin9-$_commit.tar.gz
+	"
+builddir="$srcdir"/hin9-$_commit
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_BUILD_TYPE=None \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	install -D -m755 "$builddir"/build/hin9 \
+		"$pkgdir"/usr/sbin/hinsightd
+	setcap cap_net_bind_service+eip "$pkgdir"/usr/sbin/hinsightd
+
+	# create dirs
+	install -d -m2750 -o $pkgusers -g $pkggroups \
+		"$pkgdir"/var/log/hinsightd/
+	install -d -m755 \
+		"$pkgdir"/etc/hinsightd/ \
+		"$pkgdir"/var/www/localhost/htdocs
+
+	install -m755 -D "$builddir"/external/packaging/$pkgname.initd.sh \
+		"$pkgdir"/etc/init.d/$pkgname
+	install -m644 -D "$builddir"/external/packaging/$pkgname.confd.sh \
+		"$pkgdir"/etc/conf.d/$pkgname
+	install -m644 -D "$builddir"/external/packaging/$pkgname.logrotate.sh \
+		"$pkgdir"/etc/logrotate.d/$pkgname
+
+	# config files
+	local i; for i in default_config.lua main.lua lib.lua
+	do
+		install -m644 "$builddir"/workdir/"$i" "$pkgdir"/etc/$pkgname/"$i"
+	done
+
+}
+
+sha512sums="
+4bea1785f0ad83ffcf5437456e7f1c11e879dfa037fa89ca892a0d4d920bc7495ee68dc72d31025ebc977bcca48ca7e88194fe13e8884ebe2ce8e5d0b2f54cde  hin9-f04d7703f6cdbd2e33f8a7289d80a01dba5e970f.tar.gz
+"

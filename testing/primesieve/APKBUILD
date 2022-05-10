@@ -1,0 +1,32 @@
+# Contributor: Curt Tilmes <Curt.Tilmes@nasa.gov>
+# Maintainer: Curt Tilmes <Curt.Tilmes@nasa.gov>
+pkgname=primesieve
+pkgver=7.6
+pkgrel=0
+pkgdesc="Program and library for generating prime numbers"
+url="http://primesieve.org"
+arch="all"
+license="BSD-2-Clause"
+makedepends="cmake"
+subpackages="$pkgname-dev $pkgname-doc"
+source="primesieve-$pkgver.tar.gz::https://github.com/kimwalisch/primesieve/archive/v$pkgver.tar.gz"
+
+build() {
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_BUILD_TYPE=None \
+		-DBUILD_TESTS=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="bff67be7f2e3f1bb9b009b703ae9e402a9a5ed40e8d3e7f754fd8947c18ff47b2dec0c4a35b67968cfd3156f3af7aa8882e92e7122abab63662dbd20b9c4a2bf  primesieve-7.6.tar.gz"

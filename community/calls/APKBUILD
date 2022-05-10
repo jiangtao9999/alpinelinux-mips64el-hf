@@ -1,0 +1,49 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=calls
+pkgver=41.0
+pkgrel=1
+pkgdesc="A phone dialer and call handler"
+# s390x, mips64 and riscv64 blocked by polkit -> modemmanager
+arch="all !s390x !mips64 !riscv64"
+url="https://gitlab.gnome.org/GNOME/calls"
+license="GPL-3.0-or-later"
+depends="modemmanager callaudiod"
+makedepends="
+	callaudiod-dev
+	evolution-data-server-dev
+	feedbackd-dev
+	folks-dev
+	gettext-dev
+	gobject-introspection-dev
+	gom-dev
+	gsound-dev
+	gstreamer-dev
+	gtk+3.0-dev
+	libhandy1-dev
+	libpeas-dev
+	meson
+	modemmanager-dev
+	ninja
+	sofia-sip-dev
+	vala
+	"
+subpackages="$pkgname-lang"
+source="https://gitlab.gnome.org/GNOME/calls/-/archive/$pkgver/calls-$pkgver.tar.gz"
+options="!check" # Requires running Wayland compositor
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+sha512sums="
+6fdc8ad1c4fe3c38db1f4772e9dba2c3e7ee744a0ddb5b553c32f75be4fc8dde2cee15694f3027ec5dbaed10b36ef85a7f056e0fd6f91d1b26655a56f09c9c5d  calls-41.0.tar.gz
+"

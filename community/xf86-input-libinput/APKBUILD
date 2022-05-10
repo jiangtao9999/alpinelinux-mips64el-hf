@@ -1,0 +1,36 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=xf86-input-libinput
+pkgver=1.2.0
+pkgrel=1
+pkgdesc="X.Org input driver based on libinput"
+url="https://xorg.freedesktop.org"
+arch="all"
+license="MIT"
+depends_dev="libinput-dev xorg-server-dev"
+makedepends="$depends_dev eudev-dev xorgproto"
+subpackages="$pkgname-dev $pkgname-doc"
+source="https://www.x.org/releases/individual/driver/xf86-input-libinput-$pkgver.tar.bz2"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+ebff9490d33fd7495df2e03203060a76b3274f0e638bc92f3d95257fac57cdb9dac308e90e54006fe9522b6de3b1f1c38fd5f0b0b75b7051e5422290f43de52d  xf86-input-libinput-1.2.0.tar.bz2
+"

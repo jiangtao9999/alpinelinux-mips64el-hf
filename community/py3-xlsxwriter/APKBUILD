@@ -1,0 +1,35 @@
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=py3-xlsxwriter
+_pyname=XlsxWriter
+pkgver=3.0.2
+pkgrel=0
+pkgdesc="A Python module for creating Excel XLSX files"
+url="https://github.com/jmcnamara/XlsxWriter"
+arch="noarch"
+license="BSD-2-Clause"
+depends="python3"
+makedepends="py3-setuptools py3-packaging"
+checkdepends="py3-pytest"
+source="$pkgname-$pkgver.tar.gz::https://github.com/jmcnamara/XlsxWriter/archive/RELEASE_$pkgver.tar.gz"
+
+builddir="$srcdir"/$_pyname-RELEASE_$pkgver
+
+replaces=py-xlsxwriter # Backwards compatibility
+provides=py-xlsxwriter=$pkgver-r$pkgrel # Backwards compatibility
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	py.test-3
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+790eb7fb93d25987adf5d30bfa28e0fa137f809dc9a293edfe86105e0a948263759df85b5a0f9fb19b89c256a33b5b68179d95a210964b6f82345972ee9e6108  py3-xlsxwriter-3.0.2.tar.gz
+"

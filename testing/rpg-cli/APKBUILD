@@ -1,0 +1,27 @@
+# Contributor: Michał Polański <michal@polanski.me>
+# Maintainer: Michał Polański <michal@polanski.me>
+pkgname=rpg-cli
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Your filesystem as a dungeon!"
+url="https://github.com/facundoolano/rpg-cli"
+license="MIT"
+arch="all !s390x !mips64 !riscv64" # blocked by rust/cargo
+makedepends="cargo"
+source="https://github.com/facundoolano/rpg-cli/archive/$pkgver/rpg-cli-$pkgver.tar.gz"
+
+build() {
+	cargo build --release --locked
+}
+
+check() {
+	cargo test --release --locked
+}
+
+package() {
+	install -Dm755 target/release/rpg-cli "$pkgdir"/usr/bin/rpg-cli
+}
+
+sha512sums="
+798d6926446e09ff81b12e9e1e181270e1b529a6fcb4ad26f6857c7ee6fbb6a47ec4690bd944a74c57c519acfb9b2eb2eb3ae97fe5f41f45ebfc7444f34e3500  rpg-cli-1.0.0.tar.gz
+"

@@ -1,0 +1,34 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=mce-dev
+pkgver=1.29.0
+pkgrel=0
+pkgdesc="Mers mce-dev"
+url="https://github.com/sailfishos/mce-dev"
+arch="noarch"
+license="LGPL-2.1-or-later"
+makedepends="
+	doxygen
+	qt5-qtbase-dev
+	"
+subpackages="$pkgname-doc"
+source="https://github.com/sailfishos/mce-dev/archive/$pkgver/mce-dev-$pkgver.tar.gz"
+options="!check" # No test suite available
+
+build() {
+	make
+	make doc
+}
+
+package() {
+	DESTDIR="$pkgdir" make install
+}
+
+doc() {
+	install -dm755 "$subpkgdir"/usr/share/doc/$pkgname
+	mv "$builddir"/doc/html "$subpkgdir"/usr/share/doc/$pkgname/
+}
+
+sha512sums="
+653af424eaa25e462c08aed5f923a712a34d6efead9dbc345fd3d0fb4412220d2e1bd19662da73741ce814381e219407682f54accf40bd1a68549bddda6f2aba  mce-dev-1.29.0.tar.gz
+"

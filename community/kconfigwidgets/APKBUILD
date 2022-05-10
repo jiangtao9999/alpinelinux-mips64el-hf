@@ -1,0 +1,50 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kconfigwidgets
+pkgver=5.88.0
+pkgrel=0
+pkgdesc="Widgets for KConfig"
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://community.kde.org/Frameworks"
+license="LGPL-2.1-only AND LGPL-2.1-or-later"
+depends_dev="
+	kauth-dev
+	kcodecs-dev
+	kconfig-dev
+	kcoreaddons-dev
+	kguiaddons-dev
+	ki18n-dev
+	kwidgetsaddons-dev
+	"
+makedepends="$depends_dev
+	doxygen
+	extra-cmake-modules
+	kdoctools-dev
+	qt5-qttools-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/kconfigwidgets-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_QCH=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+cbc4af1f19509325528cef138746b081552547bbbd5c741dada8d9b58e6d510eb3611867335d94b892d42fa1eb771f0ab4b93c56014cede65bf6769cf10b5a3e  kconfigwidgets-5.88.0.tar.xz
+"

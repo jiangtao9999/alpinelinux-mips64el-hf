@@ -1,0 +1,56 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=parley
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# ppc64le, s390x, mips64 and riscv64 blocked by qt5-qtwebengine
+arch="all !armhf !ppc64le !s390x !mips64 !riscv64"
+url="https://kde.org/applications/education/org.kde.parley"
+pkgdesc="Vocabulary Trainer"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	extra-cmake-modules
+	kcmutils-dev
+	kconfig-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kdoctools-dev
+	ki18n-dev
+	kio-dev
+	knewstuff-dev
+	knotifications-dev
+	kross-dev
+	kxmlgui-dev
+	libkeduvocdocument-dev
+	libxml2-dev
+	libxslt-dev
+	qt5-qtbase-dev
+	qt5-qtmultimedia-dev
+	qt5-qtwebengine-dev
+	sonnet-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/parley-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+5bfb0d44c8a3d0d62d0c9446e99c9c36173916c62b8d02c33eced4e3440fe9c19392515df837f00b132aa320c6df8a7ac78c2873e21e2ad4d90d03664c998a7b  parley-21.08.3.tar.xz
+"

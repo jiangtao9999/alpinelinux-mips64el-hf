@@ -1,0 +1,41 @@
+# Contributor: Clayton Craft <clayton@craftyguy.net>
+# Maintainer: Clayton Craft <clayton@craftyguy.net>
+pkgname=vvmplayer
+pkgver=1.3
+pkgrel=0
+pkgdesc="front end GUI to display, play, and delete visual voicemails"
+url="https://gitlab.com/kop316/vvmplayer"
+arch="all !s390x !mips64 !riscv64" # no libhandy1
+license="GPL-3.0-only"
+makedepends="
+	evolution-data-server-dev
+	callaudiod-dev
+	glib-dev
+	gst-plugins-base-dev
+	gstreamer-dev
+	gtk+3.0-dev
+	libhandy1-dev
+	meson
+	"
+checkdepends="xvfb-run"
+depends="gst-plugins-ugly gst-plugins-good gst-libav vvmd"
+subpackages="$pkgname-lang $pkgname-bash-completion"
+source="https://gitlab.com/kop316/vvmplayer/-/archive/$pkgver/vvmplayer-$pkgver.tar.gz"
+
+build() {
+	abuild-meson \
+		--sysconfdir=/etc \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	xvfb-run meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+sha512sums="
+34e7e288f571b885d651427f68fd65ed9f28e0b808f8165abada64df8d1c3d52ce6e81adb05f7aa16ef1d57a34faf37c8f296aff996de26642fa519047a0df2e  vvmplayer-1.3.tar.gz
+"

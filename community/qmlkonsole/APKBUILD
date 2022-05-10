@@ -1,0 +1,41 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=qmlkonsole
+pkgver=21.08
+pkgrel=0
+pkgdesc="Terminal app for Plasma Mobile"
+# armhf blocked by extra-cmake-modules
+arch="all !armhf"
+url="https://invent.kde.org/plasma-mobile/qmlkonsole"
+license="GPL-3.0-or-later"
+depends="
+	qmltermwidget
+	kirigami2
+	"
+makedepends="
+	extra-cmake-modules
+	ki18n-dev
+	kirigami2-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	qt5-qtquickcontrols2-dev
+	qt5-qtsvg-dev
+	"
+source="https://download.kde.org/stable/plasma-mobile/$pkgver/qmlkonsole-$pkgver.tar.xz"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+79e5495f7bedc36e3edaf2a128387d45dd48826d73f0291772b35c2ae65165245c6668f2ef47996d7473cfe1480d57cb037e5018fc45bbe79eefdbcb1668069c  qmlkonsole-21.08.tar.xz
+"

@@ -1,0 +1,56 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kpat
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="KPatience offers a selection of solitaire card games"
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://kde.org/applications/games/kpat/"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	black-hole-solver-dev
+	extra-cmake-modules
+	freecell-solver-dev
+	kcompletion-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kdbusaddons-dev
+	kdoctools-dev
+	kguiaddons-dev
+	ki18n-dev
+	kio-dev
+	knewstuff-dev
+	kwidgetsaddons-dev
+	kxmlgui-dev
+	libkdegames-dev
+	qt5-qtbase-dev
+	qt5-qtsvg-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kpat-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+6f5ed7bb6ed172c9da2a58cfb41c0662ced56a4b854d046bfa2d344fb39a642d9de0f693280c83092f3a10f9bfb4307a2b53bdfefd0b9ebc14a27189bba6664c  kpat-21.08.3.tar.xz
+"

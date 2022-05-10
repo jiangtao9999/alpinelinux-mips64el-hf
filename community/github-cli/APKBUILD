@@ -1,0 +1,58 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Contributor Andrei Jiroh Eugenio Halili <ajhalili2006@gmail.com>
+# Maintainer: Andrei Jiroh Eugenio Halili <ajhalili2006@gmail.com>
+pkgname=github-cli
+pkgver=2.2.0
+pkgrel=1
+pkgdesc="CLI for dealing with GitHub"
+options="net chmod-clean" # Need to fetch modules and clean them up
+url="https://cli.github.com"
+arch="all"
+license="MIT"
+depends="git"
+makedepends="go"
+subpackages="
+	$pkgname-doc
+	$pkgname-bash-completion
+	$pkgname-zsh-completion
+	"
+source="https://github.com/cli/cli/archive/v$pkgver/github-cli-$pkgver-$pkgver.tar.gz
+	"
+builddir="$srcdir/cli-$pkgver"
+
+prepare() {
+	default_prepare
+
+	# TODO: These tests invoke the TTY and our container *really* does not like that
+	# Copied from https://github.com/archlinux/svntogit-community/blob/packages/github-cli/trunk/PKGBUILD
+	rm pkg/cmd/auth/login/login_test.go
+}
+
+build() {
+	CGO_CPPFLAGS="$CPPFLAGS" \
+	CGO_CFLAGS="$CFLAGS" \
+	CGO_CXXFLAGS="$CXXFLAGS" \
+	CGO_LDFLAGS="$LDFLAGS" \
+	\
+	make GH_VERSION="v$pkgver" bin/gh manpages
+	bin/gh completion -s bash | install -Dm0644 /dev/stdin \
+		share/bash-completion/completions/gh
+	bin/gh completion -s zsh | install -Dm0644 /dev/stdin \
+		share/zsh/site-functions/_gh
+}
+
+check() {
+	go test -v ./...
+}
+
+package() {
+	install -Dm755 bin/gh "$pkgdir"/usr/bin/gh
+
+	mkdir -p "$pkgdir"/usr
+	cp -r share "$pkgdir"/usr
+}
+
+
+sha512sums="
+b54fc2e7cc0ccb458a4f93a304a4fc03416f42604b4782571be940cf32da58d5b65c8b65f552e04d3b0b6bbc25b5604922f1a8c4b87a8d9e7f4a83b6c7a30baf  github-cli-2.2.0-2.2.0.tar.gz
+"

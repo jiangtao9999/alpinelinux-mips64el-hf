@@ -1,0 +1,33 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Fabian Affolter <fabian@affolter-engineering.ch>
+pkgname=py3-enchant
+pkgver=3.2.1
+pkgrel=0
+pkgdesc="Spellchecking library for Python"
+url="https://github.com/pyenchant/pyenchant"
+arch="noarch"
+license="LGPL-2.0-or-later"
+depends="enchant2 python3"
+makedepends="py3-setuptools"
+checkdepends="py3-pytest aspell-en"
+source="$pkgname-$pkgver.tar.gz::https://github.com/pyenchant/pyenchant/archive/v$pkgver.tar.gz"
+builddir="$srcdir"/pyenchant-$pkgver
+
+replaces="py-enchant" # Backwards compatibility
+provides="py-enchant=$pkgver-r$pkgrel" # Backwards compatibility
+
+build() {
+	python3 setup.py build
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+check() {
+	python3 -m pytest
+}
+
+sha512sums="
+3d1229307b070fa83bd8a287a787b40edfba31e748ca37a94f71caa4b355a9de829f3133db9772a57f0aa922fbd4f32c67c986e86c8905633b3940dd20be32ed  py3-enchant-3.2.1.tar.gz
+"

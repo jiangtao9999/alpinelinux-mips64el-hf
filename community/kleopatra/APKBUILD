@@ -1,0 +1,38 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kleopatra
+pkgver=21.08.3
+pkgrel=0
+# riscv64 disabled due to missing rust in recursive dependency
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://www.kde.org/applications/utilities/kleopatra/"
+pkgdesc="Certificate Manager and Unified Crypto GUI"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+depends="gnupg pinentry-qt"
+makedepends="extra-cmake-modules qt5-qtbase-dev kcmutils-dev kwidgetsaddons-dev kconfigwidgets-dev kcoreaddons-dev kcodecs-dev kconfig-dev ki18n-dev kiconthemes-dev kitemmodels-dev kxmlgui-dev kwindowsystem-dev kdoctools-dev kcrash-dev kdoctools-dev kdbusaddons-dev gpgme-dev qgpgme libkleo-dev kmime-dev libassuan-dev boost-dev"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kleopatra-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+
+	# kuniqueservicetest requires running dbus
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest -E "kuniqueservicetest"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="
+b29333dd8d9f47b550b553e487ef1cf854cfd8ee18cbd77ffeaabc68c7314e3f06a013037a109dc03d4ddf591b894478d05f35598332c094731a725c80e69731  kleopatra-21.08.3.tar.xz
+"

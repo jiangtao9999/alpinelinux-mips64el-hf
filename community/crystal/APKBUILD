@@ -1,0 +1,147 @@
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Contributor: Milan P. Stanić <mps@arvanta.net>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=crystal
+pkgver=1.2.2
+pkgrel=0
+_bootver=1.2.0
+_llvmver=12
+pkgdesc="The Crystal Programming Language"
+url="https://crystal-lang.org/"
+arch="x86_64 aarch64"
+license="Apache-2.0"
+depends="
+	gc-dev
+	gcc
+	gmp-dev
+	libatomic_ops
+	libevent-dev
+	libevent-static
+	musl-dev
+	pcre-dev
+	"
+checkdepends="
+	openssl1.1-compat-dev
+	tzdata
+	yaml-dev
+	zlib-dev
+	"
+makedepends="
+	libxml2-dev
+	llvm$_llvmver-dev
+	llvm$_llvmver-static
+	zlib-static
+	"
+subpackages="$pkgname-doc
+	$pkgname-bash-completion:bashcomp:noarch
+	$pkgname-zsh-completion:zshcomp:noarch
+	"
+source="$pkgname-$pkgver.tar.gz::https://github.com/crystal-lang/$pkgname/archive/$pkgver.tar.gz
+	https://dev.alpinelinux.org/archive/crystal/crystal-$_bootver-x86_64-alpine-linux-musl.tar.gz
+	https://dev.alpinelinux.org/archive/crystal/crystal-$_bootver-aarch64-alpine-linux-musl.tar.gz
+	fix-crystal-sh.patch
+	"
+builddir="$srcdir/$pkgname-$pkgver"
+
+_coredir="/usr/lib/$pkgname/core"
+_shardsdir="/usr/lib/$pkgname/shards"
+
+export CRYSTAL_CONFIG_VERSION="$pkgver"
+export CRYSTAL_CACHE_DIR="$srcdir/.cache"
+export LLVM_CONFIG="/usr/lib/llvm$_llvmver/bin/llvm-config"
+
+# Build static crystal binary and upload it to dev.a.o, so it can be used
+# for building crystal next time (needed for bootstrapping).
+# NOTE: After https://github.com/crystal-lang/crystal/issues/5689 is fixed,
+# we can also use prebuilt binary from upstream if needed.
+snapshot() {
+	local binary="$builddir/.build/crystal"
+	local tarname="$pkgname-$pkgver-$CTARGET"
+
+	if [ ! -f "$binary" ] || ! file "$binary" | grep -qw 'statically linked'; then
+		msg "Building statically linked crystal..."
+		BUILD_STATIC=1 abuild clean deps unpack prepare build
+	fi
+
+	cd "$srcdir"
+
+	strip "$builddir"/.build/crystal
+	install -D -m 755 "$builddir"/.build/crystal "$tarname"/bin/crystal
+	tar -czf "$tarname.tar.gz" "$tarname"
+
+	msg "Uploading $tarname.tar.gz to dev.alpinelinux.org"
+	scp "$tarname.tar.gz" dev.alpinelinux.org:/archive/$pkgname/
+
+	APKBUILD="../APKBUILD" abuild undeps
+}
+
+prepare() {
+	default_prepare
+
+	# FIXME: These specs fail with invalid memory access.
+	rm spec/compiler/compiler_spec.cr
+
+	cat > Makefile.local <<-EOF
+		progress = 1
+		threads = ${JOBS:-2}
+		verbose = 1
+		FLAGS = --verbose --target $CTARGET ${BUILD_STATIC:+"--link-flags=-no-pie"}
+		LLVM_CONFIG = $LLVM_CONFIG
+	EOF
+}
+
+build() {
+	make crystal \
+		CRYSTAL_CONFIG_BUILD_COMMIT= \
+		CRYSTAL_CONFIG_PATH="lib:$_shardsdir:$_coredir" \
+		PATH="$srcdir/$pkgname-$_bootver-$CBUILD/bin:$PATH" \
+		release=1 \
+		static=${BUILD_STATIC:-}
+}
+
+check() {
+	make std_spec threads=1 SPEC_FLAGS='--no-color --verbose'
+
+	find samples -name '*.cr' | xargs -tn 1 ./bin/crystal build --no-codegen
+
+	# Takes ~1 hour on x86_64, ~1.5 hour on aarch64.
+	#make compiler_spec threads=1 SPEC_FLAGS='--no-color --verbose'
+}
+
+package() {
+	install -D -m 755 .build/crystal "$pkgdir"/usr/bin/crystal
+	install -D -m 644 man/crystal.1 "$pkgdir"/usr/share/man/man1/crystal.1
+
+	mkdir -p "$pkgdir$_coredir" "$pkgdir$_shardsdir"
+	cp -r src/* "$pkgdir$_coredir"/
+
+	cd "$pkgdir$_coredir"
+	rm llvm/ext/llvm_ext.o
+}
+
+bashcomp() {
+	pkgdesc="Bash completions for $pkgname"
+	depends=""
+	install_if="$pkgname=$pkgver-r$pkgrel bash-completion"
+
+	cd "$builddir"
+	install -D -m 644 etc/completion.bash \
+		"$subpkgdir"/usr/share/bash-completion/completions/$pkgname
+}
+
+zshcomp() {
+	pkgdesc="ZSH completions for $pkgname"
+	depends=""
+	install_if="$pkgname=$pkgver-r$pkgrel zsh"
+
+	cd "$builddir"
+	install -D -m 644 etc/completion.zsh \
+		"$subpkgdir"/usr/share/zsh/site-functions/_$pkgname
+}
+
+sha512sums="
+855f9c103f05d1ebb03d146d93362849a15ea67a64c993219f7c66438585b590caa53a9482daf81810920b39795c9f5c3e2a0caf316b3d62826e2540fd5fb60e  crystal-1.2.2.tar.gz
+abcf4170bd2d9a687b7aeac6940f0ccdf4c2ddd6ea8e8a7cc06924dbaffbd04e7189ffaf21b0bcc20f552c4ef131c6ef36581b4e5d91a355016fb5116b6a1dba  crystal-1.2.0-x86_64-alpine-linux-musl.tar.gz
+d6d06bbfaeaee9e52a32d914f6cf6cfdff10d03a53dddc8ffb0440a735d23f4d87e37f0f4245059f96ccc1a113ac3d2a6b16f85a4db5877559fe15a3f5e951f7  crystal-1.2.0-aarch64-alpine-linux-musl.tar.gz
+2ba9e26eb1e6d20681e7f2ad78e0ebd75ae0dc614624c8de90c918046d0451f43173a23981dbebb47d1da2cf58663e8b1169d7f32799b054fc0f6a6cb112b7c5  fix-crystal-sh.patch
+"

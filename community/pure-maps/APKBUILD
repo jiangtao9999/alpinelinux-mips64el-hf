@@ -1,0 +1,77 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Contributor: Newbyte <newbytee@protonmail.com>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=pure-maps
+pkgver=2.8.0
+pkgrel=0
+pkgdesc="Maps and navigation"
+url="https://github.com/rinigus/pure-maps"
+# armhf blocked by mapbox-gl-qml -> qt5-qtdeclarative-dev
+# s390x, mips64 blocked by mimic1
+# riscv64 blocked by luajit -> osmscout-server
+arch="all !armhf !s390x !mips64 !riscv64"
+license="GPL-3.0-or-later"
+depends="
+	geoclue
+	kirigami2
+	mapbox-gl-qml
+	mimic1
+	nemo-qml-plugin-dbus
+	osmscout-server
+	py3-gpxpy
+	py3-pyotherside
+	qml-module-clipboard
+	qmlrunner
+	qt5-qtbase-sqlite
+	qt5-qtmultimedia
+	qt5-qtsensors
+	"
+makedepends="
+	cmake
+	gettext
+	py3-pyflakes
+	python3
+	qt5-qtbase-dev
+	qt5-qtlocation-dev
+	qt5-qtquickcontrols2-dev
+	qt5-qttools-dev
+	qtchooser
+	s2geometry-dev
+	"
+checkdepends="py3-pytest"
+subpackages="$pkgname-lang"
+source="https://github.com/rinigus/pure-maps/releases/download/$pkgver/pure-maps-$pkgver.tar.gz"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DFLAVOR="kirigami" \
+		-DDEFAULT_PROFILE="offline" \
+		-DDEFAULT_FONTPROVIDER="osmscout"
+	cmake --build build
+}
+
+check() {
+	# Disabled as they require API keys to be present and/or an internet connection
+	pytest geocoders guides poor routers \
+		-k 'not test_geocode and not test_autocomplete_type and not test_nearby and not test_get and not test_autocomplete'
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+
+	# Locales get installed to the wrong location and thus have to be moved
+	# to get picked up by abuild lang()
+	mv "$pkgdir"/usr/share/pure-maps/locale "$pkgdir"/usr/share
+}
+
+lang() {
+	default_lang
+
+	amove usr/share/pure-maps/translations
+}
+
+sha512sums="
+4e0365b2bc58173c4867119cf621a83c28f55027d8da3ed04dafcc1b44150b49eb57a719e96632f103003cac7936d4f7a2b7eae6aab660169ca7aefb3c9ab58b  pure-maps-2.8.0.tar.gz
+"

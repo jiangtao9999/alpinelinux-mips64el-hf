@@ -1,0 +1,79 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=krita
+pkgver=4.4.8
+pkgrel=0
+# armhf and armv7 blocked by build failures
+arch="all !armv7 !armhf"
+url="https://krita.org/"
+pkgdesc="Free digital painting application. Digital Painting, Creative Freedom!"
+license="GPL-2.0-or-later"
+makedepends="
+	boost-dev
+	eigen-dev
+	exiv2-dev
+	extra-cmake-modules
+	fftw-dev
+	giflib-dev
+	gsl-dev
+	karchive-dev
+	kcompletion-dev
+	kconfig-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kguiaddons-dev
+	ki18n-dev
+	kitemmodels-dev
+	kitemviews-dev
+	kwidgetsaddons-dev
+	kwindowsystem-dev
+	lcms2-dev
+	libheif-dev
+	libjpeg-turbo-dev
+	libraw-dev
+	libxi-dev
+	openexr-dev
+	poppler-qt5-dev
+	py3-qt5
+	python3-dev
+	qt5-qtbase-dev
+	qt5-qtmultimedia-dev
+	qt5-qtsvg-dev
+	qt5-qttools-dev
+	quazip-dev
+	tiff-dev
+	xcb-util-dev
+	zlib-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/krita/$pkgver/krita-$pkgver.tar.gz
+	boost-1750.patch
+	openexr-3.patch
+	"
+subpackages="$pkgname-lang"
+options="!check" # Breaks compilation on Musl https://bugs.kde.org/show_bug.cgi?id=412058
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_KRITA_QT_DESIGNER_PLUGINS=ON \
+		-DBUILD_TESTING=OFF
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+53b9814fcf61fbaee06e81f456aa9de7ab09df99e04932251984c8ae190248e48fa20762bdb7be503ea267e1fb835095b105ce4bf2078fd510ab5a8ef6d82f81  krita-4.4.8.tar.gz
+2872edaa5acd227a851b4f87844d978d2860fb7b30434b7ebd255a4d50bdc32f9d576440db0cae6e450e2d41aac4676f5adc902bda67f0aa02a1c82071f24317  boost-1750.patch
+b022d871c1915904a25590a0ab65fe4c537e395f74334759cde78a16ff9b6d0ef803031c9b1f7153520cc3ee462d9c2c58d8f79d38d0fffd88b9e0ef3ef6d23e  openexr-3.patch
+"

@@ -1,0 +1,32 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=breeze-icons
+pkgver=5.88.0
+pkgrel=0
+pkgdesc="Breeze icon themes"
+arch="noarch !armhf" # armhf blocked by extra-cmake-modules
+url="https://community.kde.org/Frameworks"
+license="LGPL-3.0-or-later"
+makedepends="extra-cmake-modules qt5-qtbase-dev"
+checkdepends="bash"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/breeze-icons-$pkgver.tar.xz"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DBINARY_ICONS_RESOURCE=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest -E '(dupe|symlink)'
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+e66ee04a2e073fe954e97dfd377581715313a041d62740eda7c4b599fd6785ca241f58508afafcb2fb3a8803df72f5e451a213dff7329f6beca87197e8e1f00d  breeze-icons-5.88.0.tar.xz
+"

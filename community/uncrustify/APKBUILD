@@ -1,0 +1,34 @@
+# Maintainer: André Klitzing <aklitzing@gmail.com>
+pkgname=uncrustify
+pkgver=0.74.0
+pkgrel=0
+pkgdesc="Source code beautifier"
+url="https://github.com/uncrustify/uncrustify"
+arch="all"
+license="GPL-2.0-or-later"
+makedepends="cmake python3"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/uncrustify/uncrustify/archive/uncrustify-$pkgver.tar.gz"
+builddir="$srcdir/uncrustify-uncrustify-$pkgver"
+
+build() {
+	cmake -B build . \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	cmake --build build
+}
+
+check() {
+	cd build
+	ctest --output-on-failure
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+
+	install -Dm644 etc/*.cfg -t "$pkgdir"/usr/share/$pkgname
+}
+
+sha512sums="
+97348bf151464e12e292a38dfdbb98d62c15bdd7dd990da7c8854969ceb53d6f70a0873a6e09b9978291010615dda29c3486a4e8a77dc1bfb881c34df01143c5  uncrustify-0.74.0.tar.gz
+"

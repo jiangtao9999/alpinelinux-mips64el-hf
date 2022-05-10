@@ -1,0 +1,37 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=feedbackd
+pkgver=0_git20211018
+pkgrel=0
+pkgdesc="A daemon to provide haptic (and later more) feedback on events"
+url="https://source.puri.sm/Librem5/feedbackd"
+arch="all"
+license="GPL-3.0-or-later"
+depends="dbus feedbackd-device-themes"
+makedepends="meson glib-dev gsound-dev libgudev-dev json-glib-dev gtk-doc
+	vala gobject-introspection-dev"
+subpackages="$pkgname-dev $pkgname-doc"
+source="https://source.puri.sm/Librem5/feedbackd/-/archive/v0.0.0+${pkgver#0_}/feedbackd-v0.0.0+${pkgver#0_}.tar.gz"
+builddir="$srcdir/$pkgname-v0.0.0+${pkgver#0_}"
+install="$pkgname.pre-install $pkgname.pre-upgrade"
+
+build() {
+	abuild-meson \
+		-Dgtk_doc=true \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+	install -Dm644 "$builddir"/debian/feedbackd.udev \
+		"$pkgdir"/usr/lib/udev/rules.d/90-feedbackd.rules
+}
+
+sha512sums="
+0bb0b27cd6befcca29d2c7f260419a3f2079ccf432454f6fb1ce85be8709c2f05d8fdfc5f0ef948efd49b30e7bac4ebcf744e94fd8bd7f9262ae55359b85ffa9  feedbackd-v0.0.0+git20211018.tar.gz
+"

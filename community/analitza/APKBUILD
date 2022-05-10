@@ -1,0 +1,43 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=analitza
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x blocked by qt5-qtbase-x11
+arch="all !armhf !s390x"
+url="https://edu.kde.org/"
+pkgdesc="A library to add mathematical features to your program"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	eigen-dev
+	extra-cmake-modules
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	qt5-qtsvg-dev
+	qt5-qttools-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/analitza-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="
+ee333dfba8e7e35747b4eb6474641a4bd8f55a8466aa70053ab9521402183115def32e7707bfa2ddfc2ebea401f49effd5904265952a1b3abb242f917806bc11  analitza-21.08.3.tar.xz
+"

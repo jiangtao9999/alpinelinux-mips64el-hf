@@ -1,0 +1,35 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Maintainer:
+pkgname=esptool
+pkgver=3.1
+pkgrel=1
+pkgdesc="ESP8266 and ESP32 serial bootloader utility"
+options="!check" # tests require older version of pycodestyle
+url="https://github.com/espressif/esptool"
+arch="noarch"
+license="GPL-2.0-or-later"
+depends="python3 py3-pyserial py3-ecdsa py3-pyaes"
+makedepends="py3-setuptools"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/espressif/esptool/archive/v$pkgver.tar.gz"
+
+prepare() {
+	default_prepare
+	sed "/\['wheel'\]/d" -i setup.py
+}
+
+build() {
+	python3 setup.py build
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+
+	mkdir -p "$pkgdir"/usr/share/doc/$pkgname/
+	install -m644 CONTRIBUTING.md README.md \
+		"$pkgdir"/usr/share/doc/$pkgname/
+}
+
+sha512sums="
+5edaaa376932acc9e7ba717fe931ec1e14b80d1eee415fcef4c69b30b375cd61887ac52a20dd1001d215b8d739019d6b9f624d294d8d76ff112e630d52f7f15b  esptool-3.1.tar.gz
+"

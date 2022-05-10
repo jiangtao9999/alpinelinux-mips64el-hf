@@ -1,0 +1,38 @@
+# Contributor: Andy Postnikov <apostnikov@gmail.com>
+# Maintainer: Andy Postnikov <apostnikov@gmail.com>
+
+pkgname=php8-pecl-pcov
+_extname=pcov
+pkgver=1.0.9
+pkgrel=0
+pkgdesc="Code coverage driver for PHP 8 - PECL"
+url="https://pecl.php.net/package/pcov"
+arch="all"
+license="PHP-3.01"
+depends="php8-common"
+makedepends="php8-dev"
+source="php-pecl-$_extname-$pkgver.tgz::https://pecl.php.net/get/$_extname-$pkgver.tgz"
+builddir="$srcdir"/$_extname-$pkgver
+
+build() {
+	phpize8
+	./configure --prefix=/usr --with-php-config=php-config8
+	make
+}
+
+check() {
+	php8 -dextension=modules/$_extname.so --ri $_extname
+	make NO_INTERACTION=1 REPORT_EXIT_STATUS=1 test TESTS=--show-diff
+}
+
+package() {
+	make INSTALL_ROOT="$pkgdir" install
+
+	local _confdir="$pkgdir"/etc/php8/conf.d
+	mkdir -p $_confdir
+	echo "extension=$_extname" > $_confdir/$_extname.ini
+}
+
+sha512sums="
+71e24ee387970d344b6a05317c24dc47d4fb9bb76a1116976c417e5cb558db2c6208e8bbc14aa3aa50b72dff1e150e08a228bbabe8c2c8de839a5791701f55ad  php-pecl-pcov-1.0.9.tgz
+"

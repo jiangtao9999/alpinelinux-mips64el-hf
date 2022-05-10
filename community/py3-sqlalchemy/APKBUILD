@@ -1,0 +1,34 @@
+# Contributor: Drew DeVault <sir@cmpwn.com>
+# Maintainer: Drew DeVault <sir@cmpwn.com>
+pkgname=py3-sqlalchemy
+pkgver=1.4.26
+pkgrel=0
+pkgdesc="object relational mapper for Python"
+url="https://pypi.python.org/pypi/SQLAlchemy"
+arch="all"
+license="MIT"
+makedepends="python3-dev py3-setuptools"
+checkdepends="
+	py3-pytest py3-mock py3-pytest-xdist py3-greenlet
+"
+source="https://files.pythonhosted.org/packages/source/S/SQLAlchemy/SQLAlchemy-$pkgver.tar.gz"
+builddir="$srcdir/SQLAlchemy-$pkgver"
+
+replaces="py-sqlalchemy" # Backwards compatibility
+provides="py-sqlalchemy=$pkgver-r$pkgrel" # Backwards compatibility
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	pytest-3 -n $JOBS
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+0289bfc61391e330a8b3df0876727947c6ebd55b54922d3c6107e47a1da27fd6bf7087edbf259e1ef8e7359f53c73d833185f0bc72d307defdb56560bbb21902  SQLAlchemy-1.4.26.tar.gz
+"

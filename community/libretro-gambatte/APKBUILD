@@ -1,0 +1,23 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-gambatte
+pkgver=0_git20210325
+pkgrel=0
+_commit="d7adc32658b9a3204422f075361f3315edc5d274"
+pkgdesc="libretro implementation of libgambatte"
+url="https://github.com/libretro/gambatte-libretro"
+arch="all"
+license="GPL-2.0-only"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/gambatte-libretro/archive/$_commit.tar.gz"
+builddir="$srcdir/gambatte-libretro-$_commit"
+options="!check" # No tests
+
+build() {
+	make -f Makefile.libretro
+}
+
+package() {
+	install -Dm644 gambatte_libretro.so "$pkgdir"/usr/lib/libretro/gambatte_libretro.so
+}
+
+sha512sums="19379b20afb80de4dbd47ee161912ede4edb3cc554acd61f52b1ca2a7003908dd81d1b7051e6ceba50e1b77d4556280691af5f6dd7610f9d0990f3e70b3f4690  libretro-gambatte-d7adc32658b9a3204422f075361f3315edc5d274.tar.gz"

@@ -1,0 +1,83 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Contributor: Łukasz Jendrysik <scadu@yandex.com>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=mbedtls
+pkgver=2.16.10
+pkgrel=1
+pkgdesc="Light-weight cryptographic and SSL/TLS library"
+url="https://tls.mbed.org"
+arch="all"
+license="Apache-2.0"
+makedepends="cmake perl python3"
+subpackages="$pkgname-static $pkgname-dev $pkgname-utils"
+source="$pkgname-$pkgver.tar.gz::https://github.com/ARMmbed/mbedtls/archive/v$pkgver.tar.gz"
+
+# Track security issues
+# https://tls.mbed.org/security
+
+# secfixes:
+#   2.16.8-r0:
+#     - CVE-2020-16150
+#   2.16.6-r0:
+#     - CVE-2020-10932
+#   2.16.4-r0:
+#     - CVE-2019-18222
+#   2.16.3-r0:
+#     - CVE-2019-16910
+#   2.14.1-r0:
+#     - CVE-2018-19608
+#   2.12.0-r0:
+#     - CVE-2018-0498
+#     - CVE-2018-0497
+#   2.7.0-r0:
+#     - CVE-2018-0488
+#     - CVE-2018-0487
+#     - CVE-2017-18187
+#   2.6.0-r0:
+#     - CVE-2017-14032
+#   2.4.2-r0:
+#     - CVE-2017-2784
+
+prepare() {
+	default_prepare
+
+	# Enable flags for non-embedded systems.
+	sed -i \
+		-e 's|//\(#define MBEDTLS_THREADING_C\)|\1|' \
+		-e 's|//\(#define MBEDTLS_THREADING_PTHREAD\)|\1|' \
+		"$builddir"/include/mbedtls/config.h
+}
+
+build() {
+	cmake . \
+		-DCMAKE_BUILD_TYPE="MinSizeRel" \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
+		-DUSE_SHARED_MBEDTLS_LIBRARY=ON
+	make
+}
+
+check() {
+	make test
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+utils() {
+	pkgdesc="Utilities for mbedtls (including gen_key / cert_write)"
+
+	mkdir -p "$subpkgdir"/usr
+	mv "$pkgdir"/usr/bin "$subpkgdir"/usr/
+}
+
+static() {
+	pkgdesc="Static files for mbedtls"
+
+	mkdir -p "$subpkgdir"/usr/lib
+	mv "$pkgdir"/usr/lib/*.a "$subpkgdir"/usr/lib/
+	chmod -x "$subpkgdir"/usr/lib/*.a
+}
+
+sha512sums="9a2d7b5e786d7bc377c9fbf36322621b8873037e6f28d1ff16bd81650f87d421aaf1c34f8b8f1829c824710c63b2c262208dc3f242dac7f361c1d9607fe9933c  mbedtls-2.16.10.tar.gz"

@@ -1,0 +1,27 @@
+# Contributor: rahmanshaber <rahmanshaber@yahoo.com>
+# Maintainer: rahmanshaber <rahmanshaber@yahoo.com>
+pkgname=corehunt
+pkgver=4.2.0
+pkgrel=0
+pkgdesc="A file finder utility from C-Suite"
+arch="all"
+url="https://gitlab.com/cubocore"
+license="GPL-3.0-or-later"
+depends="qt5-qtsvg"
+makedepends="qt5-qtbase-dev libcprime-dev cmake ninja"
+source="$pkgname-$pkgver.tar.gz::https://gitlab.com/cubocore/corehunt/-/archive/v$pkgver/corehunt-v$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-v$pkgver"
+options="!check"
+
+build() {
+	cmake ../$pkgname-v$pkgver \
+		-GNinja \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	ninja
+}
+
+package() {
+	DESTDIR="$pkgdir" ninja install
+}
+sha512sums="e2d45e317947888b14213581d653047d261dc06ac6888e3f3dcf005cd837959250938b6eb3c10027ef018fe9a6878ab4115be61932a1f02255a637a2afef01cb  corehunt-4.2.0.tar.gz"

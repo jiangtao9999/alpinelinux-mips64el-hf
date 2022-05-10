@@ -1,0 +1,23 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-gpsp
+pkgver=0_git20210427
+pkgrel=0
+_commit="52088a4d10af9a8c0e95b0eb168d4dfd0a13639f"
+pkgdesc="gpSP for libretro"
+url="https://github.com/libretro/gpsp"
+arch="all"
+license="GPL-2.0-only"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/gpsp/archive/$_commit.tar.gz"
+builddir="$srcdir/gpsp-$_commit"
+options="!check" # No tests
+
+build() {
+	make
+}
+
+package() {
+	install -Dm644 gpsp_libretro.so "$pkgdir"/usr/lib/libretro/gpsp_libretro.so
+}
+
+sha512sums="286400ea7f538d085f21ff35f496b085115d4342979851e9e6a1c76d488d744cfa6201da1a29cf13213bdfc72e952db0ac5f9374e7126ec1c535387ccbe63863  libretro-gpsp-52088a4d10af9a8c0e95b0eb168d4dfd0a13639f.tar.gz"

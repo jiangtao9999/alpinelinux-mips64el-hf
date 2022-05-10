@@ -1,0 +1,104 @@
+# Contributor: Sergei Lukin <sergej.lukin@gmail.com>
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Contributor: Pierre-Gilas MILLON <pgmillon@gmail.com>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=libgit2
+pkgver=1.3.0
+pkgrel=0
+pkgdesc="linkable library for Git"
+url="https://libgit2.org/"
+arch="all"
+license="GPL-2.0-only WITH GCC-exception-2.0"
+depends_dev="curl-dev libssh2-dev http-parser-dev"
+makedepends_host="$depends_dev zlib-dev openssl1.1-compat-dev pcre-dev"
+makedepends_build="python3 cmake"
+subpackages="$pkgname-static $pkgname-dev $pkgname-tests::noarch"
+source="$pkgname-$pkgver.tar.gz::https://github.com/libgit2/libgit2/archive/v$pkgver.tar.gz
+	"
+
+# secfixes:
+#   0.28.4-r0:
+#     - CVE-2019-1348
+#     - CVE-2019-1349
+#     - CVE-2019-1350
+#     - CVE-2019-1351
+#     - CVE-2019-1352
+#     - CVE-2019-1353
+#     - CVE-2019-1354
+#     - CVE-2019-1387
+#   0.27.4-r0:
+#     - CVE-2018-15501
+#   0.27.3-r0:
+#     - CVE-2018-10887
+#     - CVE-2018-10888
+#   0.25.1-r0:
+#     - CVE-2016-10128
+#     - CVE-2016-10129
+#     - CVE-2016-10130
+#   0.24.3-r0:
+#     - CVE-2016-8568
+#     - CVE-2016-8569
+
+prepare() {
+	default_prepare
+	mkdir -p "$builddir"/build
+	sed -i 's|/usr/bin/env python|/usr/bin/env python3|' tests/generate.py
+
+	if [ "$CARCH" = "ppc64le" ]; then
+		# this test hangs
+		sed -i -E '/ADD_CLAR_TEST\(auth_clone /d' tests/CMakeLists.txt
+	fi
+}
+
+build() {
+	cd "$builddir"/build
+
+	cmake .. \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DUSE_HTTP_PARSER=system \
+		-DUSE_HTTPS=OpenSSL \
+		-DREGEX_BACKEND=pcre \
+		-DUSE_BUNDLED_ZLIB=OFF \
+		-DCMAKE_C_FLAGS="$CFLAGS"
+	make
+
+	# Build static library
+	mkdir -p "$builddir"/build-static
+	cd "$builddir"/build-static
+
+	cmake .. \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DUSE_HTTP_PARSER=system \
+		-DUSE_HTTPS=OpenSSL \
+		-DREGEX_BACKEND=pcre \
+		-DUSE_BUNDLED_ZLIB=OFF \
+		-DCMAKE_C_FLAGS="$CFLAGS" \
+		-DBUILD_SHARED_LIBS=OFF
+	make
+}
+
+check() {
+	cd "$builddir"/build
+	# Test 'offline' fails on s390x, aarch64 and ppc64le
+	ctest -E 'offline|online'
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+	make -C build-static DESTDIR="$pkgdir" install
+}
+
+tests() {
+	pkgdesc="$pkgdesc (tests)"
+
+	mkdir -p "$subpkgdir"/usr/src/$pkgname/
+	cp -a "$builddir"/tests "$subpkgdir"/usr/src/$pkgname/
+}
+
+sha512sums="
+842a648a67ff23ba9e6bf14b706ba9081164866e14000ebf3858442b7046925f05e1dbf00a7d740dc4bf32280e260730e23a9492e817094aa90736ae335ee76e  libgit2-1.3.0.tar.gz
+"

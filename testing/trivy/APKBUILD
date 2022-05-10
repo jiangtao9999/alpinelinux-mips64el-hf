@@ -1,0 +1,29 @@
+# Contributor: TBK <alpine@jjtc.eu>
+# Maintainer: TBK <alpine@jjtc.eu>
+pkgname=trivy
+pkgver=0.21.0
+pkgrel=0
+pkgdesc="Simple and comprehensive vulnerability scanner for containers"
+url="https://github.com/aquasecurity/trivy"
+arch="all"
+# s390x, mips64: tests SIGSEGV: https://github.com/aquasecurity/trivy/issues/430
+arch="$arch !s390x !mips !mips64"
+license="Apache-2.0"
+makedepends="btrfs-progs-dev go linux-headers lvm2-dev"
+source="https://github.com/aquasecurity/trivy/archive/v$pkgver/trivy-$pkgver.tar.gz"
+
+build() {
+	make build
+}
+
+check() {
+	make test
+}
+
+package() {
+	install -Dm755 $pkgname "$pkgdir"/usr/bin/$pkgname
+}
+
+sha512sums="
+32b5cd13aab6c71d224bf8c9e2ad6623c6464c612de4d4743aa502a26584c7567fa85e86b21bc214d76995edce42ff00850d82b7709d8466f26db8293b319924  trivy-0.21.0.tar.gz
+"

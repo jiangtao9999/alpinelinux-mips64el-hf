@@ -1,0 +1,29 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-tour
+pkgver=40.0
+pkgrel=0
+pkgdesc="GNOME Tour & Greeter"
+url="https://gitlab.gnome.org/GNOME/gnome-tour"
+# s390x, mips64 and riscv64 blocked by cargo
+arch="all !s390x !mips64 !riscv64"
+license="GPL-3.0-or-later"
+makedepends="meson cargo glib-dev gtk+3.0-dev libhandy1-dev"
+checkdepends="appstream-glib desktop-file-utils"
+subpackages="$pkgname-lang"
+source="https://download.gnome.org/sources/gnome-tour/${pkgver%.*}/gnome-tour-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="5d0d695422e8dace19e2e1a33d0ee8eebbf4d804622bc2f91b4367d5d8b3ba298b5da7dce2c34e2bb00ce06895172d4b9da3d34f80c8896d52af8b95339ae46e  gnome-tour-40.0.tar.xz"

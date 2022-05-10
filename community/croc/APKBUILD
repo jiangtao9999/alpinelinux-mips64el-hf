@@ -1,0 +1,34 @@
+# Contributor: André Klitzing <aklitzing@@gmail.com>
+# Maintainer: André Klitzing <aklitzing@gmail.com>
+pkgname=croc
+pkgver=9.5.0
+pkgrel=0
+pkgdesc="Easily and securely send things from one computer to another"
+url="https://github.com/schollz/croc"
+license="MIT"
+arch="all"
+makedepends="go"
+source="https://github.com/schollz/croc/releases/download/v$pkgver/croc_${pkgver}_src.tar.gz"
+
+# secfixes:
+#   9.1.0-r0:
+#     - CVE-2021-31603
+
+build() {
+	export CGO_LDFLAGS="$LDFLAGS"
+	export GOFLAGS="$GOFLAGS -trimpath -mod=vendor"
+	go mod vendor
+	go build
+}
+
+check() {
+	go test ./...
+}
+
+package() {
+	install -Dm755 -t "$pkgdir"/usr/bin croc
+}
+
+sha512sums="
+a12b47c1d6fc5ddeac903d7020d82cf21ba8d0efc3275c7282b7a9498632a1ec5b1032b840cc7a66435f17d224f7a499721166d6028594e1f2c59c8aa231a717  croc_9.5.0_src.tar.gz
+"

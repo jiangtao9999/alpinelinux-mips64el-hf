@@ -1,0 +1,49 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kidentitymanagement
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="KDE PIM libraries"
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://kontact.kde.org"
+license="LGPL-2.0-or-later"
+depends_dev="
+	kcodecs-dev
+	kcompletion-dev
+	kconfig-dev
+	kcoreaddons-dev
+	kiconthemes-dev
+	kio-dev
+	kpimtextedit-dev
+	ktextwidgets-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	"
+makedepends="$depends_dev extra-cmake-modules"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kidentitymanagement-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+
+	# kpimidentity-signaturetest is broken
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest -E "kpimidentity-signaturetest"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+dee3cbc245988de782d1502160eed9b284b0e4a2272fac6969f241e1905321197ec480f783ba1fbaeca6a86ec36e630093efdc2c26e4f764b386d2bc8d342dd8  kidentitymanagement-21.08.3.tar.xz
+"

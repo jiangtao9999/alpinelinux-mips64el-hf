@@ -1,0 +1,41 @@
+# Contributor: Will Sinatra <wpsinatra@gmail.com>
+# Maintainer: Will Sinatra <wpsinatra@gmail.com>
+pkgname=fennel
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="A Lua Lisp Language"
+url="https://fennel-lang.org"
+arch="all"
+license="MIT"
+options="net"
+source="fennel-$pkgver.tar.gz::https://git.sr.ht/~technomancy/fennel/archive/$pkgver.tar.gz"
+_lua_version=5.4
+makedepends="lua5.4 lua5.4-dev lua5.4-libs"
+subpackages="$pkgname-doc"
+
+build() {
+	make fennel.lua fennel-bin LUA=lua$_lua_version STATIC_LUA_LIB=/usr/lib/liblua-$_lua_version.so.0.0.0
+	./fennel-bin --compile src/fennel/binary.fnl > binary.lua
+}
+
+check() {
+	make test LUA=lua$_lua_version
+}
+
+package() {
+	install -Dm0644 "fennel.lua" \
+			-t "$pkgdir/usr/share/lua/$_lua_version/"
+
+	install -Dm0644 "binary.lua" \
+			-t "$pkgdir/usr/share/lua/$_lua_version/fennel/"
+
+	install -Dm0644 "fennel.1" \
+			-t "$pkgdir/usr/share/man/man1/fennel.1"
+
+	install -Dm0755 "fennel-bin" \
+			"$pkgdir/usr/bin/fennel"
+}
+
+sha512sums="
+4ad1635807d244297fdc7bf7c06568ae708ae805dcaac2bb190fad412da21c9e3c3b86a6afa223e343488c725afea94682f213332fb22ba66eb5190e97f18415  fennel-1.0.0.tar.gz
+"

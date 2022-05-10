@@ -1,0 +1,32 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=broot
+pkgver=1.7.1
+pkgrel=0
+pkgdesc="New way to see and navigate directory trees"
+url="https://github.com/Canop/broot"
+arch="x86_64 armv7 armhf aarch64 x86 ppc64le"  # limited by rust/cargo
+license="MIT"
+makedepends="cargo libgit2-dev libxcb-dev"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/Canop/broot/archive/v$pkgver.tar.gz
+	minimize-size.patch
+	"
+
+build() {
+	cargo build --release --locked
+}
+
+check() {
+	cargo test --locked
+}
+
+package() {
+	install -Dm0755 target/release/broot "$pkgdir"/usr/bin/broot
+	install -Dm0644 man/page "$pkgdir"/usr/share/man/man1/broot.1
+}
+
+sha512sums="
+a32f37577f8d5e6b173df758872387ceeccdbf8c157320494cfb9792342eed455abc238bdef9e1423c6ab3f35eb8bb4f7c723325291feedf025f49f13181ce60  broot-1.7.1.tar.gz
+05bbce2c8553beba42d13e50de87e4a320aed45787d788269388e04408cf9325dba5cd44ce24c30547483e7b6e9561d3aca17e06ca2b8097fc24a387395dac0b  minimize-size.patch
+"

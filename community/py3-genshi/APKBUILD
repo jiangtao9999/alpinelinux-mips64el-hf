@@ -1,0 +1,29 @@
+# Contributor: Mika Havela <mika.havela@gmail.com>
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=py3-genshi
+_realname=Genshi
+pkgver=0.7.5
+pkgrel=2
+pkgdesc="Python toolkit for stream-based generation of output for the web."
+url="http://genshi.edgewall.org/"
+arch="noarch"
+license="MIT"
+depends="python3"
+makedepends="py3-setuptools"
+source="$pkgname-$pkgver.tar.gz::https://github.com/edgewall/genshi/archive/$pkgver.tar.gz"
+builddir="$srcdir/genshi-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="24930388447990b3180bd3db3a6f8bc630d9520e2b14b0a1c117aaa573d53bc442253c3547ff82f4db020996c1d4cbc52c56c0a9e20a620dfd3b9ee4f4164c81  py3-genshi-0.7.5.tar.gz"

@@ -1,0 +1,27 @@
+# Contributor: Valery Kartel <valery.kartel@gmail.com>
+# Maintainer: Valery Kartel <valery.kartel@gmail.com>
+pkgname=rcs
+pkgver=5.10.0
+pkgrel=0
+pkgdesc="Revision Control System"
+url="https://www.gnu.org/software/rcs"
+arch="all"
+license="GPL-3.0-or-later"
+depends="diffutils"
+subpackages="$pkgname-doc"
+source="https://ftp.gnu.org/gnu/rcs/rcs-$pkgver.tar.xz"
+
+build() {
+	./configure \
+		CFLAGS="-std=c11" \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="d42bded1214f27dfcbe912bbabad8479555a02bc57000a62512d63ff0672de1ed23911cd15c9d1aa4b9a53794ac3fd45937fa1cbc0fcb9d54a3ede4d831f76d0  rcs-5.10.0.tar.xz"

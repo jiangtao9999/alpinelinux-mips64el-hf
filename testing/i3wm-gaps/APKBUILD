@@ -1,0 +1,29 @@
+# Maintainer: prspkt <prspkt@protonmail.com>
+pkgname=i3wm-gaps
+pkgver=4.19.1
+pkgrel=0
+pkgdesc="Improved dynamic tiling window manager with additional features"
+url="https://github.com/Airblader/i3"
+arch="all"
+license="BSD-3-Clause"
+replaces="i3wm"
+depends_dev="$pkgname=$pkgver-r$pkgrel"
+makedepends="bison flex libxcb-dev xcb-util-cursor-dev
+	xcb-util-keysyms-dev xcb-util-wm-dev libev-dev pango-dev cairo-dev
+	yajl-dev startup-notification-dev pcre-dev libxkbcommon-dev
+	xcb-util-xrm-dev asciidoc perl xmlto meson"
+subpackages="$pkgname-doc"
+source="i3wm-$pkgver.tar.gz::https://github.com/Airblader/i3/archive/$pkgver.tar.gz"
+builddir="$srcdir/i3-$pkgver"
+options="!check" # missing perl bindings for libxcb
+
+build() {
+	abuild-meson -Dmans=true -Ddocs=true . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="200610a221655beee5c204dca1b2d8fe37c64d9054713605a403ba8973b30460bbc64f9172aa3b262f2f8b477584fca667137147ac076bb06745130f31750a9a  i3wm-4.19.1.tar.gz"

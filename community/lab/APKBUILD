@@ -1,0 +1,43 @@
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Carlo Landmeter <clandmeter@alpinelinux.org>
+pkgname=lab
+pkgver=0.23.0
+pkgrel=0
+pkgdesc="Git Wrapper for GitLab"
+url="https://zaquestion.github.io/lab/"
+arch="all"
+license="CC0-1.0"
+depends="git"
+makedepends="go"
+checkdepends="bash"
+subpackages="
+	$pkgname-bash-completion
+	$pkgname-zsh-completion
+	$pkgname-fish-completion
+	"
+source="lab-$pkgver.tar.gz::https://github.com/zaquestion/lab/archive/v$pkgver.tar.gz"
+options="net !check chmod-clean" # Tests require configured GitLab account with SSH keys
+
+export CGO_ENABLED=0
+
+build() {
+	go build -ldflags "-X main.version=$pkgver" -o bin/$pkgname
+	./bin/lab completion bash > lab.bash
+	./bin/lab completion zsh > _lab.zsh
+	./bin/lab completion fish > lab.fish
+}
+
+package() {
+	install -Dm755 "$builddir"/bin/$pkgname \
+		"$pkgdir"/usr/bin/$pkgname
+	install -Dm644 "$builddir"/lab.bash \
+		"$pkgdir"/usr/share/bash-completion/completions/$pkgname
+	install -Dm644 "$builddir"/_lab.zsh \
+		"$pkgdir"/usr/share/zsh/site-functions/_$pkgname
+	install -Dm644 "$builddir"/lab.fish \
+		"$pkgdir"/usr/share/fish/completions/$pkgname.fish
+}
+
+sha512sums="
+c2638a26a85d4207847d3612517a2d86c743be241ec5d7cd3eab90b10cdd1b525fb65b16a23a1b82265133a66ac3e7c9aeac37b8336d2fbf39aa54917920e140  lab-0.23.0.tar.gz
+"

@@ -1,0 +1,32 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Fabian Affolter <fabian@affolter-engineering.ch>
+pkgname=py3-python-stdnum
+_pkgname=python-stdnum
+pkgver=1.15
+pkgrel=1
+pkgdesc="Python module to handle standardized numbers and codes"
+url="https://arthurdejong.org/python-stdnum"
+arch="noarch"
+license="LGPL-2.0-or-later"
+depends="python3"
+makedepends="py3-setuptools"
+checkdepends="py3-coverage py3-nose"
+source="https://files.pythonhosted.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz"
+builddir="$srcdir"/$_pkgname-$pkgver
+
+replaces="py-stdnum" # Backwards compatibility
+provides="py-stdnum=$pkgver-r$pkgrel" # Backwards compatibility
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	nosetests
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="e6f1d921e8ce64a11f9c5572e7eabc27bd7c71c34017fb795c45fa585701fcc78ff81c15b1a9bd48b8d9975e1fbc354b3923942c6f81e8fe4dfb8f611e3ab9cc  python-stdnum-1.15.tar.gz"

@@ -1,0 +1,74 @@
+# Contributor: Newbyte <newbyte@disroot.org>
+# Maintainer: Newbyte <newbyte@disroot.org>
+pkgname=mirage
+pkgver=0.7.2
+pkgrel=0
+pkgdesc="Qt/QML Matrix client"
+url="https://github.com/mirukana/mirage"
+# armhf: blocked by py3-pyotherside, qt5-qtquickcontrols2
+# mips64: ???
+# s390x: blocked by py3-watchgod
+arch="all !armhf !mips64 !s390x"
+license="LGPL-3.0-or-later"
+options="!check" # requires types-aiohttp
+depends="
+	py3-aiofiles
+	py3-appdirs
+	py3-blist
+	py3-cairosvg
+	py3-filetype
+	py3-hsluv
+	py3-html-sanitizer
+	py3-matrix-nio
+	py3-mistune
+	py3-pillow
+	py3-plyer
+	py3-pymediainfo
+	py3-pyotherside
+	py3-redbaron
+	py3-simpleaudio
+	py3-sortedcontainers
+	py3-watchgod
+	"
+makedepends="
+	libjpeg-turbo-dev
+	libmediainfo-dev
+	libwebp-dev
+	libx11-dev
+	libxscrnsaver-dev
+	olm-dev
+	openjpeg-dev
+	py3-setuptools
+	python3-dev
+	qtchooser
+	qt5-qtbase-dev
+	qt5-qtquickcontrols2-dev
+	qt5-qtsvg-dev
+	qt5-qtimageformats
+	tiff-dev
+	zlib-dev
+	"
+_commit_hsluv_c=9e9be32d6010cad484a7b12b1a3d19c6cf4c1353
+source="
+	mirage-v$pkgver.tar.gz::https://github.com/mirukana/mirage/archive/v$pkgver.tar.gz
+	hsluv-c.tar.gz::https://github.com/hsluv/hsluv-c/archive/$_commit_hsluv_c.tar.gz
+	"
+
+prepare() {
+	default_prepare
+	mv "$srcdir/hsluv-c-$_commit_hsluv_c/"* "$builddir/submodules/hsluv-c"
+}
+
+build() {
+	qmake CONFIG+=qtquickcompiler PREFIX=/usr mirage.pro
+	make
+}
+
+package() {
+	make INSTALL_ROOT=$pkgdir install
+}
+
+sha512sums="
+793e730aae73c95f1aee4df85ffc9c0bb785da8ec1f7845d98d785ef2649d1f837dba8c82c4ce87462e26f736de5fcab76ed8b351aa09e38cbab637a45a10108  mirage-v0.7.2.tar.gz
+ecd8c9afa9e22c6a0093435ce89b5d5b1882207359d02a65f6e62952fa4b57fc5b3e1aaa07527553a7e86c350173409b21d41b3da5235a7fb5f96b61944be839  hsluv-c.tar.gz
+"

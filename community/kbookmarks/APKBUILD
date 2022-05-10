@@ -1,0 +1,49 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kbookmarks
+pkgver=5.88.0
+pkgrel=0
+pkgdesc="Support for bookmarks and the XBEL format"
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://community.kde.org/Frameworks"
+license="LGPL-2.1-or-later"
+depends_dev="
+	kcodecs-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	kwidgetsaddons-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	"
+makedepends="$depends_dev
+	doxygen
+	extra-cmake-modules
+	qt5-qttools-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/kbookmarks-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_QCH=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+147cb700ae3dd844319f7984d9dee12ab9f81a06d388670882cabd9f301dcc21bf057cdf1b4b41b4d0381465afedbf4e72b3231841c91014a08445bda5667616  kbookmarks-5.88.0.tar.xz
+"

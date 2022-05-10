@@ -1,0 +1,24 @@
+# Contributor: Dennis Krupenik <dennis@krupenik.com>
+# Maintainer: Dennis Krupenik <dennis@krupenik.com>
+pkgname=inxi
+pkgver=3.3.04
+_pkgver="$pkgver"-1
+pkgrel=0
+pkgdesc="Fully featured CLI system information tool"
+options="!check" # no upstream tests
+url="https://github.com/smxi/inxi"
+arch="noarch"
+license="GPL-3.0-or-later"
+depends="perl"
+subpackages="$pkgname-doc"
+source="https://github.com/smxi/inxi/archive/$_pkgver/inxi-$_pkgver.tar.gz"
+builddir="$srcdir/inxi-$_pkgver"
+
+package() {
+	install -Dm0755 inxi -t "$pkgdir"/usr/bin
+	install -Dm0644 inxi.1 -t "$pkgdir"/usr/share/man/man1
+}
+
+sha512sums="
+0ffde2362c79a4269df0f4bbe439e50d24a13969a22f6e84f6caeb8cace2ee49fb075d6051211709efdc831c2f7ef37eaa38d70306bc8f1a86f8ed0dc7dea094  inxi-3.3.04-1.tar.gz
+"

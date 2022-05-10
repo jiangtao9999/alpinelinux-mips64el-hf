@@ -1,0 +1,33 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Fabian Affolter <fabian@affolter-engineering.ch>
+pkgname=tig
+pkgver=2.5.4
+pkgrel=0
+pkgdesc="Text-mode interface for the git revision control system"
+url="https://jonas.github.io/tig/"
+arch="all"
+license="GPL-2.0-or-later"
+options="!check" # Tests are broken
+depends="git"
+makedepends="ncurses-dev xmlto asciidoc"
+subpackages="$pkgname-doc"
+source="https://github.com/jonas/tig/releases/download/tig-$pkgver/tig-$pkgver.tar.gz"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var
+	make all doc-man
+}
+
+package() {
+	make DESTDIR="$pkgdir" install install-doc-man
+}
+
+sha512sums="
+8c2c1d3aa980d3a6619501a770bb5210db445200e46939e2c122db1fd684ae9857eee4a06a8b6622d5d683457f11629522b121e0b429eec6d11dce4f4020dfb3  tig-2.5.4.tar.gz
+"

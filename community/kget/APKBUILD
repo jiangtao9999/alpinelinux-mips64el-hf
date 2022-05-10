@@ -1,0 +1,69 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kget
+pkgver=21.08.3
+pkgrel=0
+# ppc64le, s390x and riscv64 blocked by polkit -> kio
+# armhf blocked by extra-cmake-modules
+# mips64 blocked by libktorrent
+arch="all !armhf !ppc64le !s390x !mips64 !riscv64"
+url="https://kde.org/applications/internet/org.kde.kget"
+pkgdesc="A versatile and user-friendly download manager"
+license="GPL-2.0-or-later AND LGPL-2.0-only AND GFDL-1.2-only"
+makedepends="
+	extra-cmake-modules
+	gpgme-dev
+	kcmutils-dev
+	kcompletion-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kdbusaddons-dev
+	kdelibs4support-dev
+	kdoctools-dev
+	ki18n-dev
+	kiconthemes-dev
+	kio-dev
+	kitemmodels-dev
+	kitemviews-dev
+	knotifications-dev
+	knotifyconfig-dev
+	kparts-dev
+	kservice-dev
+	ktextwidgets-dev
+	kwallet-dev
+	kwidgetsaddons-dev
+	kwindowsystem-dev
+	kxmlgui-dev
+	libktorrent-dev
+	libmms-dev
+	plasma-workspace-dev
+	qca-dev
+	qt5-qtbase-dev
+	sqlite-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kget-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+54a529d5b8ac25b17448072a9c00bb73f287d8aabaa74273477d0f6de21e3419108cf118b4736a0010dcbebcb2718819c6df5cf62e73c8ee598b8e329d2c764e  kget-21.08.3.tar.xz
+"

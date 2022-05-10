@@ -1,0 +1,58 @@
+# Contributor: Valery Kartel <valery.kartel@gmail.com>
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=ntfs-3g
+_pkgreal=ntfs-3g_ntfsprogs
+pkgver=2021.8.22
+pkgrel=0
+pkgdesc="Stable, full-featured, read-write NTFS"
+url="https://www.tuxera.com/company/open-source/"
+arch="all"
+license="GPL-2.0-or-later AND LGPL-2.0-or-later"
+options="!check" # No test suite
+makedepends="attr-dev util-linux-dev linux-headers"
+subpackages="
+	$pkgname-static
+	$pkgname-doc
+	$pkgname-dev
+	$pkgname-libs
+	$pkgname-progs
+	"
+source="https://tuxera.com/opensource/ntfs-3g_ntfsprogs-$pkgver.tgz
+	"
+builddir="$srcdir/$_pkgreal-$pkgver"
+
+# secfixes:
+#   2017.3.23-r2:
+#     - CVE-2019-9755
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info
+	make
+}
+
+package() {
+	pkgdesc="$pkgdesc (driver)"
+
+	mkdir -p "$pkgdir"/lib
+	make -j1 DESTDIR="$pkgdir" LDCONFIG=: install
+	ln -s /bin/ntfs-3g "$pkgdir"/sbin/mount.ntfs
+}
+
+progs() {
+	pkgdesc="$pkgdesc (utilities)"
+
+	mkdir -p "$subpkgdir"/sbin
+	mv "$pkgdir"/usr "$pkgdir"/lib "$subpkgdir"/
+	rm -fr "$subpkgdir"/lib "$subpkgdir"/usr/lib
+}
+
+sha512sums="
+e0544df78a6c352999e1206d7b5d71c56e39396b7a0936a261d728c2ac9d61c6b95ef297f8529ac2a5146f31c1c9e43066d3e281064d4f5d781a04eba51f536d  ntfs-3g_ntfsprogs-2021.8.22.tgz
+"

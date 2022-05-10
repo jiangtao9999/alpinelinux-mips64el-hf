@@ -1,0 +1,51 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kasts
+pkgver=21.08
+pkgrel=1
+pkgdesc="Kirigami-based podcast player"
+# armhf blocked by extra-cmake-modules
+arch="all !armhf"
+url="https://invent.kde.org/plasma-mobile/kasts"
+license="LicenseRef-KDE-Accepted-GPL AND CC0-1.0"
+depends="
+	kirigami2
+	qt5-qtbase-sqlite
+	"
+makedepends="
+	extra-cmake-modules
+	kconfig-dev
+	kcoreaddons-dev
+	ki18n-dev
+	kirigami2-dev
+	syndication-dev
+	openssl1.1-compat-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	qt5-qtmultimedia-dev
+	qt5-qtquickcontrols2-dev
+	qt5-qtsvg-dev
+	"
+subpackages="$pkgname-lang"
+source="https://download.kde.org/stable/plasma-mobile/$pkgver/kasts-$pkgver.tar.xz"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+81686129617feebf55e5ec68dc9405cb434748fd9606c2ccc80eb0f8fa118b65df7727f874a75a7f21beeda2f73fe582def19a0000cf36fccfbacc88c21ce0af  kasts-21.08.tar.xz
+"

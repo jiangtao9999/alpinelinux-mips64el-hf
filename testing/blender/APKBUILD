@@ -1,0 +1,150 @@
+# Contributor: Mark Riedesel <mark@klowner.com>
+# Contributor: Leon Marz <main@lmarz.org>
+# Maintainer: Leon Marz <main@lmarz.org>
+pkgname=blender
+pkgver=2.93.6
+_pkgver=${pkgver%.[0-9]}
+pkgrel=0
+pkgdesc="3D Creation/Animation/Publishing System"
+url="https://www.blender.org/"
+arch="x86_64" # only on x86_64, mainly because of openvdb
+license="GPL-2.0-or-later"
+depends="blender-shared=$pkgver-r$pkgrel"
+makedepends="cmake
+	alembic-dev
+	blosc-dev
+	boost-dev
+	eigen-dev
+	embree-dev
+	embree-static
+	ffmpeg-dev
+	fftw-dev
+	freetype-dev
+	glew-dev
+	gmp-dev
+	jack-dev
+	libharu-dev
+	libjpeg-turbo-dev
+	libpng-dev
+	libsndfile-dev
+	libtbb-dev
+	libx11-dev
+	libxi-dev
+	libxrender-dev
+	llvm12-dev
+	lzo-dev
+	openal-soft-dev
+	opencolorio-dev
+	openexr-dev
+	openimagedenoise-dev
+	openimageio-dev
+	openjpeg-dev
+	opensubdiv-dev
+	openvdb-dev
+	openxr-dev
+	osl
+	osl-dev
+	potrace-dev
+	pugixml-dev
+	pulseaudio-dev
+	py3-numpy-dev
+	python3-dev
+	sdl2-dev
+	tiff-dev
+	"
+subpackages="$pkgname-doc $pkgname-shared::noarch $pkgname-headless py3-$pkgname:python"
+source="https://download.blender.org/source/blender-$pkgver.tar.xz
+	0001-musl-fixes.patch
+	0002-fix-linking-issue.patch
+	0003-increase-thread-stack-size-for-musl.patch
+	0004-OpenEXR-3.patch
+	"
+
+
+build() {
+	# Headless
+	mkdir -p "$builddir"/build-headless
+	cd "$builddir"/build-headless
+	_build -C../build_files/cmake/config/blender_headless.cmake
+
+	# Full
+	mkdir -p "$builddir"/build-full
+	cd "$builddir"/build-full
+	_build -C../build_files/cmake/config/blender_full.cmake
+
+	# Python module
+	mkdir -p "$builddir"/build-py
+	cd "$builddir"/build-py
+	_build -C../build_files/cmake/config/bpy_module.cmake
+}
+
+_build() {
+	local _py_version=$(python3 -c 'import sys; print("%i.%i" % (sys.version_info.major, sys.version_info.minor))')
+
+	export CFLAGS="$CFLAGS -D__MUSL__"
+	export CXXFLAGS="$CXXFLAGS -D__MUSL__"
+
+	cmake .. "$@" \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_BUILD_TYPE=None \
+		-DWITH_PYTHON_INSTALL=OFF \
+		-DWITH_INSTALL_PORTABLE=OFF \
+		-DWITH_SYSTEM_LZO=ON \
+		-DWITH_SYSTEM_EIGEN3=ON \
+		-DWITH_SYSTEM_GLEW=ON \
+		-DPYTHON_VERSION=$_py_version
+
+	cmake --build .
+}
+
+package() {
+	# Install headless files
+	cd "$builddir"/build-headless
+	DESTDIR="$pkgdir"/headless cmake --install .
+
+	# Rename the headless blender to blender-headless
+	mkdir -p "$pkgdir"/usr/bin
+	mv "$pkgdir"/headless/usr/bin/blender "$pkgdir"/usr/bin/blender-headless
+	rm -rf "$pkgdir"/headless
+
+	# Install python module
+	cd "$builddir"/build-py
+	DESTDIR="$pkgdir" cmake --install .
+
+	# Install the full package
+	cd "$builddir"/build-full
+	DESTDIR="$pkgdir" cmake --install .
+}
+
+shared() {
+	pkgdesc="Blender shared runtime data and add-on scripts"
+	mkdir -p "$subpkgdir"/usr/share/
+	mv "$pkgdir"/usr/share/blender "$subpkgdir"/usr/share/
+}
+
+headless() {
+	pkgdesc="$pkgdesc (headless build)"
+	depends="blender-shared=$pkgver-r$pkgrel"
+	mkdir -p "$subpkgdir"/usr/bin
+	mv "$pkgdir"/usr/bin/blender-headless "$subpkgdir"/usr/bin/
+}
+
+python() {
+	local _py_version=$(python3 -c 'import sys; print("%i.%i" % (sys.version_info.major, sys.version_info.minor))')
+
+	pkgdesc="Blender modules for Python 3"
+	mkdir -p "$subpkgdir"/usr/lib/python"$_py_version"/site-packages
+	mv "$pkgdir"/usr/lib/python"$_py_version"/site-packages/bpy.so "$subpkgdir"/usr/lib/python"$_py_version"/site-packages/
+	rm -rf "$pkgdir"/usr/lib
+
+	# Symlink to the blender-shared files
+	ln -s /usr/share/blender/"$_pkgver" "$subpkgdir"/usr/lib/python"$_py_version"/site-packages/"$_pkgver"
+}
+
+sha512sums="
+0f8e7686a141ba55be29c73f9b2fcd43b03f7551ec91d226f389295f4866926f9a81ddf627aef54f6d762271ca05ccdea1f80efc00cc52315925ad626b283aea  blender-2.93.6.tar.xz
+c3d783e049e08acf5a2a474e86b7cf6d3d9f0e47984c199ae748b86c82b36a201c1b1f3e6eae932a1b3bcf808456df9bae4ea2bdbbbb00b7d092391478aa094f  0001-musl-fixes.patch
+792b8bd42fb4301a371338c2de6124f6ec4e98a45d10d6e5a03b086d56b8da7396d258d77e517655fd73e2cc8d7ede3bf9240f8b98e207beeea8f4dec7a90e03  0002-fix-linking-issue.patch
+b31f7c9d98477e9ee4929357a8d57bc75b1c66312d63ee6d05f6c865025a16cd4ceb99648fe09941b44581807f817ba578b3c7422f0bee6228b268d51f849d85  0003-increase-thread-stack-size-for-musl.patch
+90cbcb342c948fa954c42e8a48dfd92dd434c29dcd47210383bf00f0bad415e19e59ff8276deffa7f8ef3f270f28c8beef2000ccdbb2879e77dfeea5af0bda4e  0004-OpenEXR-3.patch
+"

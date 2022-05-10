@@ -1,0 +1,31 @@
+# Contributor: Alex McGrath <amk@amk.ie>
+# Maintainer: Alex McGrath <amk@amk.ie>
+pkgname=py3-marshmallow
+_pkgname=marshmallow
+pkgver=3.14.1
+pkgrel=0
+pkgdesc="A lightweight library for converting complex objects to and from simple Python datatypes"
+url="https://github.com/marshmallow-code/marshmallow"
+arch="all"
+license="MIT"
+depends="python3"
+makedepends="py3-setuptools"
+checkdepends="py3-pytest py3-tz py3-simplejson"
+source="py3-marshmallow-$pkgver.tar.gz::https://github.com/marshmallow-code/marshmallow/archive/$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+6e3586f3a6d30817642e05f9510e394fb1d36a8fefd10f83b2e58802c0a2295b0f492b5ad97fe0188235ffbcb1a6abdbfcce2142e07be4d92ee743d39e6cc878  py3-marshmallow-3.14.1.tar.gz
+"

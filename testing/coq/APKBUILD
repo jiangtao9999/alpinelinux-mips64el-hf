@@ -1,0 +1,32 @@
+# Contributor: alpine-mips-patches <info@mobile-stream.com>
+# Maintainer: alpine-mips-patches <info@mobile-stream.com>
+pkgname=coq
+pkgver=8.13.2
+pkgrel=0
+pkgdesc="A formal proof management system"
+url="https://coq.inria.fr"
+arch="aarch64 ppc64le x86_64"  # reflect ocaml aport platforms
+license="LGPL-2.1"
+depends="ocaml-runtime"
+makedepends="ocaml ocaml-findlib ocaml-compiler-libs ocaml-zarith dune gmp-dev bash"
+options="!check"
+subpackages="$pkgname-doc"
+source="coq-$pkgver.tar.gz::https://github.com/coq/coq/archive/V$pkgver.tar.gz"
+
+build() {
+	./configure \
+		-prefix /usr \
+		-coqdocdir /usr/share/texmf-dist/tex/latex/misc \
+		-bytecode-compiler no \
+		-coqide no \
+		-nodebug
+	make world
+}
+
+package() {
+	make -j1 COQINSTALLPREFIX="$pkgdir" install
+}
+
+sha512sums="
+d5c16689a3a08d9be58e15d502e5c9bbe13ce8b9755334d1c096307260a804eeb59116c3a7b5fd85910e7f468ee728c69d04735769998a6e6369bf5352f5ec05  coq-8.13.2.tar.gz
+"

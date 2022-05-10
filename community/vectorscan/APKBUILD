@@ -1,0 +1,66 @@
+# Contributor: Duncan Bellamy <dunk@denkimushi.com>
+# Maintainer: Duncan Bellamy <dunk@denkimushi.com>
+pkgname=vectorscan
+pkgver=5.4.4
+pkgrel=0
+pkgdesc="High-performance regular expression matching library"
+url="https://www.hyperscan.io"
+arch="x86 x86_64 aarch64"  #requires SSSE3 or Neon
+license="BSD-3-Clause"
+makedepends="cmake ragel boost-dev pcre-dev sqlite-dev py3-breathe chrpath"
+subpackages="$pkgname-doc $pkgname-dev $pkgname-utils"
+source="$pkgname-$pkgver.tar.gz::https://github.com/vectorcamp/vectorscan/archive/v$pkgver+vectorscan.tar.gz
+	version.patch
+	"
+builddir="$srcdir/$pkgname-$pkgver-$pkgname"
+build() {
+	local _march="-march=native"
+	case "${CARCH:-native}" in
+		x86|x86_64)
+			_march="-march=core2" ;;
+		aarch64)
+			_march="-march=armv8-a" ;;
+	esac
+
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_C_FLAGS="$CFLAGS $_march" \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS $_march" \
+		-DBUILD_STATIC_AND_SHARED=ON \
+		"$CMAKE_CROSSOPTS" .
+	cmake --build build --target all dev-reference
+}
+
+check() {
+	cd build
+	./bin/unit-hyperscan
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+
+	cd "$pkgdir"
+	install -Dm644 "$builddir"/LICENSE usr/share/licenses/$pkgname/LICENSE
+	mkdir -p usr/bin
+	for _f in hsbench hscheck hscollider;
+	do
+		mv "$builddir"/build/bin/"$_f" usr/bin/
+		chrpath -d usr/bin/"$_f"
+	done
+	mkdir -p usr/share/html
+	mv "$builddir"/build/doc/dev-reference/html usr/share/html/"$pkgname"
+}
+
+utils() {
+	amove usr/bin/hsbench usr/bin/hscheck usr/bin/hscollider
+}
+
+sha512sums="
+68266b953a82962c6c8c5e5232a0932333967d18fd69aef2a1e58a25ded65f9b49ed863cea9824fe75e958999d5a64cdf35f63d19d5a4c566c5d1688642d5db5  vectorscan-5.4.4.tar.gz
+a85f94c5680e1af8a94ae91eacaae6be0f71c92d85102881e98329d9c8af394ee24b8d599d8f0f316a3480aa6117f14b88d585b608cc8a8b0a231df473e796e0  version.patch
+"

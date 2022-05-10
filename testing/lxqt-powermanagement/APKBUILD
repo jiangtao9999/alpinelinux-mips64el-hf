@@ -1,0 +1,37 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=lxqt-powermanagement
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Power management module for LXQt"
+url="https://github.com/lxqt/lxqt-powermanagement"
+# s390x, mips64 and riscv64 blocked by polkit -> solid
+arch="all !s390x !mips64 !armhf !riscv64"
+license="LGPL-2.0-or-later"
+makedepends="
+	cmake
+	kidletime-dev
+	kwindowsystem-dev
+	liblxqt-dev
+	lxqt-build-tools
+	lxqt-globalkeys-dev
+	qt5-qttools-dev
+	solid-dev
+	"
+options="!check" # No testsuite
+source="https://github.com/lxqt/lxqt-powermanagement/releases/download/$pkgver/lxqt-powermanagement-$pkgver.tar.xz"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+004f10376c638c1566d28cd2caf8d68ddc91c3c882a4590296a649074b8181b5aba4e78d766e561e4868d17b08b78082ec45b44d26d4cae4b01a5f1cc652acc3  lxqt-powermanagement-1.0.0.tar.xz
+"

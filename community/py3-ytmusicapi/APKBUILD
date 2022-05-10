@@ -1,0 +1,26 @@
+# Maintainer: Luca Weiss <luca@z3ntu.xyz>
+pkgname=py3-ytmusicapi
+_pyname=ytmusicapi
+pkgver=0.19.4
+pkgrel=0
+pkgdesc="Unofficial API for YouTube Music"
+url="https://github.com/sigma67/ytmusicapi"
+arch="noarch"
+license="MIT"
+depends="py3-setuptools py3-requests"
+_pypiprefix="${_pyname%${_pyname#?}}"
+source="https://files.pythonhosted.org/packages/source/$_pypiprefix/$_pyname/$_pyname-$pkgver.tar.gz"
+builddir="$srcdir/ytmusicapi-$pkgver"
+options="!check" # tests require special auth setup
+
+build() {
+	python3 setup.py build
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+ad528eb5eefb34cdf9d45ab0500fc5585b27ed7a0c603c46775ebdb930bc0ac0d8df4a3fb104b2e6bf4b87f8db3c0748579222dca33b9cf85fbbbe44e8682d28  ytmusicapi-0.19.4.tar.gz
+"

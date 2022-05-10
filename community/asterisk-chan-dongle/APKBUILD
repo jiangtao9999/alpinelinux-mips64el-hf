@@ -1,0 +1,43 @@
+# Contributor: Timo Teräs <timo.teras@iki.fi>
+# Maintainer: Timo Teräs <timo.teras@iki.fi>
+pkgname=asterisk-chan-dongle
+pkgver=1.1.20210419
+_commitid=ca9b69276738af1d571ec120e103d317701760c2
+pkgrel=0
+pkgdesc="GSM modem dongle channel driver"
+url="https://github.com/wdoekes/asterisk-chan-dongle/"
+arch="all"
+license="GPL-2.0-or-later"
+depends="asterisk"
+makedepends="asterisk-dev autoconf automake sqlite-dev"
+provides="asterisk-dongle=$pkgver"
+source="$pkgname-$pkgver.tar.gz::https://github.com/wdoekes/asterisk-chan-dongle/archive/$_commitid.tar.gz
+	fix-autodisc.patch
+	"
+builddir="$srcdir/$pkgname-$_commitid"
+
+prepare() {
+	default_prepare
+	./bootstrap
+}
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--with-astversion=18 \
+		--prefix=/usr \
+		--mandir=/usr/share/man \
+		--sysconfdir=/etc \
+		--localstatedir=/var
+	make
+}
+
+package() {
+	mkdir -p "$pkgdir"/usr/lib/asterisk/modules "$pkgdir"/etc/asterisk
+	install -m644 etc/dongle.conf "$pkgdir"/etc/asterisk/dongle.conf.sample
+	install -m755 chan_dongle.so "$pkgdir"/usr/lib/asterisk/modules
+}
+
+sha512sums="d326bcd5eb50141ab36e799285b1d14de6ff96991d42d9d0c195b82806693700e47a3fab66f120efb2ee1f3d8422bf268d873ed54752e457f19fec20acd2b971  asterisk-chan-dongle-1.1.20210419.tar.gz
+6c22fedff7e8aa422f2070bea388eaeeaec844fc42d333e271cb1b4542005d1b83a888db1038c23fc65dc6c82322af00aea08db0d31d719bddc3dc535b5333ff  fix-autodisc.patch"

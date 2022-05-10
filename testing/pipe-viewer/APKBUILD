@@ -1,0 +1,40 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=pipe-viewer
+pkgver=0.1.5
+pkgrel=0
+pkgdesc="Lightweight YouTube client for Linux"
+url="https://github.com/trizen/pipe-viewer"
+arch="noarch"
+license="Artistic-2.0"
+depends="
+	perl perl-data-dump perl-json perl-lwp-protocol-https youtube-dl
+	perl-gtk3 perl-libwww perl-file-sharedir perl-unicode-linebreak
+	perl-json-xs perl-term-readline-gnu ffmpeg mpv wget perl-lwp-useragent-cached
+	"
+makedepends="perl-module-build"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/trizen/pipe-viewer/archive/refs/tags/$pkgver.tar.gz"
+
+build() {
+	perl Build.PL --gtk3
+}
+
+check() {
+	./Build test
+}
+
+package() {
+	./Build install --destdir "$pkgdir" --installdirs vendor --install_path script=/usr/bin
+	rm -r "$pkgdir"/usr/lib
+
+	mkdir -p "$pkgdir"/usr/share/applications
+	mkdir -p "$pkgdir"/usr/share/pixmaps
+	install -Dm644 "$pkgdir"/usr/share/perl5/vendor_perl/auto/share/dist/WWW-PipeViewer/gtk-pipe-viewer.desktop \
+	"$pkgdir"/usr/share/applications/gtk-pipe-viewer.desktop
+	install -Dm644 "$pkgdir"/usr/share/perl5/vendor_perl/auto/share/dist/WWW-PipeViewer/icons/gtk-pipe-viewer.png \
+	"$pkgdir"/usr/share/pixmaps/gtk-pipe-viewer.png
+}
+
+sha512sums="
+a5e36bfc90542029453727551c646b767b6f0dcb2eb662765a46c5500b8a1ccabf5ff9d59c082b2e8a344c87b5aa490f88e2d495773cdff656262408d69af04b  pipe-viewer-0.1.5.tar.gz
+"

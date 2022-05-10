@@ -1,0 +1,44 @@
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=qt6-qtquick3d
+pkgver=6.2.1
+pkgrel=0
+pkgdesc="Qt module and API for defining 3D content in Qt Quick"
+url="https://qt.io/"
+# s390x and mips64 build fails
+# Shader baking failed: Cannot resolve expression type.
+arch="all !s390x !mips64"
+license="LGPL-2.1-only AND LGPL-3.0-only AND GPL-3.0-only AND Qt-GPL-exception-1.0"
+depends_dev="
+	qt6-qtdeclarative-dev
+	qt6-qtshadertools-dev
+	vulkan-headers
+	"
+makedepends="$depends_dev
+	cmake
+	perl
+	"
+subpackages="$pkgname-dev"
+options="!check" # No tests
+builddir="$srcdir/qtquick3d-everywhere-src-${pkgver/_/-}"
+
+case $pkgver in
+	*_alpha*|*_beta*|*_rc*) _rel=development_releases;;
+	*) _rel=official_releases;;
+esac
+
+source="https://download.qt.io/$_rel/qt/${pkgver%.*}/${pkgver/_/-}/submodules/qtquick3d-everywhere-src-${pkgver/_/-}.tar.xz"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+a46c98cb49fa1078c564c3993f6e14ac2a450c4c53663733b211603db33eedcdb893b0a89a69acdba1bac50e5d2c6ef21d9940a35ca0381069c90c6fe9a454d3  qtquick3d-everywhere-src-6.2.1.tar.xz
+"

@@ -1,0 +1,26 @@
+# Contributor: Niko Dittmann <mail@niko-dittmann.com>
+# Maintainer: Niko Dittmann <mail@niko-dittmann.com>
+pkgname=sakura
+pkgver=3.8.3
+pkgrel=0
+pkgdesc="Sakura Terminal Emulator"
+url="https://launchpad.net/sakura"
+arch="all"
+license="GPL-2.0-only"
+makedepends="cmake vte3-dev pango-dev gtk+3.0-dev glib-dev gettext-dev pcre2-dev"
+subpackages="$pkgname-doc $pkgname-lang"
+source="https://launchpad.net/sakura/trunk/$pkgver/+download/sakura-$pkgver.tar.bz2"
+options="!check" # no tests provided by upstream
+
+build() {
+	cmake -DCMAKE_INSTALL_PREFIX=/usr .
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+82e77940b4b4c90948235459a0135e74c5778c3bc1df4e803571b316e6ec6298493468a0c8c2517ca6b1680fcdbba6d0e36c8bad696205e3aa3e5b4f402c2a8e  sakura-3.8.3.tar.bz2
+"

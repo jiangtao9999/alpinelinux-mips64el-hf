@@ -1,0 +1,58 @@
+# Contributor: Isaac Dunham <ibid.ag@gmail.com>
+# Maintainer:
+pkgname=py3-matplotlib
+_pyname=matplotlib
+pkgver=3.3.3
+pkgrel=1
+pkgdesc="Python3 library for plots"
+url="https://matplotlib.org"
+# mips64 blocked due to py3-numpy
+arch="all !mips64"
+license="Python-2.0"
+depends="
+	py3-cairo
+	py3-certifi
+	py3-cycler
+	py3-dateutil
+	py3-kiwisolver
+	py3-numpy
+	py3-parsing
+	py3-pillow
+	py3-tz
+	python3-tkinter
+	"
+makedepends="
+	python3-dev
+	gfortran
+	py3-numpy-dev
+	freetype-dev
+	libpng-dev
+	tk-dev
+	py3-setuptools
+	qhull-dev
+	"
+checkdepends="py3-pytest xvfb"
+source="https://github.com/matplotlib/$_pyname/archive/v$pkgver/matplotlib-v$pkgver.tar.gz
+	"
+builddir="$srcdir/$_pyname-$pkgver"
+# matplotlib provides unit tests, but they need to be run post installation :-(
+options="!check"
+
+replaces="py-matplotlib" # Backwards compatibility
+provides="py-matplotlib=$pkgver-r$pkgrel" # Backwards compatibility
+
+prepare() {
+	default_prepare
+
+	# Use system freetype and qhull
+	sed -e 's|#system_freetype = False|system_freetype = True|' -e 's|#system_qhull = False|system_qhull = True|' setup.cfg.template > setup.cfg
+}
+
+build() {
+	python3 setup.py build
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+sha512sums="11477e9afe15b8c1e7eea3c889187d9ab704c727578c3a1c5dcfbc6bbabf89d964f03bc17e739ee76df4758931e33bd5555587b533f14d7a553c9ff7a5743960  matplotlib-v3.3.3.tar.gz"

@@ -1,0 +1,40 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-settings-daemon
+pkgver=41.0
+pkgrel=0
+pkgdesc="GNOME settings daemon"
+url="https://gitlab.gnome.org/GNOME/gnome-settings-daemon"
+# s390x, mips64 and riscv64 blocked by polkit -> upower
+arch="all !s390x !mips64 !riscv64"
+options="!check" # needs unpackaged py-dbusmock
+license="GPL-2.0-only AND LGPL-2.1-only"
+depends_dev="gnome-desktop-dev libnotify-dev
+	libcanberra-dev colord-dev geoclue-dev
+	libgweather-dev geocode-glib-dev
+	pulseaudio-dev upower-dev libwacom-dev
+	cups-dev networkmanager-dev polkit-dev
+	lcms2-dev nss-dev alsa-lib-dev gcr-dev
+	modemmanager-dev"
+makedepends="$depends_dev libxml2-utils meson"
+checkdepends="py3-gobject3"
+depends="pulseaudio"
+subpackages="$pkgname-dev $pkgname-lang"
+source="https://download.gnome.org/sources/gnome-settings-daemon/${pkgver%.*}/gnome-settings-daemon-$pkgver.tar.xz
+	dont-use-logind-for-brightness-changing.patch"
+
+build() {
+	abuild-meson \
+		-Dsystemd=false \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+2c6848a749f84fd0c3a9ade6f4a83ae3ff7464da429b2d73030c9dcbd278b070c40475c678c819e31464941f2bd38d81f11b96f24d0d1fb05271267c3a1ecc2a  gnome-settings-daemon-41.0.tar.xz
+fd80b939a14bbc5dd502afda0bc6511f2d9c045018680e5ae7fbec32efadb564c5060ec91d374330f246d70571aad5979ce8c175175a29b5ccec3443c8286dc6  dont-use-logind-for-brightness-changing.patch
+"

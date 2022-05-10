@@ -1,0 +1,30 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Maintainer:
+pkgname=py3-mediafile
+pkgver=0.8.1
+pkgrel=0
+pkgdesc="Simple interface to the metadata tags for many audio file formats"
+url="https://github.com/beetbox/mediafile"
+arch="noarch"
+license="MIT"
+depends="python3 py3-mutagen"
+makedepends="py3-setuptools"
+checkdepends="py3-nose"
+source="$pkgname-$pkgver.tar.gz::https://files.pythonhosted.org/packages/source/m/mediafile/mediafile-$pkgver.tar.gz"
+builddir="$srcdir/mediafile-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	nosetests
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+ee7d19816a3278e3b5d0e8f97844895af2cd4739c7284042fdc1eef98e50e14e55350e7326f04e5cf02c895620b759e869f53de58ce76784b476bde86bb6435f  py3-mediafile-0.8.1.tar.gz
+"

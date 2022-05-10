@@ -1,0 +1,43 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=flameshot
+pkgver=0.10.2
+pkgrel=0
+pkgdesc="Featureful screenshot app"
+options="!check" # No test suite
+url="https://github.com/lupoDharkael/flameshot"
+arch="all"
+license="GPL-3.0-or-later"
+depends="qt5-qtsvg"
+makedepends="cmake qt5-qtsvg-dev qt5-qttools-dev"
+subpackages="$pkgname-lang $pkgname-bash-completion $pkgname-zsh-completion $pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/lupoDharkael/flameshot/archive/v$pkgver.tar.gz
+	"
+langdir="/usr/share/flameshot/translations"
+
+# XXX: Temporarily allow textrels on riscv64.
+[ "$CARCH" = "riscv64" ] && options="$options textrels"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		$CMAKE_CROSSOPTS
+	make -C build
+}
+
+check() {
+	make -C build test
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+b0eb1decd87dab1d4a375708448dd4c6f85c101d33814b76edbb328150d0e9ee7a588be698fddcb24e70e39cd4331f9aa2ff082525ff6975d52303a6d9c1ab12  flameshot-0.10.2.tar.gz
+"

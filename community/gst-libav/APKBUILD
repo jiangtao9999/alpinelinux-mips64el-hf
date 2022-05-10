@@ -1,0 +1,34 @@
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=gst-libav
+pkgver=1.18.5
+pkgrel=0
+pkgdesc="GStreamer streaming media framework libav plugin"
+url="https://gstreamer.freedesktop.org"
+arch="all"
+license="GPL-2.0-or-later LGPL-2.0-or-later"
+makedepends="coreutils ffmpeg-dev gst-plugins-base-dev gstreamer-dev meson
+	orc-dev"
+source="https://gstreamer.freedesktop.org/src/gst-libav/gst-libav-$pkgver.tar.xz"
+replaces="gst-libav1"
+
+build() {
+	export CFLAGS="$CFLAGS -fno-strict-aliasing -D_XOPEN_SOURCE"
+	abuild-meson \
+		-Dpackage-origin="https://alpinelinux.org" \
+		-Dpackage-name="GStreamer libav plugin (Alpine Linux)" \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+doc() {
+	default_doc
+	replaces="${pkgname}1-doc"
+}
+
+sha512sums="
+09b1dbc23b27f301d4598e4a803d32ba94752f186d6277a1dd0c133033f89d4873f3fac7b0f8da311c778065c43e038083c7ef0890a2133d1c7f27a0be7249a7  gst-libav-1.18.5.tar.xz
+"

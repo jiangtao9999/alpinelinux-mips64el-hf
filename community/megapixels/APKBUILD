@@ -1,0 +1,30 @@
+# Contributor: Martijn Braam <martijn@brixit.nl>
+# Maintainer: Oliver Smith <ollieparanoid@postmarketos.org>
+pkgname=megapixels
+pkgver=1.4.2
+pkgrel=0
+pkgdesc="GTK+4 camera app for mobile devices"
+url="https://git.sr.ht/~martijnbraam/megapixels"
+# s390x and mips64 blocked by gtk4.0
+# riscv64 disabled due to missing rust in recursive dependency
+arch="all !s390x !mips64 !riscv64"
+license="GPL-3.0-only"
+# Required by postprocess.sh
+# depends="cmd:dcraw_emu cmd:convert cmd:exiftool"
+depends="libraw-tools imagemagick exiftool"
+makedepends="glib-dev gtk4.0-dev tiff-dev zbar-dev meson"
+source="https://gitlab.com/postmarketOS/megapixels/-/archive/$pkgver/megapixels-$pkgver.tar.bz2"
+options="!check" # There's no testsuite
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+d8de26da2142092dd86b4afe92296326b4d8b21137477b5ee91e9f45c7af0de60190ab3fb570e701def756d2889d81e539ee1d346f6bbd47cba5e81e3bb47dfb  megapixels-1.4.2.tar.bz2
+"

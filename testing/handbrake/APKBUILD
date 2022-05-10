@@ -1,0 +1,98 @@
+# Maintainer: Nathan Angelacos <nangel@alpinelinux.org>
+pkgname=handbrake
+_pkgname=HandBrake
+pkgver=1.4.1
+pkgrel=1
+pkgdesc="Handbrake video transcoder"
+url="https://handbrake.fr"
+arch="all !s390x !mips !mips64"
+license="GPL-2.0-only"
+makedepends="
+	autoconf
+	automake
+	cmake
+	coreutils
+	dav1d-dev
+	dbus-glib-dev
+	fdk-aac-dev
+	ffmpeg-dev
+	fontconfig-dev
+	freetype-dev
+	fribidi-dev
+	glib-dev
+	gst-plugins-base-dev
+	gtk+3.0-dev
+	intltool
+	jansson-dev
+	lame-dev
+	libass-dev
+	libbluray-dev
+	libbz2
+	libdvdnav-dev
+	libdvdread-dev
+	libgudev-dev
+	libnotify-dev
+	libogg-dev
+	libtheora-dev
+	libtool
+	libvorbis-dev
+	libvpx-dev
+	linux-headers
+	meson
+	nasm
+	opus-dev
+	python3
+	speex-dev
+	tinyxml-dev
+	x264-dev
+	xz-dev
+	yasm
+	zlib-dev
+	zimg-dev
+	"
+subpackages="$pkgname-lang $pkgname-gtk"
+source="https://github.com/HandBrake/HandBrake/releases/download/$pkgver/HandBrake-$pkgver-source.tar.bz2
+	handbrake-9999-remove-dvdnav-dup.patch"
+
+options="!check"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+prepare() {
+	default_prepare
+	# build against external libs
+	sed -i 's:.*contrib/.*::g' \
+		make/include/main.defs
+}
+
+build() {
+	./configure \
+		--prefix=/usr \
+		--force \
+		--verbose \
+		--disable-nvenc \
+		--disable-numa \
+		--disable-x265 \
+		--disable-gtk-update-checks
+
+	cd build
+	make
+}
+
+package() {
+	cd "$builddir"/build
+	make -j1 install DESTDIR="$pkgdir"
+}
+
+gtk() {
+	pkgdesc="HandBrake Video Transcoder - GUI"
+	install -d "$subpkgdir"/usr/bin
+
+	mv "$pkgdir"/usr/bin/ghb "$subpkgdir"/usr/bin/ghb
+	mv "$pkgdir"/usr/share "$subpkgdir"/usr
+
+}
+
+sha512sums="
+78f10e165eaec72b9b14f3bca75b01b8ee97093a2699335e0799dee3e741bc2918f96bf115894ffd49235a7810162e578aebc622ef9b85f24ee4f16ddf718cf3  HandBrake-1.4.1-source.tar.bz2
+a3d57dd37d518286a62554cfcc4722d6fd588a0c3966d30785100edc4476febb2b48fc4f9b2a7eb5b5dc049043fabd4398e1e190e10cbd63c25b2936824977d3  handbrake-9999-remove-dvdnav-dup.patch
+"

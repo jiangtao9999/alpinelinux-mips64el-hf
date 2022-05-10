@@ -1,0 +1,36 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=melonds
+pkgver=0.9.3
+pkgrel=0
+pkgdesc="Nintendo DS Emulator"
+url="http://melonds.kuribo64.net/"
+arch="all !armv7 !aarch64 !armhf" # arm disabled due to missing OpenGL on qt5-qtbase
+license="GPL-3.0-or-later"
+makedepends="cmake pkgconf libslirp-dev libepoxy-dev libarchive-dev sdl2-dev qt5-qtbase-dev"
+source="
+	0000-remove-failing-assertion-x86.patch
+	$pkgname-$pkgver.tar.gz::https://github.com/Arisotura/melonDS/archive/$pkgver.tar.gz
+	"
+options="!check" # No test suite
+builddir="$srcdir/melonDS-$pkgver"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DBUILD_SHARED_LIBS=True \
+		$CMAKE_CROSSOPTS .
+	make -C build
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+d5cabf1dfc3932bae2b939b4f87efd1caf14499d98f324f9013bd3e7ff33656e676c32d92ed912137a68f5e48163082472d722113d2957080174b187be52940f  0000-remove-failing-assertion-x86.patch
+37f26f3a9784873ce1664645cea70049725367f5fe62f7c58842ebd5da2c73ffe423695dddb0ffd444bdf59df2a3fcd778cdf95b2bb083014b961fed282953f5  melonds-0.9.3.tar.gz
+"

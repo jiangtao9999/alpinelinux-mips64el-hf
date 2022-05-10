@@ -1,0 +1,48 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kbackup
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://kde.org/applications/utilities/org.kde.kbackup"
+pkgdesc="An application which lets you back up your data in a simple, user friendly way"
+license="GPL-2.0-only"
+makedepends="
+	extra-cmake-modules
+	karchive-dev
+	kdoctools-dev
+	ki18n-dev
+	kiconthemes-dev
+	kio-dev
+	knotifications-dev
+	kwidgetsaddons-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	shared-mime-info
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kbackup-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+9e22a8d99c67eb0de712abcff5c2eea5abfccc4aee855ce6eaab48fb0d905b5d02a3a605abce1cae24127f2585906e25f9eaf4a53074f48273ddebbb59f8391b  kbackup-21.08.3.tar.xz
+"

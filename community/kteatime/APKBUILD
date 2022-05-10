@@ -1,0 +1,30 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kteatime
+pkgver=21.08.3
+pkgrel=0
+# riscv64 disabled due to missing rust in recursive dependency
+arch="all !armhf !mips !mips64 !s390x !riscv64"
+url="https://kde.org/applications/utilities/org.kde.kteatime"
+pkgdesc="A handy timer for steeping tea"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="extra-cmake-modules qt5-qtbase-dev kconfig-dev kcrash-dev kdoctools-dev ki18n-dev kiconthemes-dev knotifyconfig-dev knotifications-dev ktextwidgets-dev kxmlgui-dev kconfig-dev"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kteatime-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="
+afd90027ea522089088335d1136340ed126bfc9e406a5ef00ace1678bc4836c024293910710e6ac2383d9a088a2fd315aadfa55ae7729cc250029b71c43b78c9  kteatime-21.08.3.tar.xz
+"

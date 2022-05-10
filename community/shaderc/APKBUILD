@@ -1,0 +1,58 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=shaderc
+pkgver=2021.1
+pkgrel=0
+pkgdesc="A collection of tools, libraries, and tests for Vulkan shader compilation"
+options="!check" # Fails to configure when tests are enabled
+url="https://github.com/google/shaderc"
+arch="all"
+license="Apache-2.0"
+makedepends="cmake glslang-static glslang-dev spirv-tools-dev python3"
+subpackages="$pkgname-static $pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/google/shaderc/archive/v$pkgver.tar.gz
+	third-party.patch"
+
+prepare() {
+	default_prepare
+
+	rm -rf third_party
+
+	_glslang_ver="$( . $startdir/../../*/glslang/APKBUILD; echo $pkgver)"
+	_spirv_ver="$( . $startdir/../../*/spirv-tools/APKBUILD; echo $pkgver)"
+
+	# Create our own build-version.inc since we disabled git versioning
+	# need to keep this in sync with glslang and SPIRV-Tools versions
+	# this is displayed with 'glslc --version'
+	cat <<- EOF > glslc/src/build-version.inc
+		"shaderc $pkgver\n"
+		"SPIRV-Tools $_spirv_ver\n"
+		"glslang $_glslang_ver\n"
+	EOF
+}
+
+build() {
+	export CXXFLAGS="$CXXFLAGS -I/usr/include/glslang"
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build . \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		-DCMAKE_C_FLAGS="$CFLAGS" \
+		-DSHADERC_SKIP_TESTS=ON \
+		$CMAKE_CROSSOPTS
+	make -C build
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+b6668bc2dd54cc745184c6a0b9a8f7ba6579fd6b67691a57179d03300f3054776e70b54b82e54b16e04aa14f3b5b28385079d2533657191a69e5698af3cde444  shaderc-2021.1.tar.gz
+5c5171ef2561070fece6b4cfa087f5baace7e5f828443719570494d9adc39ad724a414da7570f38629dbc9e7b563c8ad8226143c907ce7139a87615098006585  third-party.patch
+"

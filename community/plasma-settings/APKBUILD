@@ -1,0 +1,50 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=plasma-settings
+pkgver=21.08
+pkgrel=0
+pkgdesc="Settings application for Plasma Mobile"
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://community.kde.org/Plasma/Mobile"
+license="GPL-2.0-or-later AND LGPL-2.1-or-later"
+depends="
+	kded
+	kirigami2
+	openrc-settingsd
+	qt5-qtquickcontrols2
+	"
+makedepends="
+	extra-cmake-modules
+	kauth-dev
+	kcmutils-dev
+	kconfig-dev
+	kcoreaddons-dev
+	kdbusaddons-dev
+	kdeclarative-dev
+	ki18n-dev
+	kio-dev
+	kwindowsystem-dev
+	plasma-framework-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	solid-dev
+	"
+source="https://download.kde.org/stable/plasma-mobile/$pkgver/plasma-settings-$pkgver.tar.xz"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+f49c58a227494c3829507872ea6c1c83c930c8adbd56ec8124a51410a9d35cd265ef03d4a4ec554e245a951dcfcad30e83397c2682a5da96cd7360bef45dfb7a  plasma-settings-21.08.tar.xz
+"

@@ -1,0 +1,30 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-calendar
+pkgver=41.1
+pkgrel=0
+pkgdesc="Calendar application for GNOME"
+url="https://wiki.gnome.org/Apps/Calendar"
+# s390x, mips64 and riscv64 blocked by rust -> libhandy
+arch="all !s390x !mips64 !riscv64"
+license="GPL-3.0-or-later"
+depends="gsettings-desktop-schemas"
+makedepends="meson libical-dev gsettings-desktop-schemas-dev evolution-data-server-dev
+	libsoup-dev libdazzle-dev glib-dev gtk+3.0-dev libgweather-dev geoclue-dev
+	geocode-glib-dev gtk-doc libhandy1-dev"
+options="!check" # Can't be run on release builds and we don't want debug asserts
+subpackages="$pkgname-lang"
+source="https://download.gnome.org/sources/gnome-calendar/${pkgver%.*}/gnome-calendar-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+c17ea429acbaf377036310bb42856f66632f712397a8e38279e7c537d6b4545a48935ada33d4169fd687022ad39ec73a2022b3e2f66c38325e60d45dfe41fcc6  gnome-calendar-41.1.tar.xz
+"

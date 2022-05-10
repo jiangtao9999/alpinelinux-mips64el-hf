@@ -1,0 +1,37 @@
+# Contributor: Alexander Kulak <sa-dev@rainbow.by>
+# Maintainer: Alexander Kulak <sa-dev@rainbow.by>
+pkgname=alttab
+pkgver=1.6.0
+pkgrel=0
+pkgdesc="X11 window switcher designed for minimalistic window managers"
+url="https://github.com/sagb/alttab"
+options="!check"
+arch="all"
+license="GPL-3.0-or-later"
+makedepends="autoconf automake libx11-dev libxft-dev fts-dev libxrender-dev libxrandr-dev
+	libpng-dev uthash-dev libxpm-dev"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/sagb/alttab/archive/v$pkgver.tar.gz
+	"
+
+prepare() {
+	default_prepare
+	./bootstrap.sh
+}
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var && \
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="eaffd3a8af5e8dd28c2273fb7a09fc84cab14436c0f1659dddcff80b7a0e2cde88e7202788d194830bbd582820a6042b2feafdcb64728d12ca419a79141caa81  alttab-1.6.0.tar.gz"

@@ -1,0 +1,35 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=lxqt-about
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Information provider about LXQt and the system"
+url="https://github.com/lxqt/lxqt-about"
+arch="all !armhf" # armhf blocked by liblxqt and kwindowsystem
+arch="$arch !mips64" # mips64 blocked by liblxqt
+license="LGPL-2.0-or-later"
+makedepends="
+	cmake lxqt-build-tools liblxqt-dev
+	kwindowsystem-dev qt5-qttools-dev
+	"
+options="!check" # No testsuite
+source="https://github.com/lxqt/lxqt-about/releases/download/$pkgver/lxqt-about-$pkgver.tar.xz"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+2bfeaaee5779f51dcc023cf22025e1c651b09d0e67923bb292a5b259acd30dcedf9e45998fbca3d68231fcef66812446bfc90f79e08c218cbd3989fca8f5fb22  lxqt-about-1.0.0.tar.xz
+"

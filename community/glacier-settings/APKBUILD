@@ -1,0 +1,47 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=glacier-settings
+pkgver=0.1.4
+pkgrel=2
+pkgdesc="The Glacier settings application"
+url="https://github.com/nemomobile-ux/glacier-settings"
+# armhf blocked by qtquickcontrols-nemo
+arch="all !armhf"
+license="LGPL-2.0-or-later"
+depends="
+	bluez-qt
+	bluez-obexd
+	mapplauncherd
+	nemo-qml-plugin-dbus
+	nemo-qml-plugin-settings
+	nemo-qml-plugin-systemsettings
+	qtquickcontrols-nemo
+	"
+makedepends="
+	cmake
+	libglacierapp-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	qt5-qtlocation-dev
+	qt5-qttools-dev
+	"
+source="https://github.com/nemomobile-ux/glacier-settings/archive/$pkgver/glacier-settings-$pkgver.tar.gz
+	0001-Make-developer-mode-and-example-plugins-optional.patch
+	"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+2385e7b75ecf9034f09bb1429546cc4d6737ddde6a56c8545a2cf1a75026ddae7f0ca376d552fc6cfcf86561dce56f46e522980b9400a1503fcd376f4447b192  glacier-settings-0.1.4.tar.gz
+943dc6315a70d3dd8446c30b6d9598171c2f82afba51ebc1d6713465e0ed53c66381e5f2ec32c2562cafb24e7cc30a08c436211e64df37c5baf2fa73e40a7e4f  0001-Make-developer-mode-and-example-plugins-optional.patch
+"

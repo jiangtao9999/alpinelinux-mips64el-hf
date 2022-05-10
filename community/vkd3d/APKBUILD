@@ -1,0 +1,36 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=vkd3d
+pkgver=1.2
+pkgrel=2
+pkgdesc="Direct3D 12 to Vulkan translation library"
+url="https://www.winehq.org"
+arch="all !s390x !mips64" # test failures on big-endian
+license="LGPL-2.1-or-later"
+makedepends="vulkan-headers vulkan-loader-dev spirv-headers spirv-tools-dev libxcb-dev
+	xcb-util-keysyms-dev"
+subpackages="$pkgname-static $pkgname-dev"
+source="https://dl.winehq.org/vkd3d/source/vkd3d-$pkgver.tar.xz"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var \
+		--with-xcb \
+		--with-spirv-tools
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="ca9d5b11e7770747b78b61f43196b45b7bda8d2dd4f1d76da915f895a04dc28c20499e1e433f5ce17416964fe0f37cdc907e7aa540ec9105afbc8a100094f3e7  vkd3d-1.2.tar.xz"

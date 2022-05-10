@@ -1,0 +1,41 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=libpinyin
+pkgver=2.6.1
+pkgrel=0
+pkgdesc="Library to deal with pinyin"
+url="https://github.com/libpinyin/libpinyin"
+# armhf blocked by kyotocabinet
+# s390x and mips64 blocked due to failing tests
+arch="all !armhf !s390x !mips64"
+license="GPL-3.0-or-later"
+depends_dev="kyotocabinet-dev"
+makedepends="$depends_dev
+	autoconf
+	automake
+	glib-dev
+	libtool
+	"
+subpackages="$pkgname-static $pkgname-dev $pkgname-doc"
+source="https://downloads.sourceforge.net/project/libpinyin/libpinyin/libpinyin-$pkgver.tar.gz"
+options="!check" # Flaky tests, succeeding on CI but failing on builders
+
+build() {
+	./configure \
+		--prefix=/usr \
+		--enable-libzhuyin \
+		--with-dbm=KyotoCabinet
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	DESTDIR="$pkgdir" make install
+}
+
+sha512sums="
+54f012ac66e0184c0ab9b93469570af9f899caea8dec4f056d54fcdf3941a45f524bad8976d9008cae5a07e42fa1e1ab5e433190c81115a40a930d2973c8710d  libpinyin-2.6.1.tar.gz
+"

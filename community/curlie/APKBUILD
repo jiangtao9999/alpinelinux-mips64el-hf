@@ -1,0 +1,30 @@
+# Contributor: André Klitzing <aklitzing@gmail.com>
+# Maintainer: André Klitzing <aklitzing@gmail.com>
+pkgname=curlie
+pkgver=1.6.2
+pkgrel=0
+pkgdesc="Curlie is a frontend to curl that adds the ease of use of httpie"
+url="https://github.com/rs/curlie"
+arch="all"
+license="MIT"
+depends="curl"
+makedepends="go"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/rs/curlie/archive/v$pkgver.tar.gz"
+
+build() {
+	go build -ldflags "-X main.version=$pkgver -X main.date=$(date -u -I)"
+}
+
+check() {
+	go test
+}
+
+package() {
+	install -Dm755 curlie "$pkgdir"/usr/bin/curlie
+	install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+}
+
+sha512sums="
+9e36f460d80bc7317c29980cf09da5d249d97d6fda23cfe391d1e9eea86837d5543d797172430eebc182527b57eb21ce5ca7960c0bede3f2b068257308cd5290  curlie-1.6.2.tar.gz
+"

@@ -1,0 +1,82 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-control-center
+pkgver=41.1
+pkgrel=0
+pkgdesc="GNOME control center"
+url="https://gitlab.gnome.org/GNOME/gnome-control-center"
+# s390x, mips64 and riscv64 blocked by polkit
+arch="all !s390x !mips64 !riscv64"
+license="GPL-2.0-or-later"
+depends="cups-pk-helper openrc-settingsd dbus:org.freedesktop.Secrets"
+makedepends="
+	clutter-dev
+	clutter-gtk-dev
+	gnome-desktop-dev
+	gnome-settings-daemon-dev
+	gnome-online-accounts-dev
+	grilo-dev
+	libgtop-dev
+	gnome-bluetooth-dev
+	colord-gtk-dev
+	samba-dev
+	accountsservice-dev
+	libpwquality-dev
+	networkmanager-dev
+	libnma-dev
+	modemmanager-dev
+	krb5-dev
+	itstool
+	libxml2-utils
+	libxslt
+	docbook-xml
+	docbook-xsl
+	pulseaudio-dev
+	udisks2-dev
+	cups-dev
+	meson
+	libsecret-dev
+	gsound-dev
+	libgudev-dev
+	polkit-dev
+	libhandy1-dev
+	cheese-dev
+	ibus-dev"
+options="!check" # needs unpackaged py-dbusmock
+install="$pkgname.pre-install $pkgname.pre-upgrade"
+subpackages="$pkgname-dbg $pkgname-dev $pkgname-lang $pkgname-doc $pkgname-bash-completion"
+source="https://download.gnome.org/sources/gnome-control-center/${pkgver%.*}/gnome-control-center-$pkgver.tar.xz
+	README.alpine
+	"
+
+build() {
+	abuild-meson \
+		-Dcheese=true \
+		-Dibus=true \
+		. output
+
+	# Bad dep file -> blows up when compiling with multiple build jobs otherwise
+	ninja -C output panels/network/cc-network-resources.c
+	ninja -C output panels/network/cc-network-resources.h
+
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+
+	mkdir -p "$pkgdir"/usr/lib/pkgconfig
+	mv "$pkgdir"/usr/share/pkgconfig/* "$pkgdir"/usr/lib/pkgconfig
+	rmdir "$pkgdir"/usr/share/pkgconfig
+
+	install -Dm0644 "$srcdir"/README.alpine -t "$pkgdir"/usr/share/doc/"$pkgname"
+}
+
+sha512sums="
+432cc9d90896f7d5ffc751cd6904e1694cf825e39807b00f673bf2a6b375ecb3d65de6602df49da0b3147c3a35c83f3177ab22ca68e7f66c530958afeab30bc5  gnome-control-center-41.1.tar.xz
+350aa443149c71851ad4de0976c7fc5cb626ba0c57a8d41e6ef80da1c65ed84a4dfa2483ae92630a3b611c4bfa9360ded82b55e8cd0e3907294c025e4f6b1671  README.alpine
+"

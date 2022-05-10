@@ -1,0 +1,30 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=libconnman-qt
+pkgver=1.2.38
+pkgrel=1
+pkgdesc="Qt bindings for ConnMan"
+url="https://github.com/sailfishos/libconnman-qt"
+arch="all"
+license="Apache-2.0"
+depends="connman"
+depends_dev="
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	"
+makedepends="$depends_dev"
+subpackages="$pkgname-dev"
+source="https://github.com/sailfishos/libconnman-qt/archive/$pkgver/libconnman-qt-$pkgver.tar.gz"
+
+build() {
+	qmake-qt5
+	make
+}
+
+package() {
+	INSTALL_ROOT="$pkgdir" make install
+}
+
+sha512sums="
+b5ae99a3a19d69b7c7956df5c358cb4703c54555cc9b2ba9de5e0663f0bd2769dd6d21c7342edee2824ef9abd8d259ebbe17ecbbe9ac86a992eee07c699949ff  libconnman-qt-1.2.38.tar.gz
+"

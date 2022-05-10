@@ -1,0 +1,44 @@
+# Contributor: Fabio Ribeiro <fabiorphp@gmail.com>
+# Maintainer: Andy Postnikov <apostnikov@gmail.com>
+pkgname=php8-pecl-redis
+_extname=redis
+pkgver=5.3.5_rc1
+_pkgver=${pkgver/_rc/RC}
+pkgrel=0
+pkgdesc="PHP 8 extension for interfacing with Redis - PECL"
+url="https://pecl.php.net/package/redis"
+arch="all"
+license="PHP-3.01"
+depends="php8-pecl-igbinary php8-session"
+makedepends="php8-dev lz4-dev zstd-dev"
+source="php-pecl-$_extname-$_pkgver.tgz::https://pecl.php.net/get/$_extname-$_pkgver.tgz"
+builddir="$srcdir/$_extname-$_pkgver"
+provides="php8-redis=$pkgver-r$pkgrel" # for backward compatibility
+replaces="php8-redis" # for backward compatibility
+
+build() {
+	phpize8
+	./configure --prefix=/usr --with-php-config=php-config8 \
+		--enable-redis-igbinary \
+		--enable-redis-lz4 --with-liblz4 \
+		--enable-redis-lzf \
+		--enable-redis-zstd
+	make
+}
+
+check() {
+	# Need running redis server
+	php8 -d extension=modules/$_extname.so --ri $_extname
+}
+
+package() {
+	make INSTALL_ROOT="$pkgdir" install
+
+	local _confdir="$pkgdir"/etc/php8/conf.d
+	mkdir -p $_confdir
+	echo "extension=$_extname" > $_confdir/20_$_extname.ini
+}
+
+sha512sums="
+5d92b5c58f271a66996f7f1d877491392bfb21e0da7c4d95f92fec95e3e0f7acc7d4fa085be09d68ce75dadfc9ada365b9d9034a3e9798c9a2c5df5298de3f7a  php-pecl-redis-5.3.5RC1.tgz
+"

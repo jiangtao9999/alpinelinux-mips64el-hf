@@ -1,0 +1,39 @@
+# Contributor: Kevin Daudt <kdaudt@alpinelinux.org>
+# Maintainer: Kevin Daudt <kdaudt@alpinelinux.org>
+pkgname=dnstwist
+pkgver=20201228
+pkgrel=1
+pkgdesc="Domain name permutation engine"
+options="!check" # no testsuite
+url="dnstwist.it"
+arch="noarch"
+license="Apache-2.0"
+depends="python3 py3-requests py3-dnspython py3-tld"
+makedepends="py3-setuptools"
+subpackages="$pkgname-dictionaries"
+
+source="$pkgname-$pkgver.tar.gz::https://github.com/elceef/dnstwist/archive/$pkgver.tar.gz"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+dictionaries() {
+	pkgdesc="Dictionaries for dnstwist"
+	depends=""
+
+	mkdir -p "$subpkgdir"/usr/share/dnstwist/dictionaries
+	for dict in "$builddir"/dictionaries/*.dict; do
+		install -Dm0644 "$dict" "$subpkgdir"/usr/share/dnstwist/dictionaries/"$(basename $dict)"
+	done
+}
+
+sha512sums="98735f9ac145f54c0c965786052942d00c9c658490df5e9c079a2baae135a516fc079b8bc3ace68f18a529685008eee0e6a098bea38196aedbdd2e2d1557dca6  dnstwist-20201228.tar.gz"

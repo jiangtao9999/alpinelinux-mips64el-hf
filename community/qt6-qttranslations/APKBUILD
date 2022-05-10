@@ -1,0 +1,40 @@
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=qt6-qttranslations
+pkgver=6.2.1
+pkgrel=0
+pkgdesc="A cross-platform application and UI framework (Translations)"
+url="https://qt.io/"
+arch="noarch !s390x" # s390x: blocked by qt6-qttools
+license="LGPL-2.1-only AND LGPL-3.0-only AND GPL-3.0-only AND Qt-GPL-exception-1.0"
+makedepends="
+	cmake
+	perl
+	qt6-qtbase-dev
+	qt6-qttools-dev
+	samurai
+	"
+builddir="$srcdir/qttranslations-everywhere-src-${pkgver/_/-}"
+options="!check" # No tests
+
+case $pkgver in
+	*_alpha*|*_beta*|*_rc*) _rel=development_releases;;
+	*) _rel=official_releases;;
+esac
+
+source="https://download.qt.io/$_rel/qt/${pkgver%.*}/${pkgver/_/-}/submodules/qttranslations-everywhere-src-${pkgver/_/-}.tar.xz"
+
+build() {
+	cmake -B build -G Ninja \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	# -j1 to prevent race conditions and missing translation files
+	cmake --build build -j1
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+6f997d013260f0bda2b261c5d145aa3aaf69674594e37a9b7e9a4c461d8b82f1e77d0962f15e525442ccc2d62efeaffea480ae3f2563b051f2d03ce59e22d127  qttranslations-everywhere-src-6.2.1.tar.xz
+"

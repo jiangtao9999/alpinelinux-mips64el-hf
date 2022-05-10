@@ -1,0 +1,97 @@
+# Contributor: Chloe Kudryavtsev <toast@toast.cafe>
+# Maintainer: Chloe Kudryavtsev <toast@toast.cafe>
+pkgname=skim
+pkgver=0.9.4
+pkgrel=0
+pkgdesc="Fuzzy finder in rust"
+url="https://github.com/lotabout/skim"
+arch="all !s390x !mips !mips64 !riscv64" # limited by rust/cargo
+license="MIT"
+makedepends="cargo"
+options="net"
+subpackages="
+	$pkgname-doc
+	$pkgname-tmux::noarch
+	$pkgname-vim-plugin:vim:noarch
+	$pkgname-bash-completion
+	$pkgname-zsh-completion
+	$pkgname-bash-keybinds:bashkey:noarch
+	$pkgname-fish-keybinds:fishkey:noarch
+	$pkgname-zsh-keybinds:zshkey:noarch
+	"
+source="https://github.com/lotabout/skim/archive/v$pkgver/skim-$pkgver.tar.gz"
+
+export CARGO_HOME="$srcdir"/cargo
+
+case "$CARCH" in
+	# tests on 32-bit architectures are disabled in upstream CI
+	armhf|armv7|x86) options="!check";;
+esac
+
+build() {
+	cargo build \
+		--release \
+		--verbose
+}
+
+check() {
+	cargo test --all \
+		--release \
+		--verbose
+}
+
+package() {
+	install -Dm755 target/release/sk bin/sk-tmux -t "$pkgdir"/usr/bin
+
+	install -Dm644 man/man1/sk.1 -t "$pkgdir"/usr/share/man/man1/
+	install -Dm644 man/man1/sk-tmux.1 -t "$pkgdir"/usr/share/man/man1/
+
+	install -Dm644 plugin/skim.vim -t "$pkgdir"/usr/share/vim/vimfiles/plugin
+
+	install -Dm644 shell/completion.bash "$pkgdir"/usr/share/bash-completion/completions/sk
+	install -Dm644 shell/completion.zsh "$pkgdir"/usr/share/zsh/site-functions/_sk
+
+	install -Dm644 shell/key-bindings.* -t "$pkgdir"/usr/share/"$pkgname"
+}
+
+vim() {
+	depends=""
+	pkgdesc="Vim plugin for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel vim"
+
+	amove usr/share/vim
+}
+
+tmux() {
+	depends="bash"
+	pkgdesc="tmux launcher for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel tmux"
+
+	amove usr/bin/sk-tmux
+}
+
+bashkey() {
+	depends=""
+	pkgdesc="Bash key-bindings for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel bash"
+
+	amove usr/share/skim/key-bindings.bash
+}
+
+fishkey() {
+	depends=""
+	pkgdesc="Fish key-bindings for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel fish"
+
+	amove usr/share/skim/key-bindings.fish
+}
+
+zshkey() {
+	depends=""
+	pkgdesc="Zsh key-bindings for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel zsh"
+
+	amove usr/share/skim/key-bindings.zsh
+}
+
+sha512sums="3e2fd67bb9638d184901106c7c49ec5e81d4388f6c22e9c7eddbbfd16f115fc5beab2d0d6031fee20e439a7a4220efd373dd1ddd82121ce88fc822a6dab5d601  skim-0.9.4.tar.gz"

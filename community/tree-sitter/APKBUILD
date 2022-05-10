@@ -1,0 +1,51 @@
+# Contributor: TBK <alpine@jjtc.eu>
+# Maintainer: TBK <alpine@jjtc.eu>
+pkgname=tree-sitter
+pkgver=0.20.0
+pkgrel=0
+pkgdesc="Incremental parsing system for programming tools"
+arch="all" # !s390x !mips64" # Blocked by cargo - cli requires cargo
+url="https://tree-sitter.github.io/"
+license="MIT"
+options="!check" # rustup required
+makedepends="bash" # cargo emscripten-dev npm"
+subpackages="$pkgname-static $pkgname-dev" # $pkgname-cli"
+source="https://github.com/tree-sitter/tree-sitter/archive/v$pkgver/tree-sitter-$pkgver.tar.gz"
+
+# TODO - build wasm bindings and cli
+build() {
+	# static & shared lib
+	make
+
+	# wasm bindings
+	#script/build-wasm
+
+	# cli
+	# cd cli
+	# cargo build --release --locked --all-features
+}
+
+check() {
+	script/test
+	# cd cli
+	# cargo test -p tree-sitter-cli --jobs 1 corpus -- --nocapture
+	script/test-wasm
+}
+
+package() {
+	make DESTDIR="$pkgdir" PREFIX=/usr install
+
+	# cli
+	# install -Dm 755 target/release/$pkgname -t "$pkgdir"/usr/bin
+}
+
+cli() {
+	pkgdesc="$pkgdesc (Rust based CLI)"
+	depends="$pkgname"
+
+	amove usr/bin
+}
+
+sha512sums="
+a51fa0af45a6a99bb74ff53c15a4d7939eb24c6720e65ec7a96f74ffbce54801f14539e071ec6a4891dae778d7dea5edcecc6dd57716cc70a891c9e6cfa55013  tree-sitter-0.20.0.tar.gz
+"

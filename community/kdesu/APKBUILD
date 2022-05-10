@@ -1,0 +1,49 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kdesu
+pkgver=5.88.0
+pkgrel=0
+pkgdesc="Integration with su for elevated privileges"
+# armhf blocked by extra-cmake-modules
+arch="all !armhf"
+url="https://community.kde.org/Frameworks"
+license="LGPL-2.1-only"
+depends_dev="
+	kcoreaddons-dev
+	ki18n-dev
+	kpty-dev
+	kservice-dev
+	"
+makedepends="$depends_dev
+	doxygen
+	extra-cmake-modules
+	qt5-qttools-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/kdesu-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+# Since the goal of this library is to elevate privileges, suid being needed should be obvious
+options="suid"
+
+[ "$CARCH" = "ppc64le" ] && options="$options !check" # kdesutest is broken
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_QCH=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+faca2f4d8b406efe447b100a8c8d115b4e598d7bd2887b77464110a71b7d7c37f742da177a3923037e3fec61be7da8ca9bf04a5a07e7a3e4022edbfcd3536231  kdesu-5.88.0.tar.xz
+"

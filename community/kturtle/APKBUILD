@@ -1,0 +1,47 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kturtle
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://edu.kde.org/kturtle"
+pkgdesc="Educational Programming Environment"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	extra-cmake-modules
+	kcoreaddons-dev
+	kcrash-dev
+	kdoctools-dev
+	ki18n-dev
+	kio-dev
+	knewstuff-dev
+	ktextwidgets-dev
+	qt5-qtbase-dev
+	qt5-qtsvg-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kturtle-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+b1ed78345aaf8d978209a001ebfe5285a6978951640092db8f2ed20ebf08638a53f5065de2e6791ee87c1c37ab67ab004533873c83cc0d5204aa8c519a38f796  kturtle-21.08.3.tar.xz
+"

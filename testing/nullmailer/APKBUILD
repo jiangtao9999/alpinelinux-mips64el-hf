@@ -1,0 +1,67 @@
+# Contributor: Simon Frankenberger <simon-alpine@fraho.eu>
+# Contributor: Terra <alpine-builder@tech.futurequest.net>
+# Maintainer: Simon Frankenberger <simon-alpine@fraho.eu>
+pkgname=nullmailer
+pkgver=2.2
+pkgrel=3
+pkgdesc="Simple relay-only mail transport agent"
+url="https://github.com/bruceg/nullmailer"
+arch="all"
+license="GPL-2.0-only"
+subpackages="$pkgname-doc $pkgname-openrc"
+makedepends="automake autoconf bash"
+checkdepends="daemontools ucspi-tcp6"
+source="$pkgname-$pkgver.tar.gz::https://github.com/bruceg/nullmailer/archive/$pkgver.tar.gz
+	fix-tests-catch-port.patch
+	nullmailer-2.2-disable-dns-using-test.patch
+	nullmailer-2.2-disable-smtp-auth-tests.patch
+	nullmailer-2.2-fix-test-racecondition.patch
+
+	nullmailer.initd
+	adminaddr.conf
+	defaultdomain.conf
+	remotes.conf
+	"
+pkgusers="nullmailer"
+pkggroups="nullmailer"
+install="$pkgname.pre-install $pkgname.post-install $pkgname.post-deinstall"
+
+prepare() {
+	default_prepare
+	ash ./autogen.sh
+}
+
+build() {
+	./configure \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--localstatedir=/var
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR=$pkgdir install
+	install -Dm0755 "$srcdir/nullmailer.initd"   "$pkgdir/etc/init.d/nullmailer"
+	install -Dm0644 "$srcdir/adminaddr.conf"     "$pkgdir/etc/nullmailer/adminaddr"
+	install -Dm0644 "$srcdir/defaultdomain.conf" "$pkgdir/etc/nullmailer/defaultdomain"
+	install -Dm0644 "$srcdir/remotes.conf"       "$pkgdir/etc/nullmailer/remotes"
+
+	# ref: https://gitlab.alpinelinux.org/alpine/abuild/-/issues/10031
+	rm -f "$pkgdir/var/spool/nullmailer/trigger"
+}
+
+sha512sums="
+15c070edcf820ad13d8e0b250f73d75e45f592caa039e94fd717226fe09cd0ddc1f165388fab6234f57b340acc5127b54df14f35022858aab971b1f3d4e89e63  nullmailer-2.2.tar.gz
+499666333703d6b4dfe9afa76f1d4a48ec7faa4a2ca9dbe8aee6737ce98dcf4509b281ebe2fd2ce0b32d3a91b807a8b2dcffe794b70cb5b3ccb10cb7eca713e4  fix-tests-catch-port.patch
+d16592477612a716a8883ada1f18c34a4add81cfcfdda252705090e1f0b59f22a9bda9fe26bf950a78e21b9a69d20662825461669db72269280b7f82a1f8f8d9  nullmailer-2.2-disable-dns-using-test.patch
+fc3bbcd8accd5a37b8292c6fb3e935ab1cd35d4a67bb224eadf48ff54b3b00508d6496e3d40c4546a966ce5dd6c297822a4e76a6b9e69d0ce47dd4e0e3883e47  nullmailer-2.2-disable-smtp-auth-tests.patch
+10873e538dbc89e8899047e732515d30108b25fd0ff6bb2fc695f5790a94ac32629f41c470a2fec951357169fead36ee4512f543ad0e02c52f09799334b815c7  nullmailer-2.2-fix-test-racecondition.patch
+003fb1413342ce80e522a67367fd7a032fb9814e97479d4fcd0ea9fee0bc0eb3b9489d38e7bf99e0ba983c3c01ffc10eefd08bf71eb8e264af9d1a3f190759a4  nullmailer.initd
+93eac7b9fde3c7a2ffe3acdba1dcfccc1e40d94eb9fc7fc6722d3dfaaa3fd4378bf33698ebc0e10e108833251dbfa35fd280d62d865145fe415c431120b11ffe  adminaddr.conf
+0d3df6c4d710b8e91d40649ca991e7ab424be625cae724f8305d1ed4f2cf8a1b08e07030ee690cea7091a4c0320aae4e2df14e19efbcc54f1875338d883d8809  defaultdomain.conf
+5ed12f0c212e66330a1a6429ab48020690463f91d19ab3e2ca5bf3b5b486aa7233a9eecacf5130d553a699ad8a60066aa4246e1fe01f0f92c2e6a9f456edee1e  remotes.conf
+"

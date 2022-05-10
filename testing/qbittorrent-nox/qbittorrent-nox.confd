@@ -1,0 +1,6 @@
+#qbittorrent
+
+#QBITTORRENT_USER="qbittorrent"
+#QBITTORRENT_GROUP="qbittorrent"
+#QBITTORRENT_UMASK="0022"
+#QBITTORRENT_OPTS=""

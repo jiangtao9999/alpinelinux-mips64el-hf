@@ -1,0 +1,52 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=khelpcenter
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="Application to show KDE Applications' documentation"
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> khtml
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://userbase.kde.org/KHelpCenter"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	extra-cmake-modules
+	grantlee-dev
+	karchive-dev
+	kbookmarks-dev
+	kconfig-dev
+	kcoreaddons-dev
+	kdbusaddons-dev
+	kdoctools-dev
+	khtml-dev
+	ki18n-dev
+	kinit-dev
+	kservice-dev
+	kwindowsystem-dev
+	libxml2-dev
+	qt5-qtbase-dev
+	xapian-core-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/khelpcenter-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+7642a8472ac27381b54ab61d07e5a8c47d45488622630e05a0d41b1465102dc0aa1a64f77df8c2084753875d85400a805932b23b1d82d75f7bcb5eb7c9102998  khelpcenter-21.08.3.tar.xz
+"

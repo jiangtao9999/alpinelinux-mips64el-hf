@@ -1,0 +1,37 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=bzrtp
+pkgver=5.0.50
+pkgrel=0
+pkgdesc="BZRTP is an opensource implementation of ZRTP keys exchange protocol"
+url="https://gitlab.linphone.org/BC/public/bzrtp"
+arch="all"
+license="GPL-3.0-only"
+makedepends="cmake bctoolbox-dev sqlite-dev libxml2-dev"
+options="!check" # no tests
+subpackages="$pkgname-dev"
+source="https://gitlab.linphone.org/BC/public/bzrtp/-/archive/$pkgver/bzrtp-$pkgver.tar.gz"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		-DCMAKE_C_FLAGS="$CFLAGS" \
+		-DENABLE_STATIC=False \
+		$CMAKE_CROSSOPTS .
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+5f621659430b13190f630854f417fe0fe8b972da7596d67bada8288fb3134b06f4a188620595c8b06985393c598858aea4855dabea6e2e95ad024d9ea1ed2f88  bzrtp-5.0.50.tar.gz
+"

@@ -1,0 +1,27 @@
+# Contributor: Alex McGrath <amk@amk.ie>
+# Maintainer: Alex McGrath <amk@amk.ie>
+pkgname=pamixer
+pkgver=1.5
+pkgrel=1
+pkgdesc="pulseaudio command line mixer"
+url="https://github.com/cdemoulins/pamixer"
+arch="all"
+license="GPL-3.0-only"
+makedepends="pulseaudio-dev boost-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/cdemoulins/pamixer/archive/$pkgver.tar.gz"
+# tests disabled as there are none
+options="!check"
+
+build() {
+	export CXXFLAGS="$CXXFLAGS -DVERSION=$pkgver"
+	make
+}
+
+package() {
+	install -Dm755 "$builddir"/"$pkgname" \
+		"$pkgdir"/usr/bin/"$pkgname"
+}
+
+sha512sums="
+f520e43efcf77332b26d444529d8e706256fda2a497d5c4f694c074abda118f70d82f7f87f9cd1f1f52e19f84d51484cb00ec58ece458106cef40edac8b39d3c  pamixer-1.5.tar.gz
+"

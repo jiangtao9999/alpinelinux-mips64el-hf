@@ -1,0 +1,35 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=libfm-qt
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Qt port of libfm"
+url="https://github.com/lxqt/libfm-qt"
+arch="all !s390x !mips !mips64" # s390x, mips, mips64 blocked by libfm
+license="LGPL-2.0-or-later"
+makedepends="
+	cmake lxqt-build-tools qt5-qtx11extras-dev qt5-qttools-dev
+	menu-cache-dev libexif-dev libfm-dev qt5-qtbase-dev
+	"
+subpackages="$pkgname-dev"
+options="!check" # No testsuite
+source="https://github.com/lxqt/libfm-qt/releases/download/$pkgver/libfm-qt-$pkgver.tar.xz"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+8609709b00a67273e4cb3ca18ad695df172ff3cac2ed70d48e5f607c20a4d4507598b500957bf197bffa65db4ad5843f3fd477a56868c95507a594542f24b5b4  libfm-qt-1.0.0.tar.xz
+"

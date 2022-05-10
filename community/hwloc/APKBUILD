@@ -1,0 +1,42 @@
+# Maintainer: Daniel Sabogal <dsabogalcc@gmail.com>
+pkgname=hwloc
+pkgver=2.2.0
+pkgrel=0
+pkgdesc="Portable abstraction of hierarchical hardware architectures"
+url="https://www.open-mpi.org/"
+arch="all"
+license="BSD-3-Clause"
+makedepends="cairo-dev eudev-dev libxml2-dev ncurses-dev"
+case "$CARCH" in
+	arm*) true;;
+	*) makedepends="$makedepends numactl-dev";;
+esac
+options="!check" # fails on multiple arches with different tests
+subpackages="$pkgname-dev $pkgname-doc $pkgname-tools:_tools"
+source="https://www.open-mpi.org/software/hwloc/v${pkgver%.*}/downloads/hwloc-$pkgver.tar.bz2"
+
+build() {
+	./configure \
+		--prefix=/usr \
+		--sbindir=/usr/bin \
+		--mandir=/usr/share/man \
+		--localstatedir=/var
+	make
+}
+
+check() {
+	make -C "$builddir" check
+}
+
+package() {
+	make -C "$builddir" DESTDIR="$pkgdir" install
+}
+
+_tools() {
+	pkgdesc="Portable hardware locality tools"
+
+	mkdir -p "$subpkgdir"/usr
+	mv "$pkgdir"/usr/bin "$subpkgdir"/usr
+}
+
+sha512sums="23efd1d5e2df870ca7a0abb9b3c28c5c5d60dd0cc650ee95d20d5934f48947cbe1d3cf4e90e02b2dc61062ddf7afd67f2c1cf6e1862a48397078d66dd798e850  hwloc-2.2.0.tar.bz2"

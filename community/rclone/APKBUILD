@@ -1,0 +1,55 @@
+# Maintainer: Chloe Kudryavtsev <toast@toast.cafe>
+pkgname=rclone
+pkgver=1.57.0
+pkgrel=1
+pkgdesc="Rsync for cloud storage"
+url="https://rclone.org/"
+# riscv64 blocked by binutils-gold
+arch="all !riscv64"
+license="MIT"
+makedepends="binutils-gold go"
+checkdepends="fuse"
+options="!check net" # tests fail in CI due filesystem access
+source="rclone-$pkgver.tar.gz::https://github.com/rclone/rclone/archive/refs/tags/v$pkgver.tar.gz"
+subpackages="$pkgname-doc"
+
+export GO111MODULE=on
+export GOPATH="$srcdir"
+export CGO_ENABLED=0
+
+build() {
+	go build
+}
+
+check() {
+	# backend/{ftp,sftp,swift,webdav,seafile}: uses docker(1) for tests
+	# backend/{local,memory}: fails in docker envs, but not on real machines
+	# fs/rc: fails on ppc64le
+	go test $(go list ./... | grep -v \
+		-e 'backend/ftp$' \
+		-e 'backend/local$' \
+		-e 'backend/memory$' \
+		-e 'backend/sftp$' \
+		-e 'backend/swift$' \
+		-e 'backend/webdav$' \
+		-e 'backend/seafile$' \
+		-e 'fs/rc$'
+		)
+}
+
+package() {
+	install -Dm755 "$builddir"/"$pkgname" \
+		"$pkgdir"/usr/bin/"$pkgname"
+
+	install -Dm644 "$builddir"/"$pkgname".1 \
+		"$pkgdir"/usr/share/man/man1/"$pkgname".1
+}
+
+cleanup_srcdir() {
+	go clean -modcache
+	default_cleanup_srcdir
+}
+
+sha512sums="
+d0428263b8ee1779f96176574dc17adb73668d56b9dcf6894a0aae4db2990148d785226defa520143df788d4401e1f297faa5c5c645d3c8503c796c06a1d3229  rclone-1.57.0.tar.gz
+"

@@ -1,0 +1,46 @@
+# Contributor: Luca Weiss <luca@z3ntu.xyz>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=audiotube
+pkgver=21.08
+pkgrel=0
+pkgdesc="Client for YouTube Music"
+url="https://invent.kde.org/plasma-mobile/audiotube"
+# armhf blocked by extra-cmake-modules
+arch="all !armhf"
+license="GPL-2.0-or-later"
+depends="
+	gst-plugins-good
+	kirigami2
+	py3-ytmusicapi
+	qt5-qtimageformats
+	qt5-qtmultimedia
+	youtube-dl
+	"
+makedepends="
+	extra-cmake-modules
+	kcrash-dev
+	ki18n-dev
+	kirigami2-dev
+	py3-pybind11-dev
+	python3-dev
+	qt5-qtsvg-dev
+	"
+subpackages="$pkgname-lang"
+source="https://download.kde.org/stable/plasma-mobile/$pkgver/audiotube-$pkgver.tar.xz"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None	 \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+02aa7f06c20ede84757898a3d7f501b8f1364d49198acf15df7a101883bd6f0c748686b0a0f8477cf9edf1b77d9bf67cdfc429f32e1cd012859c5129dc5ab6a4  audiotube-21.08.tar.xz
+"

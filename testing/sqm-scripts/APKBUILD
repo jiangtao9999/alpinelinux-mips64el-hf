@@ -1,0 +1,24 @@
+# Contributor:
+# Maintainer:
+pkgname=sqm-scripts
+pkgver=1.5.0
+pkgrel=0
+pkgdesc="SQM scripts traffic shaper"
+url="https://github.com/tohojo/sqm-scripts"
+arch="noarch"
+license="GPL-2.0-only"
+depends="iproute2 iptables ip6tables"
+makedepends="coreutils"
+source="$pkgname-$pkgver.tar.gz::https://github.com/tohojo/sqm-scripts/archive/v$pkgver.tar.gz
+	10-defaults.sh.patch"
+
+package() {
+	install -m 0755 -d $pkgdir/etc/network/if-up.d
+	make DESTDIR="$pkgdir" install
+
+	rm -rf "$pkgdir"/usr/lib/tmpfiles.d
+	rm -rf "$pkgdir"/sqm@.service
+}
+
+sha512sums="7c36bdabd92f881a89abde7d07d2aff327668e5d84f24ffdfa364879a92285b62c5ba66204075b93778ae13c29fc701916bc2b341ad49e09c311b8d1ee122d73  sqm-scripts-1.5.0.tar.gz
+a5d90befde15afe588d6ac46a3ce4c7b123d0d233e83be5c36c9f45f14d71622f6da6c9c47fe219645a474705daaacc52e246ce7c21b313631371db2962a3f9a  10-defaults.sh.patch"

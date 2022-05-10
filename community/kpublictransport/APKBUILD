@@ -1,0 +1,43 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kpublictransport
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by qt5-qtdeclarative
+arch="all !armhf"
+url="https://invent.kde.org/libraries/kpublictransport"
+pkgdesc="Library to assist with accessing public transport timetables and other data"
+license="BSD-3-Clause AND LGPL-2.0-or-later AND MIT"
+depends_dev="
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	zlib-dev
+	protobuf-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kpublictransport-$pkgver.tar.xz"
+options="!check" # Broken for now
+subpackages="$pkgname-dev"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+bcd422855de8f224f7a30f09cd95345bd8637d3fb7a32ba0a7efe5c4bd350aed02cd6d8f186b4bfb467d50ce4ae927f360ccb5d188dadfbfa4e498ca4665df72  kpublictransport-21.08.3.tar.xz
+"

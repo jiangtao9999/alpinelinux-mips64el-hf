@@ -1,0 +1,28 @@
+# Maintainer: Joel Hansen <joelh@disroot.org>
+pkgname=castor
+pkgver=0.8.18
+pkgrel=0
+pkgdesc="Graphical browser for Gemini, Gopher and Finger"
+url="https://sr.ht/~julienxx/Castor/"
+license="MIT"
+arch="all !s390x !riscv64" # limited by rust/cargo
+makedepends="rust cargo gtk+3.0-dev openssl-dev"
+source="$pkgname-$pkgver.tar.gz::https://git.sr.ht/~julienxx/castor/archive/$pkgver.tar.gz"
+
+build() {
+	cargo build --release --locked --verbose
+}
+
+check() {
+	cargo test --release --locked -- --test-threads=1
+}
+
+package() {
+	install -Dm755 target/release/castor "$pkgdir"/usr/bin/castor
+	install -Dm644 data/Castor.desktop -t "$pkgdir"/usr/share/applications
+	install -Dm644 data/org.typed-hole.castor.svg -t "$pkgdir"/usr/share/pixmaps
+}
+
+sha512sums="
+f9a67b0beb37033fb7eabf6142a738c85fb873e1e8857da6e34b19d2722e2a36eb1449e647d8dec1bc9d90213162bacbae19a7626ae6b9053d85294fce8be2fe  castor-0.8.18.tar.gz
+"

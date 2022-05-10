@@ -1,0 +1,29 @@
+# Maintainer: André Klitzing <aklitzing@gmail.com>
+# Contributor: André Klitzing <aklitzing@gmail.com>
+pkgname=clazy
+pkgver=1.10
+pkgrel=1
+pkgdesc="Qt oriented code checker based on clang framework"
+url="https://github.com/KDE/clazy"
+arch="all"
+license="LGPL-2.0-only"
+makedepends="llvm-dev clang-dev cmake"
+options="!check" # cannot run tests without installation
+subpackages="$pkgname-doc"
+source="https://download.kde.org/stable/clazy/$pkgver/src/clazy-$pkgver.tar.xz"
+
+build() {
+	cmake -B build .\
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_LIBDIR=/usr/lib \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install "build"
+}
+
+sha512sums="
+59dd8c6903bcc239dfc356804cab265597a771de3858a6add4877149e0e7875b3c9ddae9aeec889c9102fb9ec6b0125bb8a786344e47872b01ba87425ba021eb  clazy-1.10.tar.xz
+"

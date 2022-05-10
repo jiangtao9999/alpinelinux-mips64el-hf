@@ -1,0 +1,58 @@
+# Contributor: ScrumpyJack <scrumpyjack@st.ilet.to>
+# Maintainer: ScrumpyJack <scrumpyjack@st.ilet.to>
+pkgname=w3m
+_pkgver=0.5.3+git20210102
+pkgver=${_pkgver/+git/.}
+pkgrel=3
+pkgdesc="text-based web & gopher browser, as well as pager"
+url="https://github.com/tats/w3m"
+license="MIT"
+arch="all"
+makedepends="imlib2-dev openssl1.1-compat-dev gc-dev ncurses-dev linux-headers"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/tats/w3m/archive/v$_pkgver.tar.gz"
+builddir="$srcdir/$pkgname-${_pkgver/+/-}"
+
+# secfixes:
+#   0.5.3.20180125-r0:
+#     - CVE-2018-6196
+#     - CVE-2018-6197
+#     - CVE-2018-6198
+
+build() {
+	PERL=/usr/bin/perl ./configure \
+		--prefix=/usr \
+		--libexecdir=/usr/lib \
+		--enable-image=fb \
+		--with-ssl \
+		--disable-nntp \
+		--disable-dict \
+		--disable-help-cgi \
+		--with-imagelib=imlib2 \
+		--with-termlib=ncurses \
+		--with-editor="/usr/bin/vi" \
+		--with-browser="/usr/bin/xdg-open" \
+		--disable-w3mmailer
+	make
+}
+
+check() {
+	cd tests
+	sh run_tests
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+
+	install -d "$pkgdir"/usr/share/doc/"$pkgname"
+	install -d "$pkgdir"/usr/share/licenses/"$pkgname"
+	local i; for i in doc/*; do
+		install -m644 "$i" "$pkgdir"/usr/share/doc/"$pkgname"
+	done
+	ln -s /usr/share/doc/"$pkgname"/README \
+		"$pkgdir"/usr/share/licenses/"$pkgname"
+}
+
+sha512sums="
+357eeecf0f63bfd5174c9670533882323879657bdecefd0758d853ca645e368331bfdf91e99c0917f19829e184ce892ecdc99bd865851707d93baccfb4b97632  w3m-0.5.3.20210102.tar.gz
+"

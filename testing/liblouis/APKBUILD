@@ -1,0 +1,43 @@
+# Maintainer: Drew DeVault <sir@cmpwn.com>
+pkgname=liblouis
+pkgver=3.19.0
+pkgrel=0
+pkgdesc="Braille translator and back-translator"
+url="http://liblouis.org/"
+arch="all"
+license="GPL-3.0-or-later"
+makedepends="help2man python3"
+checkdepends="bash"
+subpackages="$pkgname-static $pkgname-dev $pkgname-bin:_bin $pkgname-doc"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/liblouis/liblouis/releases/download/v$pkgver/liblouis-$pkgver.tar.gz
+	"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var \
+		--enable-ucs4
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+_bin() {
+	mkdir -p "$subpkgdir"/usr
+	mv "$pkgdir"/usr/bin "$subpkgdir"/usr
+}
+
+sha512sums="
+e2c875e0e2f0e52cf6e5ac9312be2042bad20fc18ee48b2e57329533940d1cb80a07735f3bda166c02fc60c3ef05a6b2f19dd7025949d6fe69849dab637e9ebc  liblouis-3.19.0.tar.gz
+"

@@ -1,0 +1,76 @@
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Johannes Heimansberg <git@jhe.dedyn.io>
+pkgname=domoticz
+pkgver=2021.1
+pkgrel=4
+pkgdesc="Open source Home Automation System"
+url="https://www.domoticz.com/"
+arch="all"
+license="GPL"
+pkgusers="$pkgname"
+pkggroups="$pkgname"
+makedepends="cmake openssl1.1-compat-dev zlib-dev curl-dev boost-dev sqlite-dev
+	lua5.3-dev mosquitto-dev libusb-compat-dev openzwave-dev python3-dev
+	minizip-dev fmt-dev jsoncpp-dev
+	"
+install="$pkgname.pre-install"
+source="domoticz-$pkgver.tar.gz::https://github.com/domoticz/domoticz/archive/$pkgver.tar.gz
+	cereal-1.3.0.tar.gz::https://github.com/USCiLab/cereal/archive/v1.3.0.tar.gz
+	domoticz.confd
+	domoticz.initd
+	luafix.patch
+	"
+build() {
+	cmake \
+		-DBUILD_SHARED_LIBS=True \
+		-DUSE_STATIC_LIBSTDCXX=OFF \
+		-DUSE_STATIC_OPENZWAVE=OFF \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/var/lib/domoticz \
+		-DUSE_BUILTIN_MQTT=OFF \
+		-DUSE_BUILTIN_SQLITE=OFF \
+		-DUSE_BUILTIN_LIBFMT=OFF \
+		-DUSE_BUILTIN_MINIZIP=OFF \
+		-DUSE_BUILTIN_JSONCPP=OFF \
+		-DUSE_STATIC_BOOST=NO \
+		-DUSE_STATIC_LIBSTDCXX=NO \
+		-DUSE_STATIC_OPENZWAVE=NO \
+		-DUSE_LUA_STATIC=NO \
+		-DUSE_OPENSSL_STATIC=NO \
+		-DCEREAL_INCLUDE_DIRS=../cereal-1.3.0/include \
+		.
+	make
+}
+
+check() {
+	"$builddir"/$pkgname --help > /dev/null
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+
+	mkdir -p "$pkgdir"/usr/bin \
+		"$pkgdir"/usr/share/$pkgname
+	mv "$pkgdir"/var/lib/domoticz/domoticz \
+		"$pkgdir"/usr/bin/
+	mv "$pkgdir"/var/lib/domoticz/www \
+		"$pkgdir"/usr/share/$pkgname/
+	mv "$pkgdir"/var/lib/domoticz/Config \
+		"$pkgdir"/usr/share/$pkgname/
+	rm -f "$pkgdir"/var/lib/domoticz/updatedomo
+
+	chown -R $pkgname "$pkgdir"/var/lib/domoticz
+
+	install -D -m755 "$srcdir"/$pkgname.initd \
+		"$pkgdir"/etc/init.d/$pkgname
+	install -D -m644 "$srcdir"/$pkgname.confd \
+		"$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="
+5a7d12fe17b9ee17a22e6d55962ac2b31eaa798022f6bc7c4bfbee92d9451212e5e999cc543b33d90ca34550e9698901fa30561a9bba4e0e3b0440caacc018aa  domoticz-2021.1.tar.gz
+2bb640a222d4efe7c624c6ec3e755fecae00ef59e91c4db462e233546c5afe73c065ba1d16d9600f7cd3cc185593109148008b0b2b870208e2f1d6984fd40c72  cereal-1.3.0.tar.gz
+724440da335f1e22c8dc181df62dac9ad2bcca98b39bff059de4be5901a93a0a8cb6864d92262092041d796ee7d3933f62cf337316d35a800bbb44f84a1709e0  domoticz.confd
+aee1461afa96b6c9af6b88450a2e179990aca8ab74974b03242f58f786843f121fa1dec1177e82c143a775ad2e3db8603f54f341614e9fd55f645085c370b54d  domoticz.initd
+83e568a2e5e310ffd22c8e8546f96ee15824817a6a65d6027195689a8a7668ec54107c68d54b70cc998cbef36a2b976c9636080ab94e91462b2280de0ac12058  luafix.patch
+"

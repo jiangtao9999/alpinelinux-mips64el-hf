@@ -1,0 +1,33 @@
+# Contributor: TBK <alpine@jjtc.eu>
+# Maintainer: TBK <alpine@jjtc.eu>
+pkgname=scooper
+pkgver=1.2
+pkgrel=0
+pkgdesc="Web interface for litterbox"
+arch="all"
+url="https://git.causal.agency/scooper/"
+license="GPL-3.0-or-later"
+options="!check" # v1.1 not a real test suite
+depends="litterbox"
+makedepends="kcgi-dev kcgi-static sqlite-dev zlib-static"
+subpackages="$pkgname-doc"
+source="https://git.causal.agency/scooper/snapshot/scooper-$pkgver.tar.gz"
+
+build() {
+	./configure \
+		--prefix=/usr \
+		--mandir=/usr/share/man
+	make all
+}
+
+check() {
+	make test
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+6a5566a4472a041862efd10f5996f1408d3280355513247849e05c5f45c2a530b3dd5e2616b5be45987c85c16422192fd8c9850caf5212b7bb00975f3117c259  scooper-1.2.tar.gz
+"

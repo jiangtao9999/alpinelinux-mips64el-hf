@@ -1,0 +1,31 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=py3-pytest-asyncio
+pkgver=0.15.1
+pkgrel=0
+pkgdesc="Pytest support for asyncio"
+url="https://github.com/pytest-dev/pytest-asyncio"
+arch="noarch"
+license="Apache-2.0"
+depends="python3 py3-pytest"
+makedepends="py3-setuptools"
+checkdepends="py3-async_generator py3-coverage py3-hypothesis"
+options="!check" # doesn't find its own modules
+source="$pkgname-$pkgver.tar.gz::https://github.com/pytest-dev/pytest-asyncio/archive/v$pkgver.tar.gz"
+builddir="$srcdir/pytest-asyncio-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	PYTHONPATH="$PWD/build/lib" py.test-3
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+1813d49e0dd55f563d9bf058e009da61a17f61e081cc53626b5f1db623ba04905b6bea3ecba423dc931668053310176b634339d6526c7ea729d9aad87e4f044d  py3-pytest-asyncio-0.15.1.tar.gz
+"

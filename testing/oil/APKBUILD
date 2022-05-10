@@ -1,0 +1,29 @@
+# Maintainer: Miles Alan <m@milesalan.com>
+# Contributor: Miles Alan <m@milesalan.com>
+pkgname=oil
+pkgver=0.9.4
+pkgrel=0
+pkgdesc="Oil is a new POSIX & bash compatible shell"
+url="https://www.oilshell.org"
+arch="all"
+license="Apache-2.0"
+# !check as source has tests, but tagged releases don't
+# !strip as oil binary shows error message otherwise, see: https://github.com/oilshell/oil/issues/47
+options="!strip !check"
+makedepends="readline-dev bash"
+subpackages="$pkgname-doc"
+source="https://www.oilshell.org/download/oil-$pkgver.tar.gz"
+
+build() {
+	./configure --prefix /usr --with-readline # not a gnu-autoconf script
+	make
+}
+
+package() {
+	make install DESTDIR="$pkgdir"
+	install -Dm644 LICENSE.txt "$pkgdir"/usr/share/licenses/$pkgname/LICENSE.txt
+}
+
+sha512sums="
+7e76c8ef44ce5a93d7196162b791827c315852e20da91ecb0ade5337bfcc25d01671244f8cbfdea14e8fdcdca576eda11c5470917c621cbfce8be4e74d87cdab  oil-0.9.4.tar.gz
+"

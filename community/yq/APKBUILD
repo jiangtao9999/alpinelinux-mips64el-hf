@@ -1,0 +1,48 @@
+# Contributor: Tuan Hoang <tmhoang@linux.ibm.com>
+# Maintainer: Tuan Hoang <tmhoang@linux.ibm.com>
+pkgname=yq
+pkgver=4.14.1
+pkgrel=0
+pkgdesc="portable command-line YAML processor written in Go"
+url="https://github.com/mikefarah/yq"
+# riscv64 blocked by govendor
+arch="all !riscv64"
+license="MIT"
+makedepends="go govendor"
+options="chmod-clean"
+subpackages="
+	$pkgname-doc
+	$pkgname-bash-completion
+	$pkgname-zsh-completion
+	$pkgname-fish-completion
+	"
+source="$pkgname-$pkgver.tar.gz::https://github.com/mikefarah/yq/archive/v$pkgver.tar.gz"
+
+build() {
+	GOPATH="$srcdir" go build -v
+}
+
+check() {
+	GOPATH="$srcdir" go test
+}
+
+package() {
+	install -Dm755 yq "$pkgdir"/usr/bin/yq
+	for file in LICENSE README.md; do
+		install -Dm644 $file "$pkgdir"/usr/share/doc/$pkgname/$file
+	done
+
+	mkdir -p "$pkgdir"/usr/share/bash-completion/completions \
+			"$pkgdir"/usr/share/zsh/site-functions \
+			"$pkgdir"/usr/share/fish/completions
+	"$pkgdir"/usr/bin/yq shell-completion bash \
+		> "$pkgdir"/usr/share/bash-completion/completions/yq.bash
+	"$pkgdir"/usr/bin/yq shell-completion zsh \
+		> "$pkgdir"/usr/share/zsh/site-functions/_yq
+	"$pkgdir"/usr/bin/yq shell-completion fish \
+		> "$pkgdir"/usr/share/fish/completions/yq.fish
+}
+
+sha512sums="
+d25ae4a1168130a2518ce496fb0c2c88fc49be4d0a5392657419df1c702cb0fe1b13dca5ef164ca3f2920bc382e27638d3c25cfd94d93ed4e822bb9a50e2b7a8  yq-4.14.1.tar.gz
+"

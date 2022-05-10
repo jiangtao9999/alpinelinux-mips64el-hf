@@ -1,0 +1,45 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=dolphin-plugins
+pkgver=21.08.3
+pkgrel=0
+url="https://www.kde.org/applications/system/dolphin/"
+pkgdesc="Extra Dolphin plugins"
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !s390x !mips64 !riscv64"
+license="GPL-2.0-or-later"
+makedepends="
+	dolphin-dev
+	extra-cmake-modules
+	ki18n-dev
+	kio-dev
+	ktexteditor-dev
+	ktextwidgets-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/dolphin-plugins-$pkgver.tar.xz"
+subpackages="$pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_svn=OFF # Broken "error: expected unqualified-id before '(' token"
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+2fb7fbd6490d768f3eb7d756429d858337b8088a7c87836ed4a54fc3f863f50c4973bbe2ae149d53d2769d7ce3c31fbd737bc4afc74fd14260a158da83992076  dolphin-plugins-21.08.3.tar.xz
+"

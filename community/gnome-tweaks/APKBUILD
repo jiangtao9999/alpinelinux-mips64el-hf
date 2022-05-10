@@ -1,0 +1,31 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-tweaks
+pkgver=40.0
+pkgrel=0
+pkgdesc="GNOME3 tool to customize advanced options"
+url="https://wiki.gnome.org/Apps/Tweaks"
+# s390x, mips64 and riscv64 blocked by rust -> libhandy
+# armv7 blocked by mutter
+arch="noarch !s390x !armv7 !mips64 !riscv64"
+license="GPL-3.0-or-later CC0-1.0"
+depends="gtk+3.0 dconf gnome-settings-daemon mutter libnotify py3-gobject3
+	libhandy1"
+makedepends="meson gettext-dev"
+subpackages="$pkgname-lang"
+source="https://download.gnome.org/sources/gnome-tweaks/${pkgver%.*}/gnome-tweaks-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="c3467f40af6bb79c2b10cb429e93aa29261066c2a5fd744bf2801c4e596cc270d45302ebfa942ee0c40067849c12e1ccd404c40e7f594bcff4c44cfe3f90bb97  gnome-tweaks-40.0.tar.xz"

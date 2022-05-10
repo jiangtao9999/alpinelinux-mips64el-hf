@@ -1,0 +1,44 @@
+# Contributor: TBK <alpine@jjtc.eu>
+# Maintainer: TBK <alpine@jjtc.eu>
+pkgname=faudio
+pkgver=21.07
+pkgrel=0
+pkgdesc="Accuracy-focused XAudio reimplementation for open platforms"
+url="https://fna-xna.github.io/"
+arch="all !mips !mips64"
+license="Zlib"
+makedepends="cmake sdl2-dev"
+subpackages="$pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/FNA-XNA/FAudio/archive/$pkgver.tar.gz"
+builddir="$srcdir/FAudio-$pkgver"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	# XXX: For some reason, faudio is not capable of autodetecting
+	# the SDL2 build configuration using CMake, just hardcode paths
+	# for now to unblock the builders.
+	cmake -B build \
+		-DSDL2_INCLUDE_DIRS=/usr/include/SDL2 \
+		-DSDL2_LIBRARIES=libSDL2.so \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=1 \
+		-DBUILD_TESTS=1
+	make -C build
+}
+
+check() {
+	cd build
+	./faudio_tests
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+427f1270e6b8b1030a996e088031af88a8fb3588373cd8210cc5c519da584e0ca81c7224d7fdea2cbf494c80e93d1fa3a7c5ada9dd94d4978fac0702afbbf12f  faudio-21.07.tar.gz
+"

@@ -1,0 +1,40 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=dav1d
+pkgver=0.9.2
+pkgrel=0
+pkgdesc="small and fast AV1 Decoder"
+url="https://code.videolan.org/videolan/dav1d"
+arch="all"
+license="BSD-2-Clause"
+makedepends="nasm meson"
+subpackages="$pkgname-dev lib$pkgname:libs"
+source="https://code.videolan.org/videolan/dav1d/-/archive/$pkgver/dav1d-$pkgver.tar.bz2"
+
+build() {
+	case "$CARCH" in
+		armhf*) meson_opts="-Denable_asm=false" ;;
+		*) meson_opts="-Denable_asm=true" ;;
+	esac
+
+	abuild-meson \
+		-Denable_tests=true \
+		-Denable_tools=true \
+		-Dfuzzing_engine=none \
+		-Dtestdata_tests=false \
+		$meson_opts \
+		build
+	meson compile ${JOBS:+-j ${JOBS}} -C build
+}
+
+check() {
+	meson test --no-rebuild -v -C build
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C build
+}
+
+sha512sums="
+adfb822734a3fc8b73e9cf5f757bfd78fb144b00d95f1e942254c5caf1d801b05438d39571486ef37a94d2226166937fc56160a862e8d6d45c4f6d790531dc3f  dav1d-0.9.2.tar.bz2
+"

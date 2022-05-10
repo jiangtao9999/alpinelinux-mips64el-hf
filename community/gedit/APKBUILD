@@ -1,0 +1,32 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gedit
+pkgver=40.1
+pkgrel=1
+pkgdesc="gedit is the GNOME text editor"
+url="https://wiki.gnome.org/Apps/Gedit"
+arch="all !s390x !mips !mips64 !riscv64" # limited by librsvg -> rust
+license="GPL-2.0-only"
+depends_dev="gedit=$pkgver-r$pkgrel"
+makedepends="meson glib-dev gtk+3.0-dev gtksourceview4-dev libpeas-dev
+	libxml2-dev libsoup-dev gspell-dev libx11-dev gobject-introspection-dev
+	vala gtk-doc itstool perl tepl-dev"
+checkdepends="appstream-glib desktop-file-utils"
+depends="gsettings-desktop-schemas"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+source="https://download.gnome.org/sources/gedit/${pkgver%.*}/gedit-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="ac4cd2864af63625dbdb5c55fcc5e7ea403d84d7cc25d9f1c121f544ef1cf686ab9b7c0d50ef73b4bf24e573cdf528622a49d82f675b0c1673c46f691b79ac09  gedit-40.1.tar.xz"

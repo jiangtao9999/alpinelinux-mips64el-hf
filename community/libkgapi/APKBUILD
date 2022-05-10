@@ -1,0 +1,51 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=libkgapi
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="LibKGAPI is a KDE-based library for accessing various Google services via their public API"
+# armhf blocked by extra-cmake-modules
+# ppc64le, s390x, mips64 and riscv64 blocked by qt5-qtwebengine
+arch="all !armhf !ppc64le !s390x !mips64 !riscv64"
+url="https://community.kde.org/KDE_PIM"
+license="LGPL-2.1-only OR LGPL-3.0-only"
+depends_dev="
+	cyrus-sasl-dev
+	kcalendarcore-dev
+	kcontacts-dev
+	kio-dev
+	kwallet-dev
+	kwindowsystem-dev
+	qt5-qtbase-dev
+	qt5-qtwebengine-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	qt5-qttools-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/libkgapi-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	# calendar-freebusyqueryjobtest and contacts-contactfetchjobtest are broken
+	# tasks-taskfetchjobtest fails on the builders
+	# contacts-contactfetchjobtest: https://gitlab.alpinelinux.org/alpine/aports/-/issues/11787
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest -E "(tasks-taskfetchjob|calendar-freebusyqueryjob|contacts-contactfetchjob)test"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+aacd08066d014eb90ef32413876a6bab42a65773fa0447aeab11bb87fe2b425dbe09abf37a4374e64d24f5ed864f0a14d7c7dbe4a221eca3e2b492ccb566bbd2  libkgapi-21.08.3.tar.xz
+"

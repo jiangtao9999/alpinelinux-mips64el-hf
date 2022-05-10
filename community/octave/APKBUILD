@@ -1,0 +1,113 @@
+# Contributor: Duncan Bellamy <dunk@denkimushi.com>
+# Contributor: Daniel Sabogal <dsabogalcc@gmail.com>
+# Maintainer: Duncan Bellamy <dunk@denkimushi.com>
+pkgname=octave
+pkgver=6.4.0
+pkgrel=1
+pkgdesc="A high-level language, primarily intended for numerical computations"
+url="https://www.gnu.org/software/octave/"
+# ppc64le, s390x missing texlive
+# missing openjdk8 on riscv64 and mips64
+arch="all !s390x !riscv64 !mips64 !ppc64le"
+license="GPL-3.0-or-later"
+subpackages="$pkgname-dev $pkgname-doc"
+
+#openjdk8 needed for 32bit support
+case "$CARCH" in
+	x86)
+		#x86 libjava.so cannot find libjvm.so
+		options="!check"
+		_jdkver=8 ;;
+	armv7|armhf)
+		_jdkver=8 ;;
+	*)
+		_jdkver=11 ;;
+esac
+
+_jhome=/usr/lib/jvm/java-1."$_jdkver"-openjdk
+makedepends="arpack-dev
+	autoconf
+	automake
+	bison
+	curl
+	curl-dev
+	fftw-dev
+	fltk-dev
+	fontconfig-dev
+	freetype-dev
+	gfortran
+	ghostscript-dev
+	glpk-dev
+	glu-dev
+	gnuplot
+	graphicsmagick-dev
+	hdf5-dev
+	imagemagick-dev
+	lcms2-dev
+	libltdl
+	libsm-dev
+	libsndfile-dev
+	libtool
+	openblas-dev
+	openjdk$_jdkver
+	pcre-dev
+	perl
+	pkgconf
+	portaudio-dev
+	qhull-dev
+	qrupdate-dev
+	qscintilla-dev
+	qt5-qttools-dev
+	readline-dev
+	suitesparse-dev
+	texinfo
+	texlive
+	texlive-dvi
+	xz-dev
+	zip
+	zlib-dev
+	"
+source="https://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.xz
+	libinterp-deps.patch
+	abs.patch
+	test.patch
+	"
+
+prepare() {
+	default_prepare
+	autoreconf -vif
+}
+
+build() {
+	export JAVA_HOME=$_jhome
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--infodir=/usr/share/info \
+		--mandir=/usr/share/man \
+		--localstatedir=/var \
+		--enable-shared \
+		--disable-static \
+		--disable-rpath
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir/" \
+		-C "$builddir" install
+	rm -rf "$pkgdir"/usr/lib/charset.alias
+	rm -rf "$pkgdir"/usr/share/octave/"$pkgver"/etc/tests
+}
+
+sha512sums="
+d239edde22877f0669314a66eb0d5ae787c387b1601a18e38d0b6971fe25b934801d1050679126974b716a6b7b27a3b51ecbfcff14a4ea529e51291f4028318b  octave-6.4.0.tar.xz
+f449d84ec0b9e18919473d9efc5b6628dc9eb62bbb4fe8160ef9c280546b7b2f07ea803992240063685ec4e8519b80002c752647060fc438e6dce8d464b98b6d  libinterp-deps.patch
+f6cd1a52686a66d9914029b3c70eba88d2468700abfb16c3bdc5c0bae2a29cbf06143e15c2828be1112d45403247ff5713edf1b1261eaf132465ac05df6c7c7c  abs.patch
+30b5572aa082ebe8a53596dee83e25cfb956914c1e0105982527d76377a15a9904c023d2ee8a2e6f04258314de16fe1aa8ec9ccb0bdc2937cd6a21609785c14f  test.patch
+"

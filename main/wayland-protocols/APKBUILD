@@ -1,0 +1,30 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Maintainer: Valery Kartel <valery.kartel@gmail.com>
+pkgname=wayland-protocols
+pkgver=1.23
+pkgrel=0
+pkgdesc="Protocols and protocol extensions complementing the Wayland core protocol"
+url="https://wayland.freedesktop.org"
+arch="noarch"
+license="MIT"
+provides="$pkgname-dev"
+makedepends="meson wayland-dev"
+source="https://wayland.freedesktop.org/releases/wayland-protocols-$pkgver.tar.xz"
+options="!check" # tests are busted
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+11f09147da1dd01a9f5c921eb0bfc6244a72023a052ef96bc121e16437a2c43d0dbba748c2de832539f57371e90b16bd13069bec07391305717f8fca295ea2a6  wayland-protocols-1.23.tar.xz
+"

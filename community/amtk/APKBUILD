@@ -1,0 +1,33 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=amtk
+pkgver=5.2.0
+pkgrel=0
+pkgdesc="Actions, Menus and Toolbars Kit for GTK+ applications"
+url="https://wiki.gnome.org/Projects/Amtk"
+arch="all"
+license="LGPL-2.1-or-later"
+makedepends="gtk+3.0-dev glib-dev gobject-introspection-dev"
+subpackages="$pkgname-dev $pkgname-doc"
+source="https://download.gnome.org/sources/amtk/${pkgver%.*}/amtk-$pkgver.tar.xz"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="520c9e762bdef96907320ec8dd4d3a005f262064ee402527c1087652af91c61657868189be8aedb7c0bd17758cf6d7e976da4ce941eb8a54e2d3e10ce55dc9eb  amtk-5.2.0.tar.xz"

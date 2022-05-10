@@ -1,0 +1,32 @@
+# Contributor: Jordan Christiansen <xordspar0@gmail.com>
+# Maintainer: Jordan Christiansen <xordspar0@gmail.com>
+pkgname=acme-client
+pkgver=1.2.0
+pkgrel=2
+pkgdesc="Client for issuing certificates from ACME-complaint servers"
+url="https://git.sr.ht/~graywolf/acme-client-portable"
+arch="all"
+license="ISC"
+makedepends="openssl1.1-compat-dev byacc automake autoconf"
+subpackages="$pkgname-doc"
+source="https://data.wolfsden.cz/sources/acme-client-$pkgver.tar.gz"
+options="!check" # Upstream has no tests.
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+205e89c700aa97b661a9adcb6fadbd804ffb216d80fea7cd31aeda73e780db9312159983376cb0d3f87309d0cc9015dd384e75147d5cf126ef872297fe05a38d  acme-client-1.2.0.tar.gz
+"

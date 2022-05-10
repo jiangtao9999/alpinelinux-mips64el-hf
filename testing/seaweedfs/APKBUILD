@@ -1,0 +1,63 @@
+# Contributor: wener <wenermail@gmail.com>
+# Maintainer: wener <wenermail@gmail.com>
+pkgname=seaweedfs
+pkgver=2.78
+pkgrel=0
+pkgdesc="SeaweedFS is a simple and highly scalable distributed file system to store and serve billions of files fast"
+url="https://github.com/chrislusf/seaweedfs"
+license="Apache-2.0"
+arch="all !s390x !ppc64le !mips64 !riscv64" # FTBFS
+makedepends="go"
+subpackages="$pkgname-doc $pkgname-openrc"
+source="
+	seaweedfs-$pkgver.tar.gz::https://github.com/chrislusf/seaweedfs/archive/$pkgver.tar.gz
+	seaweedfs.initd
+	seaweedfs.confd
+	"
+
+export GO111MODULE=on
+export GOPATH="$srcdir"
+export CGO_ENABLED=1
+
+build() {
+	GO_LDFLAGS="
+		-w -s
+		-extldflags
+		-static
+		-X github.com/chrislusf/seaweedfs/weed/util.COMMIT=AlpineLinux
+	"
+	# build for large disk support
+	go build -tags 5BytesOffset -ldflags "$GO_LDFLAGS" -o weed/weed ./weed
+	# generate master conf
+	./weed/weed scaffold -config master -output ./
+}
+
+check() {
+	# s3/basic need credential
+	# weed/operation need server
+	# shellcheck disable=SC2046
+	go test $(go list ./... | grep -v -e 's3/basic$' -e 'weed/operation$')
+}
+
+package() {
+	install -m755 -D weed/weed "$pkgdir"/usr/bin/weed
+	install -m644 -D master.toml "$pkgdir"/etc/$pkgname/master.toml
+
+	install -m644 -D -t "$pkgdir"/usr/share/doc/$pkgname README.md
+
+	install -m755 -D "$srcdir"/$pkgname.initd \
+		"$pkgdir"/etc/init.d/$pkgname
+	install -m644 -D "$srcdir"/$pkgname.confd \
+		"$pkgdir"/etc/conf.d/$pkgname
+}
+
+cleanup_srcdir() {
+	go clean -modcache
+	default_cleanup_srcdir
+}
+
+sha512sums="
+cd1381ca1d82a11c8c67bc4cf7588636e3cba99dbb48306b76c8dbee2b7b52d2f9b8ed083f476d573e89cfb30ffd470b3a74b2367e5a6d2cad05565f6b320e6c  seaweedfs-2.78.tar.gz
+54a1bb3d77e20e54dc38b08124665fc0f0bc510e9ca044a0d77d43ca45500572b9eae591ac1e55f7d54f95bb16055909534f9a8111ee33662d6a3f2789244adc  seaweedfs.initd
+31c4f65425836fc53e6b2e3f93333afb2804d4655aa2903eee10b12a5f337518dae5b3e26510bc76f61e8c917a3e130decdac7ec1faeb9dab143a8aefb3951df  seaweedfs.confd
+"

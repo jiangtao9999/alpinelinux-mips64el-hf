@@ -1,0 +1,38 @@
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer:
+pkgname=drone
+pkgver=2.5.0
+pkgrel=0
+pkgdesc="Container-Native, Continuous Delivery Platform"
+url="https://drone.io/"
+license="custom"
+arch="all"
+makedepends="go"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/drone/drone/archive/v$pkgver.tar.gz"
+
+export GOPATH="$srcdir"
+
+build() {
+	GO111MODULE=on go build -o bin/drone-server ./cmd/drone-server
+}
+
+check() {
+	go test ./...
+}
+
+package() {
+	install -Dm775 "$builddir"/bin/drone-server \
+		"$pkgdir"/usr/bin/drone-server
+	install -Dm 644 "$builddir"/LICENSE \
+		"$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+}
+
+cleanup_srcdir() {
+	go clean -modcache
+	default_cleanup_srcdir
+}
+
+sha512sums="
+b9c28f93e06d7da73a4481cebdd6613f46dcb6615d0430ce5e3db7ca1b141b288c9b0fd6e064d6c8fd59ca8f7e0478b7b0dc23f92822e1b4de37df2304356e6e  drone-2.5.0.tar.gz
+"

@@ -1,0 +1,36 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Maintainer: Sören Tempel <soeren+alpine@soeren-tempel.net>
+pkgname=cyclone-bootstrap
+pkgver=0.33.0
+pkgrel=0
+pkgdesc="Cyclone version used to bootstrap cyclone compiler"
+url="https://justinethier.github.io/cyclone/"
+# s390x: ck on s390x does not have ck_pr_cas_8 (used by cyclone)
+arch="all !s390x"
+license="MIT"
+depends="!cyclone"
+makedepends="ck-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/justinethier/cyclone-bootstrap/archive/refs/tags/v$pkgver.tar.gz"
+
+# This package is only intended for bootstraping the cyclone package. As
+# such, binaries are not installed to /usr/bin but to a custom location.
+
+export PREFIX=/usr
+export BINDIR=$PREFIX/lib/cyclone-bootstrap/bin
+export DATADIR=$PREFIX/lib/cyclone
+
+build() {
+	make
+}
+
+check() {
+	make test
+}
+
+package() {
+	DESTDIR="$pkgdir" make install
+}
+
+sha512sums="
+96ffd3d04636b27f36c98920359a9f880c4b2a15e9820e5d91c82f821dc93357b665537e7688b00510d6a4fd113666edbd5ec109ff491f4f18d547129527b763  cyclone-bootstrap-0.33.0.tar.gz
+"

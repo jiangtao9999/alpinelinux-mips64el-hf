@@ -1,0 +1,29 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=nymphrpc
+pkgver=0_git20210801
+pkgrel=0
+_commit="841ae5b117a990315b178ff55e9e6fb684510989"
+# mips64 blocked by poco
+arch="all !mips64"
+url="https://github.com/MayaPosch/NymphRPC"
+pkgdesc="Versatile and fast remote procedure call library"
+license="BSD-3-Clause"
+depends_dev="poco-dev"
+makedepends="$depends_dev"
+subpackages="$pkgname-static $pkgname-dev"
+source="https://github.com/MayaPosch/NymphRPC/archive/$_commit/nymphrpc-$_commit.tar.gz"
+options="!check" # No unit tests
+builddir="$srcdir/NymphRPC-$_commit"
+
+build() {
+	make
+}
+
+package() {
+	DESTDIR="$pkgdir" PREFIX="/usr" make install
+}
+
+sha512sums="
+1819f36eecad833cf88d85b014006e68b6b40284dfb157807b86f1967cd693bcb1d917fd885ab330e032f3a3882bc7b51122007246b10f44c49850be8950c498  nymphrpc-841ae5b117a990315b178ff55e9e6fb684510989.tar.gz
+"

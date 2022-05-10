@@ -1,0 +1,34 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=liquidctl
+pkgver=1.7.2
+pkgrel=0
+pkgdesc="Liquid Cooler Control"
+url="https://github.com/liquidctl/liquidctl"
+options="!check" # Requires writable /var/run
+arch="noarch"
+license="GPL-3.0-or-later"
+depends="python3 py3-docopt py3-usb py3-hidapi"
+makedepends="py3-setuptools"
+checkdepends="py3-pytest"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/liquidctl/liquidctl/archive/v$pkgver.tar.gz"
+
+build() {
+	DIST_NAME="$(source /etc/os-release && echo "$PRETTY_NAME")" \
+	DIST_PACKAGE="$pkgname $pkgver-r$pkgrel" \
+	python3 setup.py build
+}
+
+check() {
+	py.test-3
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+	install -Dm644 liquidctl.8 "$pkgdir"/usr/share/man/man8/liquidctl.8
+}
+
+sha512sums="
+b75f65ebdb383e358ad651dd9e92710ea77efa2e88a09f848d737ab98637de213e3ca60a53497f12aabc4576d404165b62187060cb6bb8dd64b3cffaa49247e3  liquidctl-1.7.2.tar.gz
+"

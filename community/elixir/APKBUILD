@@ -1,0 +1,29 @@
+# Contributor: Daniel Isaksen <d@duniel.no>
+# Contributor: Victor Schroeder <me@vschroeder.net>
+# Maintainer: Marlus Saraiva <marlus.saraiva@gmail.com>
+pkgname=elixir
+pkgver=1.12.2
+pkgrel=0
+pkgdesc="Elixir is a dynamic, functional language designed for building scalable and maintainable applications"
+url="https://elixir-lang.org/"
+arch="noarch"
+license="Apache-2.0"
+depends="erlang-dev>=23.0 erlang-dialyzer"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/elixir-lang/elixir/archive/v$pkgver.tar.gz"
+
+build() {
+	LANG="en_US.UTF-8" make
+}
+
+check() {
+	make test
+}
+
+package() {
+	make DESTDIR="$pkgdir" PREFIX=/usr install
+}
+
+sha512sums="
+4c19a6a0310606b3016b3699079dc5f667e348c86c92e7e998cbecbacd283f5f4ccdd3d83b757725ba637a39729e9d82673b596feee72e831d575630e2f3111a  elixir-1.12.2.tar.gz
+"

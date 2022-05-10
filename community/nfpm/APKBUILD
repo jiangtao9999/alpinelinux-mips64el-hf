@@ -1,0 +1,30 @@
+# Contributor: Kevin Daudt <kdaudt@alpinelinux.org>
+# Maintainer: Kevin Daudt <kdaudt@alpinelinux.org>
+pkgname=nfpm
+pkgver=2.9.2
+pkgrel=0
+pkgdesc="a simple apk, Deb and RPM packager without external dependencies"
+url="https://nfpm.goreleaser.com/"
+arch="all !riscv64"
+license="MIT"
+makedepends="go"
+source="$pkgname-$pkgver.tar.gz::https://github.com/goreleaser/nfpm/archive/v$pkgver.tar.gz"
+
+export GOMODCACHE="$srcdir/go"
+export GOFLAGS="$GOFLAGS -modcacherw"
+
+build() {
+	go build -ldflags "-s -w -X main.version=$pkgver" -v -o nfpm ./cmd/nfpm/main.go
+}
+
+check() {
+	go test
+}
+
+package() {
+	install -Dm0755 nfpm "$pkgdir/usr/bin/nfpm"
+}
+
+sha512sums="
+08126a68b1cc2b47af10ca02913389f8377bc987518404163b9aac0e3697701c23a8011a07c981f64ef1ff35eabb0d30e9a594d78dfbb5ce2a27d5d918e2e4d4  nfpm-2.9.2.tar.gz
+"

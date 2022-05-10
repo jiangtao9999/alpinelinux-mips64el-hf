@@ -1,0 +1,23 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-quicknes
+pkgver=0_git20210325
+pkgrel=0
+_commit="5a38b43fa2e97a32d0b8b360d567a9613e225c16"
+pkgdesc="QuickNES core library"
+url="https://github.com/libretro/QuickNES_Core"
+arch="all"
+license="LGPL-2.1-or-later"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/QuickNES_Core/archive/$_commit.tar.gz"
+builddir="$srcdir/QuickNES_Core-$_commit"
+options="!check" # No tests
+
+build() {
+	make
+}
+
+package() {
+	install -Dm644 quicknes_libretro.so "$pkgdir"/usr/lib/libretro/quicknes_libretro.so
+}
+
+sha512sums="ebf16475bc64a846db81b3707d211ef2fb1f8e0f9919b36af3c347c7853246643214033e289d3b513e2f6ae68ca4cab0d455dfe9cd25bb234c7196dc95515680  libretro-quicknes-5a38b43fa2e97a32d0b8b360d567a9613e225c16.tar.gz"

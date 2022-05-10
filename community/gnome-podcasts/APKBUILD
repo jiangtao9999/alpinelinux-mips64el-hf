@@ -1,0 +1,40 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-podcasts
+pkgver=0.4.9
+pkgrel=2
+pkgdesc="Podcast app for GNOME"
+url="https://wiki.gnome.org/Apps/Podcasts"
+# x86 blocked by crashing Rust
+# armv7 blocked by failing test
+# s390x, mips64 and riscv64 blocked by rust/cargo
+arch="all !s390x !mips64 !armv7 !riscv64"
+license="GPL-3.0-or-later"
+depends="gst-plugins-good"
+makedepends="meson gtk+3.0-dev gstreamer-dev libhandy1-dev sqlite-dev openssl1.1-compat-dev
+	dbus-dev gst-plugins-base-dev gst-plugins-bad-dev cargo bash"
+checkdepends="desktop-file-utils appstream-glib xvfb-run"
+options="!check" # needs the thing to be installed first
+subpackages="$pkgname-lang"
+source="https://gitlab.gnome.org/World/podcasts/uploads/e07d05de378066ec528729e8897e1d1b/gnome-podcasts-$pkgver.tar.xz"
+
+prepare() {
+	default_prepare
+
+	sed 's| /usr/bin/sh|/bin/sh|' -i scripts/test.sh
+}
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	xvfb-run meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="3131089e033801b58edf28d07acbae0b0be10c12a42070a37d91f4886b7dec3603a48d7cd88a55fb71ef91431e494a58bebd8ab8bff6bc32147913c395ad43ba  gnome-podcasts-0.4.9.tar.xz"

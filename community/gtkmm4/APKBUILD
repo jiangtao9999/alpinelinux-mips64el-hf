@@ -1,0 +1,48 @@
+# Contributor: Leonardo Arena <rnalrd@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=gtkmm4
+pkgver=4.4.0
+pkgrel=0
+pkgdesc="C++ wrappers for GTK 4"
+url="https://www.gtkmm.org/"
+# s390x, mips64 and riscv64 blocked by polkit -> gtk4.0
+arch="all !s390x !mips64 !riscv64"
+license="LGPL-2.1-or-later"
+makedepends="
+	atkmm2.36-dev
+	cairomm1.16-dev
+	doxygen
+	gdk-pixbuf-dev
+	glibmm2.68-dev
+	graphviz
+	gtk4.0-dev
+	m4
+	meson
+	pangomm2.48-dev
+	perl
+	"
+checkdepends="xvfb-run"
+subpackages="$pkgname-dev $pkgname-doc"
+source="https://download.gnome.org/sources/gtkmm/${pkgver%.*}/gtkmm-$pkgver.tar.xz"
+builddir="$srcdir/gtkmm-$pkgver"
+
+build() {
+	abuild-meson \
+		-Dbuild-demos=false \
+		-Dbuild-tests=true \
+		-Dbuild-documentation=true \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	xvfb-run meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+d6f20213e9ea7a13e2b9822f220a5cdeaef9a9406abee813e0eebdb540839f25f4c19cc7669c24184bef471f5529a7897cd16ee679266148f3181dd2cfa39eb4  gtkmm-4.4.0.tar.xz
+"

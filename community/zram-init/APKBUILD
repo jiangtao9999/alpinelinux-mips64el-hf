@@ -1,0 +1,43 @@
+# Maintainer: Stuart Cardall <developer@it-offshore.co.uk>
+# Contributor: Bartłomiej Piotrowski <bpiotrowski@alpinelinux.org>
+# Contributor: Pedro Filipe <xpecex@outlook.com>
+pkgname=zram-init
+pkgver=11.0
+pkgrel=0
+pkgdesc="wrapper script for the zram kernel module"
+arch="noarch"
+url="https://github.com/vaeth/zram-init"
+license="GPL-2.0-only"
+depends="e2fsprogs-extra util-linux" # we need zramctl from util-linux
+subpackages="
+	$pkgname-zsh-completion:zshcomp
+	$pkgname-openrc
+	$pkgname-doc
+	"
+source="$pkgname-$pkgver.tar.gz::https://github.com/vaeth/zram-init/archive/v$pkgver.tar.gz
+	"
+options="!check" # no tests
+
+build() {
+	make SYSTEMD=FALSE SYSCONFDIR=/etc GETTEXT=FALSE
+}
+
+package() {
+	install -Dm644 modprobe.d/zram.conf "$pkgdir"/lib/modprobe.d/zram.conf
+	install -Dm755 sbin/zram-init "$pkgdir"/usr/sbin/zram-init
+
+	install -Dm644 openrc/conf.d/zram-init "$pkgdir"/etc/conf.d/zram-init
+	install -Dm755 openrc/init.d/zram-init "$pkgdir"/etc/init.d/zram-init
+
+	install -Dm644 man/zram-init.8 -t "$pkgdir"/usr/share/man/man8
+}
+
+zshcomp() {
+	depends=""
+	pkgdesc="Zsh completions for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel zsh"
+
+	install -Dm644 "$builddir"/zsh/_zram-init -t "$subpkgdir"/usr/share/zsh/site-functions
+}
+
+sha512sums="f11c7ad4e684701ab7c89cb1e859c6ee58ff6795f03b584884f64341d511a8c2de375fc43463318220fab2e16632807d8a13e9b6ac502fa933d406996bf4d115  zram-init-11.0.tar.gz"

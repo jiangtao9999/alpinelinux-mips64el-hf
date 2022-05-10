@@ -1,0 +1,67 @@
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=jenkins
+pkgver=2.307
+pkgrel=0
+pkgdesc="Extendable continuous integration server (stable version)"
+url="https://jenkins.io"
+# mips64 and riscv64 blocked by openjdk8
+arch="noarch !mips64 !riscv64"
+license="MIT"
+depends="java-jre-headless freetype ttf-dejavu xvfb fontconfig"
+install="$pkgname.pre-install"
+options="!check"
+pkgusers="$pkgname"
+pkggroups="$pkgname"
+subpackages="$pkgname-openrc"
+source="$pkgname-$pkgver.war::http://mirrors.jenkins.io/war/$pkgver/jenkins.war
+	$pkgname.logrotate
+	$pkgname.initd
+	$pkgname.confd"
+builddir="$srcdir/"
+
+# secfixes:
+#   2.287-r0:
+#     - CVE-2021-21639
+#     - CVE-2021-21640
+#   2.275-r0:
+#     - CVE-2021-21602
+#     - CVE-2021-21603
+#     - CVE-2021-21604
+#     - CVE-2021-21605
+#     - CVE-2021-21606
+#     - CVE-2021-21607
+#     - CVE-2021-21608
+#     - CVE-2021-21609
+#     - CVE-2021-21610
+#     - CVE-2021-21611
+#   2.245-r0:
+#     - CVE-2020-2220
+#     - CVE-2020-2221
+#     - CVE-2020-2222
+#     - CVE-2020-2223
+#   2.228-r0:
+#     - CVE-2020-2160
+#     - CVE-2020-2161
+#     - CVE-2020-2162
+#     - CVE-2020-2163
+
+package() {
+	install -Dm755 "$srcdir"/$pkgname.initd \
+		"$pkgdir"/etc/init.d/$pkgname
+	install -Dm644 "$srcdir"/$pkgname.confd \
+		"$pkgdir"/etc/conf.d/$pkgname
+	install -Dm755 "$srcdir"/$pkgname-$pkgver.war \
+		"$pkgdir"/usr/share/webapps/jenkins/$pkgname.war
+	install -Dm644 "$srcdir"/$pkgname.logrotate \
+		"$pkgdir"/etc/logrotate.d/$pkgname
+	mkdir -p "$pkgdir"/var/log/jenkins
+	chown -R $pkgusers:$pkggroups "$pkgdir"/var/log/jenkins
+}
+
+sha512sums="
+fda6c6aeb0b49c3f060915c8b0eb0f70cb75f1005120c9fd51c1ddf28b14dfa217d81ec9c877ca048fb6814c353b7e029d0b76169cd76fb6e847555b25a11fe2  jenkins-2.307.war
+ee2e80d93b390b2c5dead3111e07d6226cbd87393740fd630975e4d177acc033392ebbdb99f8ea3c6daeceac184399b38b0fa3ae7d96b5cb28f65d473b916244  jenkins.logrotate
+43686a537248c7a0a8fe53c3ca9577c8ffb50a141248de028d398d0fd3b3be8562b6cb2c63b44b3b0ac58d6431e8907790553791b2e125d1bfc2e3263ffaa83e  jenkins.initd
+7247750a13fc2537dc1e405f6d8221ccdc80cfbaf40c47327ee04c206afa8607ada52e7b895c8eb3489dd9f6a94b42b8b38110b3120948a35dc4f197fe4c08ed  jenkins.confd
+"

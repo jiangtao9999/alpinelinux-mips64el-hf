@@ -1,0 +1,122 @@
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=npm
+pkgver=8.1.3
+pkgrel=0
+pkgdesc="The package manager for JavaScript"
+url="https://npm.community"
+arch="noarch !mips64 !mips64el !riscv64"  # limited by nodejs
+license="Artistic-2.0"
+depends="cmd:node"
+makedepends="bash nodejs"
+replaces="nodejs-doc"  # for backward compatibility
+subpackages="$pkgname-doc $pkgname-bash-completion"
+source="https://github.com/npm/cli/archive/v$pkgver/npm-cli-$pkgver.tar.gz
+	reproducible-documentation-build.patch
+	dont-check-for-last-version.patch
+	make-dont-install-deps.patch
+	smoke-tests-npm-location.patch
+	npmrc
+	"
+builddir="$srcdir/cli-$pkgver"
+
+prepare() {
+	default_prepare
+
+	# Remove bunch of unnecessary files to reduce size of the package.
+
+	rm bin/npm bin/npx bin/*.cmd bin/node-gyp-bin/*.cmd
+
+	cd node_modules
+
+	# Move libnpmdiff into node_modules instead of symlink
+	rm libnpmdiff && mv ../packages/libnpmdiff .
+
+	find . -type f \( \
+		-name '.*' -o \
+		-name '*.cmd' -o \
+		-name '*.coffee' -o \
+		-name '*.bat' -o \
+		-name '*.map' -o \
+		-name '*.md' -o \
+		-name '*.ts' -o \
+		-name 'AUTHORS*' -o \
+		-name 'LICENSE*' -o \
+		-name 'Makefile' -o \
+		-name 'README*' -o \) -delete
+	rm -Rf ./*/.git* ./*/doc ./*/docs ./*/examples ./*/scripts ./*/test
+
+	# No files should be executable here, except node-gyp.
+	find . -type f -executable ! -name 'node-gyp*' -exec chmod -x {} \;
+
+	cd ../docs/content
+
+	# XXX: Workaround for https://github.com/npm/cli/issues/780.
+	local f name
+	for f in configuring-npm/folders.md configuring-npm/install.md using-npm/*.md; do
+		name=$(basename $f .md)
+		sed -Ei "s/^title: $name/title: npm-$name/" "$f"
+		mv "$f" "$(dirname $f)/npm-$name.md"
+	done
+
+	cd "$builddir"
+
+	# Backup files that will be included in the package before installing
+	# additional dev dependencies and running tests.
+	mkdir -p "$srcdir"/npm
+	cp -r bin lib node_modules package.json "$srcdir"/npm/
+
+	# Install dependencies needed for mandocs and smoke-tests.
+	node bin/npm-cli.js install --ignore-scripts --no-audit --no-fund
+}
+
+build() {
+	# Convert Markdown docs to man pages.
+	make mandocs
+
+	# Generate bash completions.
+	node bin/npm-cli.js completion > npm.bash
+}
+
+check() {
+	make smoke-tests NPM_LOCATION="$srcdir/npm"
+}
+
+package() {
+	local destdir="$pkgdir/usr/lib/node_modules/npm"
+
+	mkdir -p "$destdir"
+	cp -r "$srcdir"/npm/* "$destdir"/
+
+	install -m 644 "$srcdir"/npmrc -t "$destdir"/
+
+	mkdir -p "$pkgdir"/usr/bin
+	ln -s ../lib/node_modules/npm/bin/npm-cli.js "$pkgdir"/usr/bin/npm
+	ln -s ../lib/node_modules/npm/bin/npx-cli.js "$pkgdir"/usr/bin/npx
+	ln -s ../lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js "$pkgdir"/usr/bin/node-gyp
+
+	cd "$builddir"
+
+	mkdir -p "$pkgdir"/usr/share
+	cp -r man "$pkgdir"/usr/share/
+	ln -s ../../../share/man "$destdir"/man
+
+	install -Dm 644 LICENSE -t "$pkgdir"/usr/share/licenses/$pkgname/
+
+	install -Dm 644 npm.bash "$pkgdir"/usr/share/bash-completion/completions/npm
+}
+
+doc() {
+	default_doc
+
+	amove usr/lib/node_modules/npm/man
+}
+
+sha512sums="
+0d0ab795e668969a41b362d21741fe0e1403790d8fa25c18ad18c59adfac52cc10d7a7689e3b2b4040cd88e476fb7dba1fc8fad1d7603b623eb49cfd12ac5a83  npm-cli-8.1.3.tar.gz
+c75734fc24bf9aac9ae795f49f1145a99b82ec359a05af18531ae5a22edd1a22348faf301d9b6e3d0b68d3333df76136c17d4953ecd4f5f5efdbfb06a227a174  reproducible-documentation-build.patch
+86bcf0d9883073b330dcb90ced00e8293dd011e1587791fadc14eb0c25eedfe7132626f9bfb792ae2587d335464f71b1af1183b5e6a411b04f975ff5aa06cdc7  dont-check-for-last-version.patch
+0aed63f6b541378d51794393bf70b6401c7bdbc8c1ebbf35fc8b91c8220fc5ab1753f577908b0dc24bdeaf4f9cabb3bb1a48329c2ac026aba1f479d6a53311d6  make-dont-install-deps.patch
+0ec638b7a5bc55b116f5d358055363e96d74fcfa2b3bc3b9b35e0a64551e9ce06a871faa013b00e2b3e9ad370d4f5a2be7983fb85f0d52a31bed65de99cccfb5  smoke-tests-npm-location.patch
+6d0ce425061ffff1c5d7a42c9908f3382cd77abf81a9c30a62ff6fff1f0d02ff633b2bb090814aa619f7d2a51237b3da7f85d97d0f584e037639b60ccfaf0e96  npmrc
+"

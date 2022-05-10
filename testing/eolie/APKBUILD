@@ -1,0 +1,31 @@
+# Contributor: Daniele Debernardi <drebrez@gmail.com>
+# Maintainer: Daniele Debernardi <drebrez@gmail.com>
+pkgname=eolie
+pkgver=0.9.101
+pkgrel=1
+pkgdesc="Web browser for GNOME"
+url="https://gitlab.gnome.org/World/eolie"
+arch="noarch !mips !mips64 !riscv64" # blocked by webkit2gtk
+license="GPL-3.0-or-later"
+depends="webkit2gtk gtkspell3 py3-cairo py3-gobject3"
+makedepends="meson python3 glib-dev gobject-introspection-dev gtk+3.0-dev"
+checkdepends="desktop-file-utils appstream-glib"
+subpackages="$pkgname-lang"
+source="https://adishatz.org/eolie/eolie-$pkgver.tar.xz
+	dont-require-py3-gettext-support.patch"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="cfb4695f421ee0a6b07eb505d918e8bfa7d001eac3621b44cae3e47fbee398c92228e4a482d460c665cffdbb298c10e6efd7c13df0baa9ec99d45d1d3bd00696  eolie-0.9.101.tar.xz
+78f62663dd7150805dcb6086b5dfc5f1a9fff367dfb7cad662ca8fc2dcbc08fd3633f58d6ecbe2e4f368ba722c31783fcf9c336ffefa0efc670906d15878bbf9  dont-require-py3-gettext-support.patch"

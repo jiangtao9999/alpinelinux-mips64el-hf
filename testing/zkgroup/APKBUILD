@@ -1,0 +1,25 @@
+# Contributor: Siva Mahadevan <me@svmhdvn.name>
+# Maintainer: Siva Mahadevan <me@svmhdvn.name>
+pkgname=zkgroup
+pkgver=0.7.2
+pkgrel=0
+pkgdesc="Library for the Signal Private Group System"
+url="https://github.com/signalapp/zkgroup"
+arch="all !s390x !mips !mips64 !ppc64le !riscv64" # limited by cargo
+license="GPL-3.0-only"
+makedepends="cargo"
+source="$pkgname-$pkgver.tar.gz::https://github.com/signalapp/zkgroup/archive/v$pkgver.tar.gz"
+
+build() {
+	cargo build --release --locked
+}
+
+check() {
+	cargo test --release --locked
+}
+
+package() {
+	install -Dm755 "target/release/libzkgroup.so" "$pkgdir/usr/lib/libzkgroup.so"
+}
+
+sha512sums="bb94b6a2952072983a7ee617228e85ccff75db5c57fd6b18edbf4df8f63b759bd1f41d0d9043897bf21296de53150981a2e95b963a6e4771ba1947e8e868316d  zkgroup-0.7.2.tar.gz"

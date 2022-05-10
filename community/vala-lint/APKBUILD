@@ -1,0 +1,29 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=vala-lint
+pkgver=0_git20210203
+_sha=5b06cc2341ae7e9f7f8c35c542ef78c36e864c30
+pkgrel=0
+pkgdesc="Check code-style of Vala code files"
+url="https://github.com/vala-lang/vala-lint"
+#arch="all"
+arch="" # https://github.com/vala-lang/vala-lint/issues/152
+license="GPL-2.0-or-later"
+makedepends="meson glib-dev vala"
+source="$pkgname-$pkgver.tar.gz::https://github.com/vala-lang/vala-lint/archive/$_sha.tar.gz"
+builddir="$srcdir/vala-lint-$_sha"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="7f8b05908aed62c408738aef7ed4fe502a20ed2b72321c34c05ad0a29aad756c862cb352456419d482fafaea1ef96717e7174d2636839f8d27d5dffb9c60c43c  vala-lint-0_git20210203.tar.gz"

@@ -1,0 +1,34 @@
+# Contributor: Duncan Bellamy <dunk@denkimushi.com>
+# Maintainer: Duncan Bellamy <dunk@denkimushi.com>
+pkgname=py3-softlayer
+pkgver=5.9.7
+pkgrel=0
+pkgdesc="library for SoftLayer's API"
+url="https://github.com/softlayer/softlayer-python"
+arch="noarch"
+license="MIT"
+depends="py3-click py3-prompt_toolkit py3-ptable py3-pygments py3-requests py3-urllib3"
+makedepends="py3-setuptools"
+checkdepends="py3-pytest py3-pytest-mock py3-testtools"
+source="$pkgname-$pkgver.tar.gz::https://github.com/softlayer/softlayer-python/archive/v$pkgver.tar.gz"
+builddir="$srcdir/softlayer-python-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	#py3tkinter needed for this test
+	python3 -m pytest \
+		--deselect=tests/CLI/environment_tests.py::EnvironmentTests::test_getpass_issues1436
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+
+	rm -rf "$pkgdir"/usr/lib/python3*/site-packages/tests
+}
+
+sha512sums="
+196748b608cf68a01eed145c8e5085974e40ed1b995055e63d349007445b431f730b3d019f337fe28f89ffe219b8a29304994a60c0086f87d97e52579e472cf0  py3-softlayer-5.9.7.tar.gz
+"

@@ -1,0 +1,34 @@
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=sysstat
+# !!! 12.5.x are stable versions !!!
+pkgver=12.5.4
+pkgrel=0
+pkgdesc="Performance monitoring tools"
+url="http://pagesperso-orange.fr/sebastien.godard/"
+arch="all"
+license="GPL-2.0-or-later"
+makedepends="linux-headers xz"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/sysstat/sysstat/archive/v$pkgver.tar.gz"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info \
+		--disable-nls
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+
+}
+
+sha512sums="
+c051f136d404684a21b11e968968e34f0f114b4568369c6449c64b7745269065a3dc492039ded7c415fe39970aca54cc81646589b0959ade43e9be6f6cd4c0dc  sysstat-12.5.4.tar.gz
+"

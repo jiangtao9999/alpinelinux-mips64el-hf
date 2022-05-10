@@ -1,0 +1,26 @@
+# Contributor: Danct12 <danct12@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=libglibutil
+pkgver=1.0.56
+pkgrel=0
+pkgdesc="Library of glib utilities"
+url="https://github.com/sailfishos/libglibutil"
+arch="all"
+license="BSD-3-Clause"
+makedepends="glib-dev"
+subpackages="$pkgname-dev $pkgname-doc"
+source="https://github.com/sailfishos/libglibutil/archive/$pkgver/libglibutil-$pkgver.tar.gz"
+options="!check" # test_log.c: error: assignment of read-only variable 'stdout'
+
+build() {
+	make KEEP_SYMBOLS=1 release pkgconfig
+}
+
+package() {
+	make DESTDIR="$pkgdir" install-dev
+	install -Dm 644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+}
+
+sha512sums="
+75955824e9790af1bc168ba9b48835dbb855d42cf0931c5b63757786c06f2c7f7782b90f68d8f5ee3e01edac4ce71f950dfbdb3b1f98879a6bd624be16ae5bdc  libglibutil-1.0.56.tar.gz
+"

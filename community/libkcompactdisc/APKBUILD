@@ -1,0 +1,43 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=libkcompactdisc
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> solid
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://www.kde.org/applications/multimedia/"
+pkgdesc="Library for interfacing with CDs"
+license="GPL-2.0-or-later AND LGPL-2.0-or-later"
+makedepends="
+	extra-cmake-modules
+	kcoreaddons-dev
+	ki18n-dev
+	phonon-dev
+	qt5-qtbase-dev
+	solid-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/libkcompactdisc-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+8265d2716bc5f3a871b1f9b3ad3cc995938a6dcad9f93aa4e131a2a66eeb9d85efe4bfa99294d7240659a29c6b6fadc19d7c821511fe9b025064c03c552b56ce  libkcompactdisc-21.08.3.tar.xz
+"

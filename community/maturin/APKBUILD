@@ -1,0 +1,42 @@
+# Contributor: omni <omni+alpine@hack.org>
+# Maintainer: omni <omni+alpine@hack.org>
+pkgname=maturin
+pkgver=0.10.6
+pkgrel=0
+pkgdesc="Build and publish crates with pyo3, rust-cpython and cffi bindings"
+url="https://github.com/PyO3/maturin"
+arch="aarch64 armv7 armhf x86 x86_64 ppc64le" # limited by rust
+license="Apache-2.0 MIT"
+makedepends="cargo dbus-dev"
+checkdepends="py3-virtualenv py3-pyo py3-cffi libffi-dev python3-dev"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/PyO3/maturin/archive/v$pkgver.tar.gz
+	integration_tests_platform.patch"
+
+build() {
+	case "$CARCH" in
+	  ppc64le | s390x) cargo build --release --locked --no-default-features --features "log,human-panic" ;;
+		*) cargo build --release --locked --all-features ;;
+	esac
+}
+
+check() {
+	# enable interpreter "python" hack
+	mkdir "$builddir"/pythonbindir
+	ln -s /usr/bin/python3 "$builddir"/pythonbindir/python
+	export PATH="$PATH:$builddir/pythonbindir"
+
+	case "$CARCH" in
+		ppc64le | s390x) cargo test --release --locked --no-default-features --features "log,human-panic" ;;
+		*) cargo test --release --locked --all-features ;;
+	esac
+}
+
+package() {
+	install -Dm0755 target/release/$pkgname -t "$pkgdir"/usr/bin
+	install -Dm0644 license-apache "$pkgdir"/usr/share/licenses/$pkgname/license-apache
+	install -Dm0644 license-mit "$pkgdir"/usr/share/licenses/$pkgname/license-mit
+}
+
+sha512sums="967c9275b2dca7ca0ebc597686680d2d33e7271b0beb0f477aac3776a3592e939ae9b155466a2cb5c8684e427217cc7d7e69b86c959ae8e6cbbd5f4cc8987501  maturin-0.10.6.tar.gz
+7a9ff735f2594f844639f9d9611800e063ecf584457cc82f26c13f20b31e6068da21bfe650a35f79a40aba64f75df83dc77fdc00f3c68ae1f43d4896fcffa0f1  integration_tests_platform.patch"

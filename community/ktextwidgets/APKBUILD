@@ -1,0 +1,51 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=ktextwidgets
+pkgver=5.88.0
+pkgrel=0
+pkgdesc="Advanced text editing widgets"
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://community.kde.org/Frameworks"
+license="LGPL-2.1-or-later"
+depends_dev="
+	kcompletion-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	ki18n-dev
+	kiconthemes-dev
+	kservice-dev
+	kwidgetsaddons-dev
+	qt5-qtspeech-dev
+	sonnet-dev
+	"
+makedepends="$depends_dev
+	doxygen
+	extra-cmake-modules
+	qt5-qttools-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/ktextwidgets-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_QCH=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+f8d05f876e1fdbfdb51af0fcd12429d21154e463be15b422505c1ddfd0897cfd2b134f60268cadf709f256e4deed25dcc9e2ad2c6488bb482b8b44a6d415223e  ktextwidgets-5.88.0.tar.xz
+"

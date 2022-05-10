@@ -1,0 +1,83 @@
+# Contributor: Oleg Titov <oleg.titov@gmail.com>
+# Maintainer: Oleg Titov <oleg.titov@gmail.com>
+pkgname=singularity
+pkgver=3.8.4
+pkgrel=0
+pkgdesc="Application containers focused on reproducibility for scientific computing and HPC world."
+url="https://www.sylabs.io/singularity/"
+# aarch64: segmentation fault during build
+# mips64: fails to build
+# ppc64le: produces a non-PIE suid binary
+# riscv64 blocked by binutils-gold
+arch="all !aarch64 !mips64 !ppc64le !riscv64"
+license="BSD-3-Clause AND BSD-3-Clause-LBNL"
+options="chmod-clean suid !check" # no test suite from upstream
+depends="squashfs-tools"
+makedepends="
+	go
+	linux-headers
+	binutils-gold
+	openssl-dev
+	libuuid
+	util-linux-dev
+	libseccomp-dev
+	cryptsetup
+	"
+subpackages="$pkgname-doc $pkgname-bash-completion::noarch"
+source="https://github.com/hpcng/singularity/releases/download/v$pkgver/singularity-$pkgver.tar.gz"
+builddir="$srcdir/src/github.com/hpcng/$pkgname"
+
+# secfixes:
+#   3.7.4-r0:
+#     - CVE-2021-32635
+#   3.7.3-r0:
+#     - CVE-2021-29136
+#   3.6.4-r0:
+#     - CVE-2020-15229
+#   3.6.3-r0:
+#     - CVE-2020-25039
+#     - CVE-2020-25040
+#   3.6.0-r0:
+#     - CVE-2020-13845
+#     - CVE-2020-13846
+#     - CVE-2020-13847
+#   3.5.2-r0:
+#     - CVE-2019-19724
+
+prepare() {
+	export GOPATH="$srcdir"
+
+	mkdir -p "$(dirname $builddir)"
+	mv "$srcdir"/$pkgname-$pkgver "$builddir"/
+
+	echo "$pkgver" > "$builddir"/VERSION
+	default_prepare
+}
+
+build() {
+	export GOPATH="$srcdir"
+	export GOBIN="$GOPATH/bin"
+
+	./mconfig \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/infodir \
+		--localstatedir=/var
+
+	make -C builddir
+}
+
+package() {
+	make -C builddir DESTDIR="$pkgdir" install
+
+	install -m644 -D -t "$pkgdir/usr/share/doc/$pkgname" README.md
+
+	mkdir -p "$pkgdir"/usr/share/bash-completion/completions
+	mv "$pkgdir"/etc/bash_completion.d/singularity \
+		"$pkgdir"/usr/share/bash-completion/completions
+}
+
+sha512sums="
+21170fcea6d49edd827b000b7885fd4bd4a35fc4367a68f1358f45f181fe6b09eae6336bb02007948c20841483c1b74831faca8408cd3f2982be780712967c55  singularity-3.8.4.tar.gz
+"

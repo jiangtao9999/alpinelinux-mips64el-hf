@@ -1,0 +1,61 @@
+# Contributor: Natanael Copa <ncopa@alpinelinux.org>
+# Contributor: Alexey Minnekhanov <alexeymin@postmarketos.org>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=qt-creator
+pkgver=5.0.2
+pkgrel=1
+pkgdesc="Lightweight and cross-platform C++ IDE"
+url="https://qt-project.org/wiki/Category:Tools::QtCreator"
+arch="all !armhf" # armhf blocked by qt5-qtdeclarative
+license="GPL-3.0-only WITH Qt-GPL-exception-1.0"
+depends="
+	qt5-qtbase-sqlite
+	qt5-qtquickcontrols
+	qt5-qtquickcontrols2
+	qt5-qtbase-dev
+	qt5-qttools-dev
+"
+makedepends="
+	botan-dev
+	clang-dev
+	clang-static
+	cmake
+	elfutils-dev
+	llvm11-dev
+	llvm11-static
+	qt5-qtdeclarative-dev
+	qt5-qtscript-dev
+	qt5-qtsvg-dev
+	qt5-qtquickcontrols2-dev
+	syntax-highlighting-dev
+"
+ldpath="/usr/lib/qtcreator:/usr/lib/qtcreator/plugins"
+source="
+	https://download.qt.io/official_releases/qtcreator/${pkgver%.*}/$pkgver/qt-creator-opensource-src-$pkgver.tar.xz
+	fix-execinfo.patch
+	fix-malloc-trim.patch
+"
+
+builddir="$srcdir"/qt-creator-opensource-src-$pkgver
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DPYTHON_EXECUTABLE=/usr/bin/python3 \
+		-DBUILD_PLUGIN_CLANGFORMAT=OFF
+	# Note: -DBUILD_PLUGIN_CLANGFORMAT=OFF: incompatible llvm/clang? without this:
+	# /usr/include/clang/Basic/LLVM.h:21:10: fatal error: llvm/Support/Casting.h: No such file or directory
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+a2111f0687fa2177a5c0b7c4a8768544d5f63b1aa7b53e1d1f9dcc69fc49a00f12399f988da35b1243de9d690d23aa05029d4385ea3882014a56b022a4a0e447  qt-creator-opensource-src-5.0.2.tar.xz
+2265351131763da0454d08d72e0370ed70901c333a56eb566c5463c04fa8c2d2577b539fc7d0b1e0ad1b0229de9b343a1b610f59c4c41d13beb786bfbe213f62  fix-execinfo.patch
+009efcc9532ad3d8a26b9b44f31e6a8f82c87359aca5ff1943caed8b9fc53cdee81a8256b082602804435410bf8c4df795c06993a49ef42a5910b5c34057aee9  fix-malloc-trim.patch
+"

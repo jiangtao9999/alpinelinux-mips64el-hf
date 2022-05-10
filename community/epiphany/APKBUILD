@@ -1,0 +1,37 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=epiphany
+pkgver=41.0
+pkgrel=0
+pkgdesc="A simple, clean, beautiful view of the web"
+url="https://wiki.gnome.org/Apps/Web"
+# s390x, mips64 and riscv64 blocked by rust -> libhandy1
+arch="all !s390x !mips64 !riscv64"
+license="GPL-3.0-or-later"
+depends="gsettings-desktop-schemas dbus:org.freedesktop.Secrets"
+makedepends="meson iso-codes-dev gtk+3.0-dev gsettings-desktop-schemas-dev
+	icu-dev json-glib-dev libdazzle-dev libhandy1-dev libnotify-dev libsecret-dev
+	libsoup-dev libxml2-dev nettle-dev sqlite-dev webkit2gtk-dev gcr-dev itstool
+	libportal-dev libarchive-dev"
+checkdepends="appstream-glib desktop-file-utils xvfb-run ibus"
+options="!check" # Fail due to our webkitgtk patches!
+subpackages="$pkgname-lang $pkgname-doc $pkgname-dbg"
+source="https://download.gnome.org/sources/epiphany/${pkgver%.*}/epiphany-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	# https://gitlab.gnome.org/GNOME/epiphany/issues/829
+	env PATH="$PATH:$builddir/output/src" xvfb-run meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+3e3f8209238b0b7fb181c48899e815896a24aae5b318c2ca6a75ce334423290d006e138c63496a0bcd4f32846439426f46b84875b2306aabb5b87e53368f8118  epiphany-41.0.tar.xz
+"

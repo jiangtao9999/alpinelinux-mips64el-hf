@@ -1,0 +1,52 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kontact
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# ppc64le, s390x, mips64 and riscv64 blocked by qt5-qtwebengine
+# riscv64 disabled due to missing rust in recursive dependency
+arch="all !armhf !ppc64le !s390x !mips64 !riscv64"
+url="https://kontact.kde.org/"
+pkgdesc="Container application to unify several major PIM applications within one application"
+license="GPL-2.0-or-later"
+makedepends="
+	akonadi-dev
+	extra-cmake-modules
+	grantleetheme-dev
+	kcmutils-dev
+	kcrash-dev
+	kdbusaddons-dev
+	kdoctools-dev
+	kiconthemes-dev
+	kontactinterface-dev
+	kpimtextedit-dev
+	kwindowsystem-dev
+	libkdepim-dev
+	pimcommon-dev
+	qt5-qtbase-dev
+	qt5-qtwebengine-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kontact-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+eb14b4642c5bc22209fcac6779e7491d2c0a56e52c4eaabe412e1d69e4bca09a5d238e696fb898d83ef1d277ec82cf02f3b94d65c50596212ae301d28e88d973  kontact-21.08.3.tar.xz
+"

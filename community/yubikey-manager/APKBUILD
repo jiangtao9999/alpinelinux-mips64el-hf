@@ -1,0 +1,35 @@
+# Contributor: Daniel Everett <deverett@gmail.com>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=yubikey-manager
+pkgver=4.0.1
+pkgrel=0
+pkgdesc="Python library and command line tool for configuring any YubiKey over all USB interfaces"
+url="https://developers.yubico.com/yubikey-manager/"
+arch="noarch"
+license="BSD-2-Clause"
+depends="python3 py3-ykman py3-click py3-usb py3-pyscard py3-openssl py3-fido2
+	py3-cryptography libusb ykpers-dev yubico-c pcsc-lite pcsc-lite-libs libu2f-host
+	ccid
+	"
+makedepends="py3-setuptools"
+subpackages="py3-ykman"
+source="https://developers.yubico.com/yubikey-manager/Releases/yubikey-manager-$pkgver.tar.gz"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py check
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+ykman() {
+	mkdir -p "$subpkgdir"/usr/
+	mv "$pkgdir"/usr/lib "$subpkgdir"/usr/lib
+}
+
+sha512sums="39613fbf2ab5c11fb8f606b63015b291d7605ce7539845f372677fc6d94b9ea0f911493c1837d2dcba7d0a1d212d588fdc5408fe272d06e3fa62be917be8455f  yubikey-manager-4.0.1.tar.gz"

@@ -1,0 +1,36 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=enchant2
+pkgver=2.3.1
+pkgrel=1
+pkgdesc="wrapper library for generic spell checking (v2)"
+url="https://abiword.github.io/enchant/"
+arch="all"
+license="LGPL-2.1-or-later"
+subpackages="$pkgname-dev $pkgname-doc"
+makedepends="aspell-dev glib-dev dbus-glib-dev gettext-dev file bash nuspell-dev"
+options="!check" # needs unpackaged unittest-cpp
+source="https://github.com/AbiWord/enchant/releases/download/v$pkgver/enchant-$pkgver.tar.gz"
+builddir="$srcdir/enchant-$pkgver"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--disable-static \
+		--with-nuspell
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" pkgdatadir=/usr/share/enchant-2 install
+}
+
+sha512sums="
+c6fb8498d34a55040c2791124c2975952497e5a1b8999958691279b1a60a37473a1d2e3e11504f7cc877370be7772c2db621022040ea7035b21e40e8367606f5  enchant-2.3.1.tar.gz
+"

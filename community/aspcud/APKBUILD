@@ -1,0 +1,30 @@
+# Contributor: Anil Madhavapeddy <anil@recoil.org>
+# Maintainer:
+pkgname=aspcud
+pkgver=1.9.5
+pkgrel=0
+pkgdesc="Package dependency solver"
+url="https://potassco.org/aspcud/"
+arch="all"
+license="MIT"
+depends="boost clingo"
+makedepends="boost-dev cmake re2c"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/potassco/aspcud/archive/v$pkgver.tar.gz"
+
+build() {
+	cmake -B build . \
+		-DCMAKE_BUILD_TYPE=None \
+		-DGRINGO_LOC=/usr/bin/gringo \
+		-DCLASP_LOC=/usr/bin/clasp \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	make -C build
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+b6c85f7e67cbf8df8dd0ed4f8fd5f988e46bf3f9756e4cb8fadfae955ed70bc27279e8dddcfe8161543e5276a70d2103816fce8edebc240fef6b182841832106  aspcud-1.9.5.tar.gz
+"

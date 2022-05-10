@@ -1,0 +1,36 @@
+# Contributor: Łukasz Jendrysik <scadu@yandex.com>
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=beets
+pkgver=1.5.0
+pkgrel=0
+pkgdesc="Music library manager and MusicBrainz tagger"
+options="!check" # Requires unpackaged dependencies
+url="https://beets.io"
+arch="noarch"
+license="MIT"
+subpackages="$pkgname-doc"
+depends="python3 py3-mutagen py3-unidecode py3-musicbrainzngs py3-munkres
+	py3-yaml py3-jellyfish py3-six py3-mediafile py3-confuse
+	py3-requests"
+makedepends="py3-sphinx py3-setuptools"
+source="https://github.com/sampsyo/beets/releases/download/v$pkgver/beets-$pkgver.tar.gz"
+
+build() {
+	# sdist := source distribution tarball, builds man pages
+	python3 setup.py build sdist
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+
+	local man
+	for man in man/*.?; do
+		install -Dm644 "$man" \
+			"$pkgdir"/usr/share/man/man${man##*.}/${man##*/}
+	done
+}
+
+sha512sums="
+447b01dc750a69d0a33d271774f3bd3b997a203d80c220c1a961f9a8e30420d263b1e2a4682d25ff7b02e1e85155f42186cb0d3bf27ebc8c2777f68e197d4018  beets-1.5.0.tar.gz
+"

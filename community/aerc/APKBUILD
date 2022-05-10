@@ -1,0 +1,29 @@
+# Maintainer: Drew DeVault <sir@cmpwn.com>
+pkgname=aerc
+pkgver=0.5.2
+pkgrel=2
+pkgdesc="email client for your terminal"
+url="https://aerc-mail.org"
+# riscv64 blocked by crypto dependency
+arch="all !riscv64"
+license="MIT"
+depends="less ncurses"
+makedepends="go scdoc"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://git.sr.ht/~sircmpwn/aerc/archive/$pkgver.tar.gz"
+
+build() {
+	make PREFIX=/usr
+}
+
+check() {
+	go test ./...
+}
+
+package() {
+	make install PREFIX=/usr DESTDIR="$pkgdir"
+}
+
+sha512sums="
+b5472f204ee2226dffaefb1a1554644711e030bac227cb708510fc4eec46ecb7ab48b7e82b1400024d8893ef2d4b880edffd98fd10339459015c0bb27956d452  aerc-0.5.2.tar.gz
+"

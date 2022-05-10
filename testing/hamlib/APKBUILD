@@ -1,0 +1,62 @@
+# Contributor: Bradford D. Boyle <bradford.d.boyle@gmail.com>
+# Maintainer: Bradford D. Boyle <bradford.d.boyle@gmail.com>
+pkgname=hamlib
+pkgver=4.3.1
+pkgrel=0
+pkgdesc="Library to control radio transceivers and receivers"
+url="https://hamlib.github.io/"
+arch="all"
+license="LGPL-2.0-or-later"
+makedepends="linux-headers perl-dev python3-dev swig tcl-dev chrpath libusb-dev"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-perl py3-$pkgname:py3 $pkgname-tcl"
+source="https://github.com/Hamlib/Hamlib/releases/download/$pkgver/hamlib-$pkgver.tar.gz"
+
+build() {
+	./configure \
+		PYTHON=/usr/bin/python3 \
+		--prefix=/usr \
+		--sbindir=/usr/bin \
+		--with-perl-binding \
+		--with-python-binding \
+		--with-tcl-binding
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	rm -f "$pkgdir"/usr/lib/*.a
+	rm -f "$pkgdir"/usr/lib/tcl8.6/Hamlib/hamlibtcl.a
+}
+
+perl() {
+	pkgdesc="Perl bindings for $pkgname"
+	depends="perl"
+
+	mkdir -p "$subpkgdir"/usr/lib
+	mv "$pkgdir"/usr/lib/perl5 "$subpkgdir"/usr/lib/
+
+	# fix perl module location
+	cd "$subpkgdir"/usr/lib/perl5/site_perl/
+	mkdir current
+	mv auto current
+	mv Hamlib.pm current
+	rm perltest.pl
+
+	chrpath --delete "$subpkgdir"/usr/lib/perl5/site_perl/current/auto/Hamlib/Hamlib.so
+}
+
+py3() {
+	pkgdesc="Python3 bindings for $pkgname"
+	depends="python3"
+
+	amove usr/lib/python3*
+}
+
+tcl() {
+	mkdir -p "$subpkgdir"/usr/lib
+	mv "$pkgdir"/usr/lib/tcl8.6 "$subpkgdir"/usr/lib/
+}
+
+sha512sums="
+8dee4676a19de7ac1ef733a4285b76e918f11aad6594d0557d36df295faf04c615e0993edb2f9ed5e7aea718c184603fec831caf28b75026c705f0b2e4b9eca7  hamlib-4.3.1.tar.gz
+"

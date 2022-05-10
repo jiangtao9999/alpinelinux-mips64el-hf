@@ -1,0 +1,39 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-panel
+pkgver=3.40.0
+pkgrel=0
+pkgdesc="Gnome Panel provides panels and default applets for the gnome-flashback desktop"
+url="https://wiki.gnome.org/Projects/GnomePanel"
+# s390x, mips64 and riscv64 blocked by polkit
+arch="all !mips64 !s390x !riscv64"
+license="GPL-2.0-or-later"
+makedepends="gnome-desktop gtk+3.0-dev glib-dev pango-dev libwnck3-dev
+	gnome-menus-dev evolution-data-server-dev libgweather-dev dconf-dev
+	libxrandr-dev elogind-dev gnome-desktop-dev gdm-dev polkit-dev itstool
+	gtk-doc libxres-dev"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+source="https://download.gnome.org/sources/gnome-panel/${pkgver%.*}/gnome-panel-$pkgver.tar.xz"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+49d8fde009ccf139dcc1412863432e642c11e3c149c6f39ab8f51d8027880654625a997f58efe03234ea2716ad0316f7d5f60fb493e7e6cea366611b975effe6  gnome-panel-3.40.0.tar.xz
+"

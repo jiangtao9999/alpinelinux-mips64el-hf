@@ -1,0 +1,72 @@
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=cfengine
+pkgver=3.18.0
+pkgrel=1
+pkgdesc="A systems administration tool for networks"
+url="https://www.cfengine.com/"
+arch="all"
+license="GPL-3.0-only"
+install="$pkgname.post-install"
+makedepends="$depends_dev lmdb-dev openssl1.1-compat-dev bison flex-dev
+	acl-dev pcre-dev linux-headers"
+depends="procps"
+subpackages="$pkgname-doc $pkgname-masterfiles::noarch"
+source="https://cfengine-package-repos.s3.amazonaws.com/tarballs/cfengine-$pkgver.tar.gz
+	https://cfengine-package-repos.s3.amazonaws.com/tarballs/cfengine-masterfiles-$pkgver.tar.gz"
+
+_builddirmasterfiles="$srcdir"/cfengine-masterfiles-${pkgver%_p*}
+options="!check" # testsuite shows some unknown errors
+
+# secfixes:
+#   3.12.2-r0:
+#     - CVE-2019-9929
+
+prepare() {
+	default_prepare
+
+	# Also extract masterfiles
+	cd $srcdir
+	tar xf $pkgname-masterfiles-$pkgver.tar.gz
+}
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--with-pic \
+		--prefix=/usr \
+		--enable-fhs \
+		--localstatedir=/var \
+		--mandir=/usr/share/man \
+		--with-lmdb \
+		--without-pam
+	make
+
+	cd "$_builddirmasterfiles"
+	./configure \
+		--prefix=/var/lib/cfengine
+	make
+}
+
+package() {
+	make install DESTDIR="$pkgdir"
+
+	# not FHS but the tools seems to require those
+	install -d "$pkgdir"/var/lib/cfengine/bin
+	for i in "$pkgdir"/usr/bin/*; do
+		ln -s ../../../../usr/bin/${i##*/} "$pkgdir"/var/lib/cfengine/bin/
+	done
+}
+
+masterfiles() {
+	pkgdesc="Cfengine default masterfiles"
+	depends="cfengine"
+
+	cd "$_builddirmasterfiles"
+	make install DESTDIR="$subpkgdir"
+}
+
+sha512sums="
+17010c8721484b36787b401ef3cd01d81e1f94b68f0857b6260c863317fb78a48d79ac3f33fb7e93973c1fd18887093b1e6edfb83bf11623bd1f19669936c337  cfengine-3.18.0.tar.gz
+1d5141e076e4efc4e1f5f72ecff429ba18171677a6d14fb1065aafa9dee39937d1f2f1d6e62e46ff37b5e8db9876e45a1e156ee96f9ffa5cdb48a9ff79557d0b  cfengine-masterfiles-3.18.0.tar.gz
+"

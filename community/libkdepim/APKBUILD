@@ -1,0 +1,60 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=libkdepim
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="Lib for common KDEPim apps"
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+# ppc64le blocked by qt5-qtwebengine -> akonadi
+arch="all !armhf !s390x !mips64 !riscv64 !ppc64le"
+url="https://community.kde.org/KDE_PIM"
+license="GPL-2.0-or-later AND LGPL-2.0-or-later"
+depends_dev="
+	akonadi-contacts-dev
+	akonadi-dev
+	akonadi-search-dev
+	kcmutils-dev
+	kcodecs-dev
+	kcompletion-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	ki18n-dev
+	kiconthemes-dev
+	kio-dev
+	kitemviews-dev
+	kjobwidgets-dev
+	kldap-dev
+	kwallet-dev
+	kwidgetsaddons-dev
+	qt5-qtbase-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	qt5-qttools-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/libkdepim-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_DESIGNERPLUGIN=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+37cb530ea01f1cb5d73e69c92dacd5daa2ed543d7a13fece26ae920276dfccd4c66c61439a8d4a1eb3cc6261de34def294004e7a1cb05f7274768ba30acd555c  libkdepim-21.08.3.tar.xz
+"

@@ -1,0 +1,30 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer: Leo <thinkabit.ukim@gmail.com>
+pkgname=py3-boltons
+pkgver=21.0.0
+pkgrel=0
+pkgdesc="Bolted-on functionality for python3"
+url="https://github.com/mahmoud/boltons"
+arch="noarch"
+license="BSD-3-Clause"
+depends="python3"
+makedepends="py3-setuptools"
+checkdepends="py3-pytest py3-pytest-cov"
+source="$pkgname-$pkgver.tar.gz::https://github.com/mahmoud/boltons/archive/$pkgver.tar.gz"
+builddir="$srcdir/boltons-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	py.test-3
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+5f5d642ab8ce0bc26133f4bd5059071bc86ca8e6619ebac796d522a0e4c39b958176ccc9de9a56e0448b24bdcf569e73f51011d5a9fc875bdef12a363f106018  py3-boltons-21.0.0.tar.gz
+"

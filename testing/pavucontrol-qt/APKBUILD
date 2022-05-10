@@ -1,0 +1,34 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=pavucontrol-qt
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Pulseaudio mixer in Qt (port of pavucontrol)"
+url="https://github.com/lxqt/pavucontrol-qt"
+arch="all !armhf !mips64" # blocked by liblxqt-dev
+license="LGPL-2.0-or-later"
+makedepends="
+	cmake lxqt-build-tools liblxqt-dev
+	qt5-qttools-dev pulseaudio-dev
+	"
+options="!check" # No testsuite
+source="https://github.com/lxqt/pavucontrol-qt/releases/download/$pkgver/pavucontrol-qt-$pkgver.tar.xz"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+10e03572287a468b2c8062098edab1e5783a6b02ec3629ff0d65f87a8dbe2e490752d9edfdba1f0886165302ec9da615467344ae6b7fa97afde63491e193df89  pavucontrol-qt-1.0.0.tar.xz
+"

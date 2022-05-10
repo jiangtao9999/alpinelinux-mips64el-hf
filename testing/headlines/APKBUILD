@@ -1,0 +1,33 @@
+# Contributor: Adam Plumb <adamplumb@gmail.com>
+# Maintainer: Adam Plumb <adamplumb@gmail.com>
+pkgname=headlines
+pkgver=0.4.0
+pkgrel=1
+pkgdesc="GTK4 Reddit client written in C++"
+url="https://gitlab.com/caveman250/Headlines"
+arch="all !s390x !riscv64"
+license="GPL-3.0-only"
+depends="ffmpeg gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad
+	youtube-dl"
+makedepends="cmake gtkmm4-dev openssl1.1-compat-dev libadwaita jsoncpp-dev
+	libmicrohttpd-dev curl-dev libsecret-dev boost-dev websocket++
+	libadwaita-dev"
+source="https://gitlab.com/caveman250/Headlines/-/archive/$pkgver/Headlines-$pkgver.tar.gz"
+builddir="$srcdir/Headlines-$pkgver"
+options="!check"
+
+build() {
+	cmake -B build \
+		-DDIST_BUILD=ON \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="
+3d6950e7ab89cfcea8fe45a8fa8309a5c73491817e4bd74f5fff8cb82855e397673ea1e2a569b808fb09161660f650b012a7ad41901ba7a482546b265cfbb4f0  Headlines-0.4.0.tar.gz
+"

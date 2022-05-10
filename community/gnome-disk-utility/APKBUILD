@@ -1,0 +1,31 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-disk-utility
+pkgver=41.0
+pkgrel=0
+pkgdesc="GNOME libraries and applications for dealing with storage devices"
+url="https://wiki.gnome.org/Apps/Disks"
+# s390x, mips64 and riscv64 blocked by rust -> libhandy1
+arch="all !s390x !mips64 !riscv64"
+license="GPL-2.0-or-later"
+# Uses udisks_client that calls dbus /org/freedesktop/UDisks2/Manager
+depends="gptfdisk parted udisks2"
+makedepends="gnome-settings-daemon-dev glib-dev libxslt-dev intltool libcanberra-dev
+	libnotify-dev libdvdread-dev libpwquality-dev libsecret-dev udisks2-dev
+	meson xz-dev elogind-dev libhandy1-dev"
+options="!check" # no tests
+subpackages="$pkgname-lang $pkgname-doc"
+source="https://download.gnome.org/sources/gnome-disk-utility/${pkgver%.*}/gnome-disk-utility-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+a78dd281c078046abef5c0986777c6a87bc27d9b1bd6e798b5be058a3352b33dead8f5fea6e8f30e8c61bdd21996ee7d784838d953a33973243faabd7b713895  gnome-disk-utility-41.0.tar.xz
+"

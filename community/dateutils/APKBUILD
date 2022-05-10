@@ -1,0 +1,32 @@
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=dateutils
+pkgver=0.4.9
+pkgrel=0
+pkgdesc="Utilities for fast date-time calculations and conversion"
+url="http://hroptatyr.github.com/dateutils/"
+arch="all"
+license="BSD-3-Clause"
+makedepends="m4 texinfo automake autoconf linux-headers"
+subpackages="$pkgname-doc"
+source="https://bitbucket.org/hroptatyr/dateutils/downloads/dateutils-$pkgver.tar.xz"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var \
+		--enable-static=no
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+b5cda838f8fa01e4208e11842f835503357c02b4a21b003db08ef88763a65f26ad2cd6f5d71c80b499d4e5ee5c0b4e552469ef91aa6cd02ebe5c5d2ad6e3105e  dateutils-0.4.9.tar.xz
+"

@@ -1,0 +1,43 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=knavalbattle
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kxmlgui
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://kde.org/applications/games/knavalbattle/"
+pkgdesc="A ship sinking game"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	extra-cmake-modules
+	kconfig-dev
+	kcrash-dev
+	kdbusaddons-dev
+	kdnssd-dev
+	kdoctools-dev
+	ki18n-dev
+	ktextwidgets-dev
+	kxmlgui-dev
+	libkdegames-dev
+	qt5-qtbase-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/knavalbattle-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+e02d6d97b2c195ab00ca59423e6b37cea5eaa5524788c15a65676f5a7d43acf1b649d80b251ba70669db20b17ba9d3f13fe91726a7b3ee02cbf4cac6a4b26388  knavalbattle-21.08.3.tar.xz
+"

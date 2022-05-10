@@ -1,0 +1,39 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Fabian Affolter <fabian@affolter-engineering.ch>
+pkgname=py3-nikola
+_pyname=Nikola
+pkgver=8.1.3
+pkgrel=1
+pkgdesc="Modular, fast, simple, static python website generator"
+options="!check" # Tests require more packages
+url="https://getnikola.com"
+# armv7, armhf, s390x, x86: py3-piexif
+# aarch64: py3-inotify
+# mips64 blocked by py3-doit
+arch="noarch !armv7 !armhf !s390x !x86 !aarch64 !mips64"
+license="MIT"
+depends="py3-babel py3-blinker py3-doit py3-dateutil py3-docutils py3-logbook
+	py3-lxml py3-mako py3-markdown py3-natsort py3-piexif py3-pillow
+	py3-pygments py3-pyphen py3-pyrss2gen py3-requests py3-unidecode py3-yapsy
+	"
+makedepends="py3-setuptools"
+source="https://files.pythonhosted.org/packages/source/N/$_pyname/$_pyname-$pkgver.tar.gz"
+builddir="$srcdir"/$_pyname-$pkgver
+
+replaces="py-nikola" # Backwards compatibility
+provides="py-nikola=$pkgver-r$pkgrel" # Backwards compatibility
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	py.test-3 -c /dev/null
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+	rm -rf "$pkgdir"/usr/lib/python3*/site-packages/tests
+}
+
+sha512sums="7b6a8391d023a339125392082cc3d2ea2a2fe25b8938bd82b8c9efe0cbb3e8b83537f1bd00d97a648e3fc2b096e673702026fa3942ab9c97e76bf21b5afefe16  Nikola-8.1.3.tar.gz"

@@ -1,0 +1,48 @@
+# Contributor: August Klein <amatcoder@gmail.com>
+# Maintainer: August Klein <amatcoder@gmail.com>
+
+# RESTRICTED: Any upgrade to this package must be tested against ALL architectures
+# supported by Alpine. It is not allowed to mask this package on ANY architecture.
+# At present, upgrade is not allowed because rustc is not yet available on ALL
+# supported architectures. Any upgrade which masks an architecture WILL be reverted.
+
+pkgname=py3-cryptography
+_pyname=cryptography
+pkgver=3.3.2
+pkgrel=3
+pkgdesc="Cryptographic recipes and primitives for Python"
+url="https://cryptography.io/"
+arch="all"
+license="Apache-2.0 OR BSD-3-Clause"
+depends="python3 py3-cffi py3-idna py3-asn1crypto py3-six"
+makedepends="python3-dev py3-setuptools libffi-dev openssl1.1-compat-dev"
+checkdepends="py3-pytest py3-hypothesis py3-tz py3-pretend py3-iso8601"
+source="https://files.pythonhosted.org/packages/source/c/cryptography/cryptography-$pkgver.tar.gz
+	https://files.pythonhosted.org/packages/source/c/cryptography_vectors/cryptography_vectors-$pkgver.tar.gz"
+builddir="$srcdir/$_pyname-$pkgver"
+
+replaces="py-cryptography" # Backwards compatibility
+provides="py-cryptography=$pkgver-r$pkgrel" # Backwards compatibility
+
+# secfixes:
+#   3.2.1-r0:
+#     - CVE-2020-25659
+
+build() {
+	python3 setup.py build
+
+	# prepare cryptography vectors for testing
+	cd "$srcdir/cryptography_vectors-$pkgver"
+	python3 setup.py build
+}
+
+check() {
+	PYTHONPATH="$(echo $PWD/build/lib.linux-*):$srcdir/cryptography_vectors-$pkgver/build/lib" pytest
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir" --skip-build
+}
+
+sha512sums="55f6ee13342b3209b1fcb310f4c4d33d22856ee785cb2347e6ad36c34e9b42f6e0d5bece8e458b09663a5b78e34c4567fe7a211b51ca71f55ccc93e3f62dc5e4  cryptography-3.3.2.tar.gz
+18590adb96a6f04b8a41d4346b126b8adfc854cbcec85f8c1c0a23b1b363f215b37da60ea94a481b8fd7752f07fba515b08fc18faf2e29fb858e133129971f7c  cryptography_vectors-3.3.2.tar.gz"

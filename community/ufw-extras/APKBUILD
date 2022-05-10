@@ -1,0 +1,23 @@
+# Contributor: TBK <alpine@jjtc.eu>
+# Maintainer: Anjandev Momi <anjan@momi.ca>
+pkgname=ufw-extras
+pkgver=0.6.0
+pkgrel=0
+pkgdesc="Extra configuration files for uncomplicated firewall (ufw)."
+url="https://github.com/xyproto/ufw-extras"
+arch="noarch"
+license="GPL-2.0-or-later"
+options="!check" # No test suite
+depends="ufw"
+source="$pkgname-$pkgver.tar.gz::https://github.com/xyproto/ufw-extras/archive/$pkgver.tar.gz"
+
+package() {
+	local file;
+	for file in "ufw-"*; do
+		install -Dm644 "$file" "$pkgdir/etc/ufw/applications.d/$file"
+	done
+}
+
+sha512sums="
+3ed4f575c47fe5d39944bdf7e43345adb595b3dd7b1cc81d834c597b410b584661a34cf689bedb1144b8f129d4ddc95c0e8a86c1b24ab52f54e23c5f157be070  ufw-extras-0.6.0.tar.gz
+"

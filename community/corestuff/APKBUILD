@@ -1,0 +1,29 @@
+# Contributor: rahmanshaber <rahmanshaber@yahoo.com>
+# Maintainer: rahmanshaber <rahmanshaber@yahoo.com>
+pkgname=corestuff
+pkgver=4.2.0
+pkgrel=0
+pkgdesc="An activity viewer from C-Suite"
+# s390x, mips64 and riscv64 blocked by polkit -> libcsys
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://gitlab.com/cubocore"
+license="GPL-3.0-or-later"
+depends="qt5-qtsvg"
+makedepends="qt5-qtbase-dev libcprime-dev libcsys-dev qt5-qtx11extras-dev
+	libxcomposite-dev kglobalaccel-dev libxi-dev xcb-util-wm-dev xcb-util-dev cmake ninja"
+source="$pkgname-$pkgver.tar.gz::https://gitlab.com/cubocore/corestuff/-/archive/v$pkgver/corestuff-v$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-v$pkgver"
+options="!check"
+
+build() {
+	cmake -B build -GNinja \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="88a7d5035b05d7b74a0dbe38b01c01b84cf614e7188ab94cf287828839a7210b622b8be48f3064b4e0f1fd77d13ba065a7ba5faee32e6f056c79706c6a11bb22  corestuff-4.2.0.tar.gz"

@@ -1,0 +1,28 @@
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Kevin Daudt <kdaudt@alpinelinux.org>
+pkgname=shotcut
+pkgver=21.09.13
+pkgrel=0
+pkgdesc="Cross-platform video editor"
+url="https://www.shotcut.org"
+arch="all !armhf !armv7 !aarch64" # desktop opengl not available on arm
+license="GPL-3.0-or-later"
+makedepends="qt5-qtbase-dev qt5-qtmultimedia-dev
+	qt5-qtwebsockets-dev qt5-qtx11extras-dev ffmpeg-dev mlt-dev
+	qt5-qttools-dev qt5-qtquickcontrols2-dev"
+subpackages="$pkgname-doc"
+source="shotcut-$pkgver.tar.gz::https://github.com/mltframework/shotcut/archive/v$pkgver.tar.gz"
+options="!check" # No test suite present
+
+build() {
+	qmake-qt5 PREFIX="/usr"
+	make
+}
+
+package() {
+	make INSTALL_ROOT="$pkgdir" install
+}
+
+sha512sums="
+be117b7056e0b3cd64917ffd6aeec939dadfe9a062eb2d6c1262837b0a3cdcb0df4ce5c4624091f842c573a22ebb74d448856f808837c8d68e932dcea61995ce  shotcut-21.09.13.tar.gz
+"

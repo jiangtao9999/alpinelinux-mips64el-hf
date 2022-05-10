@@ -1,0 +1,38 @@
+# Contributor: Timo Teräs <timo.teras@iki.fi>
+# Maintainer: Timo Teräs <timo.teras@iki.fi>
+pkgname=mdds
+pkgver=1.7.0
+pkgrel=0
+pkgdesc="Multi-dimensional data index algorithm"
+url="https://gitlab.com/mdds/mdds"
+arch="noarch"
+license="MIT"
+makedepends="boost-dev"
+subpackages="$pkgname-dev $pkgname-doc"
+source="https://kohei.us/files/mdds/src/mdds-$pkgver.tar.bz2"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info \
+		--localstatedir=/var
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	install -d 755 "$pkgdir"/usr/lib
+	mv "$pkgdir"/usr/share/pkgconfig "$pkgdir"/usr/lib/
+}
+
+sha512sums="
+a4ca9c54f07343aeeaeaec1ba11d52bc3c0f8c66c0e3a9c635c20fc929b59818443e8e23bde3243b8420a21d669a8e6d53799c354b9c6135bba2f0f58beab612  mdds-1.7.0.tar.bz2
+"

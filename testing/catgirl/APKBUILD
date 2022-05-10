@@ -1,0 +1,28 @@
+# Contributor: TBK <alpine@jjtc.eu>
+# Maintainer: TBK <alpine@jjtc.eu>
+pkgname=catgirl
+pkgver=1.9a
+pkgrel=0
+pkgdesc="TLS-only terminal IRC client"
+arch="all"
+url="https://git.causal.agency/catgirl/"
+license="GPL-3.0-or-later"
+options="!check" # No test suite
+makedepends="libretls-dev ncurses-dev"
+subpackages="$pkgname-doc"
+source="https://git.causal.agency/catgirl/snapshot/catgirl-$pkgver.tar.gz"
+
+build() {
+	./configure \
+		--prefix=/usr \
+		--mandir=/usr/share/man
+	make all
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+2eed6cc54d19a090345aa719adc256d6c8d4f26a81c7a399c20d3b4cbce336bc94b15c1c4b92a54d7cf8b16eda09e589c931292627234b000e567b2d22742420  catgirl-1.9a.tar.gz
+"

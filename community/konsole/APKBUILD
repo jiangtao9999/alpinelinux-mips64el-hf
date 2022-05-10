@@ -1,0 +1,68 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=konsole
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by qt5-qtdeclarative
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://kde.org/applications/system/konsole"
+pkgdesc="KDE's terminal emulator"
+license="GPL-2.0-only AND LGPL-2.1-or-later AND Unicode-DFS-2016"
+depends="ncurses-terminfo-base"
+makedepends="
+	extra-cmake-modules
+	kbookmarks-dev
+	kcompletion-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kdbusaddons-dev
+	kdoctools-dev
+	kglobalaccel-dev
+	kguiaddons-dev
+	ki18n-dev
+	kiconthemes-dev
+	kinit-dev
+	kio-dev
+	knewstuff-dev
+	knotifications-dev
+	knotifyconfig-dev
+	kparts-dev
+	kpty-dev
+	kservice-dev
+	ktextwidgets-dev
+	kwidgetsaddons-dev
+	kwindowsystem-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/konsole-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DENABLE_PLUGIN_SSHMANAGER=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+
+	# DBusTest requires running DBus
+	# HistoryTest is broken
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest -E "(DBus|History)Test"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+9a01678b609ca0a9f74327bb315957c2d395f80d4da14442ee0b58ba3eef54c5c4ac49b5c4d6a8ef5914502395e8d0b730472b93dea7eaa7b69cc526d2feb6c5  konsole-21.08.3.tar.xz
+"

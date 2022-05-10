@@ -1,0 +1,59 @@
+# Contributor: Paul Bredbury <brebs@sent.com>
+# Maintainer: Paul Bredbury <brebs@sent.com>
+pkgname=icewm
+pkgver=2.8.0
+pkgrel=0
+pkgdesc="Window manager designed for speed, usability and consistency"
+url="https://github.com/ice-wm/icewm"
+arch="all"
+options="!check" # No test suite
+license="LGPL-2.0-only"
+subpackages="$pkgname-doc $pkgname-lang"
+makedepends="alsa-lib-dev
+	asciidoctor
+	cmake
+	fribidi-dev
+	glib-dev
+	imlib2-dev
+	libao-dev
+	libintl
+	libsm-dev
+	libsndfile-dev
+	libxcomposite-dev
+	libxdamage-dev
+	libxft-dev
+	libxinerama-dev
+	libxpm-dev
+	libxrandr-dev
+	perl"
+
+source="https://github.com/ice-wm/icewm/releases/download/$pkgver/icewm-$pkgver.tar.lz"
+
+case "$CARCH" in
+	s390x|mips*|riscv64)
+		;;
+	*)
+		makedepends="$makedepends librsvg-dev"
+		_arch_opts="-DCONFIG_LIBRSVG=ON"
+		;;
+	esac
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCFGDIR=/etc \
+		-DENABLE_NLS=OFF \
+		-DCONFIG_IMLIB2=ON \
+		-DENABLE_LTO=ON \
+		-DDOCDIR=/usr/share/doc/icewm $_arch_opts
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="
+552d1da9ceb96c6c14a0dfd596656a56fb289716a787fb75e54b49ef6df84747a4999ce733a6ffb9ff7a1e4c0243253fc3f2fa7a2251e7f3987ab9f33c0a1b30  icewm-2.8.0.tar.lz
+"

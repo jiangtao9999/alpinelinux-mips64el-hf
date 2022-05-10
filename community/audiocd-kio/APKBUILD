@@ -1,0 +1,49 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=audiocd-kio
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://www.kde.org/applications/multimedia/"
+pkgdesc="Kioslave for accessing audio CDs"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	cdparanoia-dev
+	extra-cmake-modules
+	flac-dev
+	kcmutils-dev
+	kconfig-dev
+	kdoctools-dev
+	ki18n-dev
+	kio-dev
+	libkcddb-dev
+	libkcompactdisc-dev
+	libvorbis-dev
+	qt5-qtbase-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/audiocd-kio-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+6f81d3890531bc56c61c1aff9dd15f26f908992ea54b454f0371751897f94f30280388e8f5f8197cc4800f1fcd43541ef6741a318bdea04e2e2ba13addcc2c6d  audiocd-kio-21.08.3.tar.xz
+"

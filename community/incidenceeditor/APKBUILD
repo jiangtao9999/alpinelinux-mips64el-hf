@@ -1,0 +1,58 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=incidenceeditor
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="KDE PIM incidence editor"
+# armhf blocked by extra-cmake-modules
+# ppc64le blocked by kmailtransport -> qt5-qtwebengine
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !ppc64le !s390x !mips64 !riscv64"
+url="https://kontact.kde.org/"
+license="LGPL-2.0-or-later AND GPL-2.0-or-later"
+depends_dev="
+	akonadi-dev
+	akonadi-mime-dev
+	calendarsupport-dev
+	eventviews-dev
+	kcalendarcore-dev
+	kcalutils-dev
+	kcodecs-dev
+	kdiagram-dev
+	ki18n-dev
+	kiconthemes-dev
+	kio-dev
+	kldap-dev
+	kmailtransport-dev
+	kmime-dev
+	libkdepim-dev
+	qt5-qtbase-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/incidenceeditor-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+
+	# akonadi-sqlite-incidencedatetimetest requires running DBus
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest -E "akonadi-sqlite-incidencedatetimetest"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+1ab847bdbb14b68ad3d3dc65a43006082fb0bddefa10048c9f7f909976d6cf975d69645a3d81e2018850679fa963c619eb92d41694cf6104495e341dbc8f972c  incidenceeditor-21.08.3.tar.xz
+"

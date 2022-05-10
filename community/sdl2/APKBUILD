@@ -1,0 +1,99 @@
+# Contributor: August Klein <amatcoder@gmail.com>
+# Maintainer: August Klein <amatcoder@gmail.com>
+pkgname=sdl2
+pkgver=2.0.16
+pkgrel=4
+pkgdesc="development library designed to provide low level access to audio, keyboard, mouse, joystick and graphics"
+url="https://www.libsdl.org"
+arch="all"
+license="Zlib"
+depends_dev="directfb-dev mesa-dev"
+makedepends="
+	alsa-lib-dev
+	cmake
+	eudev-dev
+	jack-dev
+	libx11-dev
+	libxcursor-dev
+	libxext-dev
+	libxi-dev
+	libxkbcommon-dev
+	libxrandr-dev
+	libxrender-dev
+	libxscrnsaver-dev
+	libusb-dev
+	pulseaudio-dev
+	wayland-dev
+	wayland-protocols
+	$depends_dev
+	"
+subpackages="$pkgname-dev"
+# TODO: drop fullscreen mode patch after next release
+source="https://www.libsdl.org/release/SDL2-$pkgver.tar.gz
+	directfb-cflags.patch
+	wayland-ignore-stateless-configs-fullscreen-mode.patch
+	"
+options="!check" # No good way to run the available tests
+builddir="$srcdir/SDL2-$pkgver"
+
+# secfixes:
+#   2.0.10-r0:
+#     - CVE-2019-7572
+#     - CVE-2019-7573
+#     - CVE-2019-7574
+#     - CVE-2019-7575
+#     - CVE-2019-7576
+#     - CVE-2019-7578
+#     - CVE-2019-7635
+#     - CVE-2019-7636
+#     - CVE-2019-7637
+#     - CVE-2019-7638
+
+case "$CARCH" in
+	s390x|mips64) _pipewire=OFF ;;
+	*)
+		makedepends="$makedepends pipewire-dev"
+		_pipewire=ON
+		;;
+esac
+
+build() {
+	# NOTE: Please do not remove the -DVIDEO_DIRECTFB=ON flag.
+	# Some apps, used for booting Alpine derivatives, require this to function!
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_BUILD_TYPE=None \
+		-DBUILD_SHARED_LIBS=True \
+		-DSDL_TEST=OFF \
+		-DALSA=ON \
+		-DJACK=ON \
+		-DCLOCK_GETTIME=ON \
+		-DARTS=OFF \
+		-DESD=OFF \
+		-DNAS=OFF \
+		-DRPATH=OFF \
+		-DVIDEO_X11=ON \
+		-DVIDEO_DIRECTFB=ON \
+		-DVIDEO_WAYLAND=ON \
+		-DCMAKE_C_FLAGS="$CFLAGS" \
+		-DSDL_STATIC=ON \
+		-DSDL_SHARED=ON \
+		-DPIPEWIRE_SHARED=$_pipewire \
+		-DPULSEAUDIO_SHARED=ON \
+		"$CMAKE_CROSSOPTS"
+	make -C build
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+ec75ef8526792650c2647b78bb0244f973774418aeae33a2182d90ce696b30acb652f8be9c2012a16c1c5d5622f7630ff2e1eadae27ea3dc78ab47730cf5e62f  SDL2-2.0.16.tar.gz
+8efdd02e0e71908b913f4c05b1f02aa94315c2bbffff87d1a46db94723dd7f0ea177e1e00de6c212ad31a00a22aa0fd87f63c3865c4dff2dc98f302046084caf  directfb-cflags.patch
+feb2adc0c90ca8d6bdcb7bd06d20c5adb3ca720a0035079fe478abcfb399064bbfb1c8a0108f08ba74aad254572ce7dfc427f17ab345511f00d0a83216556f42  wayland-ignore-stateless-configs-fullscreen-mode.patch
+"

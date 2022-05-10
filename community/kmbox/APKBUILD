@@ -1,0 +1,35 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kmbox
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="Library for accessing mail storages in MBox format"
+# armhf blocked by extra-cmake-modules
+# mips, mips64 and s390x blocked by kmime
+arch="all !armhf !mips !mips64 !s390x"
+url="https://kontact.kde.org/"
+license="LGPL-2.0-or-later"
+depends_dev="kmime-dev"
+makedepends="$depends_dev extra-cmake-modules"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kmbox-$pkgver.tar.xz"
+subpackages="$pkgname-dev"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+b91cb7b1930a099f81f4a45ab2d9b671ca8eea397d2bfb0e44a8cb670faad124c30f0b51f898b4c549577099370e5b0828861a2ee6c8f99e4356c52e70f26ef3  kmbox-21.08.3.tar.xz
+"

@@ -1,0 +1,36 @@
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=py3-lxml
+_pkgname=lxml
+pkgver=4.6.4
+pkgrel=0
+pkgdesc="Python3 LXML Library"
+url="https://lxml.de/"
+arch="all"
+license="BSD-3-Clause AND ZPL-2.0 AND ElementTree"
+makedepends="python3-dev libxml2-dev libxslt-dev py3-setuptools"
+source="https://files.pythonhosted.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+# secfixes:
+#   4.6.2-r0:
+#     - CVE-2020-27783
+#   4.6.3-r0:
+#     - CVE-2021-28957
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py check
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+5398bd70f1be5ea84365643856ca2b293c466c0e128f54eefe4a19a779a507f0e3e83575c4850d6a735ce75d56a619b59673913ef5b0ce6cb183a19b5bcf32fe  lxml-4.6.4.tar.gz
+"

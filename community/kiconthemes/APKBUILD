@@ -1,0 +1,51 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kiconthemes
+pkgver=5.88.0
+pkgrel=0
+pkgdesc="Support for icon themes"
+# armhf blocked by extra-cmake-module
+# mips64, s390x and riscv64 blocked by polkit
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://community.kde.org/Frameworks"
+license="LGPL-2.1-only"
+depends_dev="
+	karchive-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	ki18n-dev
+	kitemviews-dev
+	kwidgetsaddons-dev
+	qt5-qtsvg-dev
+	"
+makedepends="$depends_dev
+	doxygen
+	extra-cmake-modules
+	qt5-qttools-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/kiconthemes-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_QCH=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	# kiconloader_unittest is broken
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest -E "(kiconloader_unittest|kiconloader_resourcethemetest)"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+56bb3da876cfe7bc4999730ae91c9e71001aff63c904c4bdeb5989b6465c981b848af36942a5a5979e08af0b654c9e403210b037cab7b085d14281ed769650c9  kiconthemes-5.88.0.tar.xz
+"

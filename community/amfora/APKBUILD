@@ -1,0 +1,39 @@
+# Contributor: omni <omni@gitlab.alpinelinux.org>
+# Maintainer: omni <omni@gitlab.alpinelinux.org>
+pkgname=amfora
+pkgver=1.8.0 # Don't forget to update main.commit below
+pkgrel=2
+pkgdesc="terminal browser for the Gemini protocol"
+url="https://github.com/makeworld-the-better-one/amfora"
+license="GPL-3.0-or-later"
+arch="all"
+makedepends="go"
+source="$pkgname-$pkgver.tar.gz::https://github.com/makeworld-the-better-one/amfora/archive/v$pkgver.tar.gz"
+
+export GOPATH="$srcdir"
+export GOFLAGS="$GOFLAGS -trimpath -mod=readonly -modcacherw"
+case $CARCH in
+	mips|mips64)
+		export GOFLAGS="${GOFLAGS/-buildmode=pie}" # buildmode=pie is not supported on mips64
+	;;
+esac
+
+build() {
+	go build \
+		-ldflags "-s -w -linkmode=external -extldflags \"$LDFLAGS\" \
+			-X main.version=$pkgver -X main.builtBy=Alpine_Linux \
+			-X main.commit=71385e9f4e91ab982076856cac95320173ccea73" \
+		-v .
+}
+
+check() {
+	go test -v ./...
+}
+
+package() {
+	install -Dm0755 "$pkgname" -t "$pkgdir"/usr/bin
+	install -Dm0644 "$pkgname".desktop -t "$pkgdir"/usr/share/applications
+	install -Dm0644 default-config.toml -t "$pkgdir"/usr/share/"$pkgname"
+}
+
+sha512sums="f8971082afa784506fc6499256a4bceb764bceeb57fe6148b78a586b14ff126384fa54cc1e195f46264ac54f086605f6055471ed4ba1d03dbed7e4a44ce0b34a  amfora-1.8.0.tar.gz"

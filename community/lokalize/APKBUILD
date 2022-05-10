@@ -1,0 +1,51 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=lokalize
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="Computer-Aided Translation System"
+url="https://apps.kde.org/lokalize/"
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by kio
+arch="all !armhf !s390x !mips64 !riscv64"
+license="(GPL-2.0-only OR GPL-3.0-only) AND GFDL-1.2-only"
+makedepends="
+	extra-cmake-modules
+	hunspell-dev
+	kconfig-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kdbusaddons-dev
+	kdoctools-dev
+	ki18n-dev
+	kio-dev
+	knotifications-dev
+	kross-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	sonnet-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/lokalize-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+d4368ccab3cbe3ea360fbd97f099dcbb46caaa4fe6595d7426ff94d34c2023b99dcee62e3634e54e0dc39e02768993b9c414982a2c6c061b230c33a5f337d6ff  lokalize-21.08.3.tar.xz
+"

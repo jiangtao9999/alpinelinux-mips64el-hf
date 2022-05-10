@@ -1,0 +1,40 @@
+# Contributor: Ivan Tham <pickfire@riseup.net>
+# Maintainer: Ivan Tham <pickfire@riseup.net>
+pkgname=py3-xlib
+_pkgname=python-xlib
+pkgver=0.31
+pkgrel=0
+pkgdesc="fully functional X client library for Python programs"
+url="https://github.com/python-xlib/python-xlib"
+arch="noarch"
+license="LGPL-2.1-or-later"
+depends="py3-six"
+checkdepends="xauth xvfb py3-mock py3-nose"
+makedepends="py3-setuptools"
+source="https://github.com/$_pkgname/$_pkgname/releases/download/$pkgver/$_pkgname-$pkgver.tar.bz2"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+replaces="py-xlib" # Backwards compatibility
+provides="py-xlib=$pkgver-r$pkgrel" # Backwards compatibility
+
+prepare() {
+	default_prepare
+
+	sed -e "s/setup_requires.*/version='$pkgver',/" -i setup.py
+}
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 ./runtests.py
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+f98978cd0058ae18f08f9da71b4ff31cd7811040ec1eb03ce065c187f312259d674dd76aad447752c8f508e585838948c90182eef5d5240e6c06b0a5dd1fbd33  python-xlib-0.31.tar.bz2
+"

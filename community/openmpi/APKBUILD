@@ -1,0 +1,58 @@
+# Maintainer: Daniel Sabogal <dsabogalcc@gmail.com>
+pkgname=openmpi
+pkgver=4.0.5
+pkgrel=0
+pkgdesc="Message passing library for high-performance computing"
+url="https://www.open-mpi.org/"
+# disable ppc64le until opal_fifo test can be fixed
+arch="all"
+license="custom" # BSD-based custom license
+makedepends="perl gfortran hwloc-dev libevent-dev libgomp"
+subpackages="$pkgname-dev:_dev $pkgname-doc"
+source="https://www.open-mpi.org/software/ompi/v${pkgver%.*}/downloads/openmpi-$pkgver.tar.bz2"
+
+prepare() {
+	default_prepare
+
+	update_config_sub
+	update_config_guess
+}
+
+build() {
+	local disable_atomics=""
+	case "$CARCH" in
+		ppc64le) disable_atomics="--disable-builtin-atomics";;
+	esac
+
+	./configure \
+		--prefix=/usr \
+		--mandir=/usr/share/man \
+		--sysconfdir=/etc/$pkgname \
+		--enable-ipv6 \
+		--with-threads=posix \
+		--with-hwloc=/usr \
+		$disable_atomics
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+}
+
+_dev() {
+	default_dev
+
+	local bins="mpiCC mpic++ mpicc mpicxx mpif77 mpif90 mpifort
+		ortecc opal_wrapper"
+
+	local i; for i in $bins; do
+		amove usr/bin/$i
+	done
+}
+
+sha512sums="b7a1a5ccfc0eaa0f0504ff770b550480f7ae6727fa891e3310d9340a0d844a2ceddf62c2e59efd047ab9416b24c829919bbccd29606ca0e0d7a0569dad800011  openmpi-4.0.5.tar.bz2"

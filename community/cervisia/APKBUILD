@@ -1,0 +1,47 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=cervisia
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kparts
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://kde.org/applications/development/org.kde.cervisia"
+pkgdesc="A user friendly version control system front-end"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	extra-cmake-modules
+	kdesu-dev
+	kdoctools-dev
+	kiconthemes-dev
+	kinit-dev
+	kitemviews-dev
+	knotifications-dev
+	kparts-dev
+	kwidgetsaddons-dev
+	qt5-qtbase-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/cervisia-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+6361ff9a3892d6245744e1cefcdcfc1dac534c649280c0c06dd3e53b31d5c87289ab183cb4e6c80a06f6df0f7859e226a7c1a424ec384e83fff4732482661f97  cervisia-21.08.3.tar.xz
+"

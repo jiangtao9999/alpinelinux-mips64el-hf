@@ -1,0 +1,40 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=akonadi-notes
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="Libraries and daemons to implement management of notes"
+# armhf blocked by extra-cmake-modules
+arch="all !armhf"
+url="https://community.kde.org/KDE_PIM"
+license="LGPL-2.0-or-later"
+depends_dev="
+	ki18n-dev
+	kmime-dev
+	qt5-qtbase-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/akonadi-notes-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+ec5944e5cd097a342aa342314c395eb4de787e06a633f6cd2af47f63a28ecf51ceed483a955ff020b5848458969c8e48611f1220d81760221ad112762b787915  akonadi-notes-21.08.3.tar.xz
+"

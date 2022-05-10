@@ -1,0 +1,46 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=akonadi-calendar-tools
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# ppc64le, s390x, mips64 and riscv64 blocked by akonadi-calendar -> kmailtransport -> libkgapi -> qt5-qtwebengine
+arch="all !armhf !ppc64le !s390x !mips64 !riscv64"
+url="https://kontact.kde.org/"
+pkgdesc="CLI tools to manage akonadi calendars"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	akonadi-calendar-dev
+	akonadi-dev>=$pkgver
+	calendarsupport-dev
+	extra-cmake-modules
+	kcalendarcore-dev
+	kcalutils-dev
+	kdoctools-dev
+	libkdepim-dev
+	qt5-qtbase-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/akonadi-calendar-tools-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests available
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+1f2dc20a9b0d2d8ad35327ebbdf39e382f687120245b346d6b9e03d3c2d521e57208567c5edf6a5552515f62ecf25e0da43fae5bccd41d47114207a30afd5d4c  akonadi-calendar-tools-21.08.3.tar.xz
+"

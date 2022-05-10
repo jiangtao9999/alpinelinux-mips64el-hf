@@ -1,0 +1,28 @@
+# Contributor: Michał Polański <michal@polanski.me>
+# Maintainer: Michał Polański <michal@polanski.me>
+pkgname=fclones
+pkgver=0.16.1
+pkgrel=0
+pkgdesc="Efficient duplicate file finder"
+url="https://github.com/pkolaczk/fclones"
+license="MIT"
+arch="all !s390x !mips64 !riscv64" # blocked by rust/cargo
+arch="$arch !armhf !armv7" # flaky tests
+makedepends="cargo eudev-dev"
+source="https://github.com/pkolaczk/fclones/archive/v$pkgver/fclones-$pkgver.tar.gz"
+
+build() {
+	cargo build --release --locked
+}
+
+check() {
+	cargo test --release --locked
+}
+
+package() {
+	install -Dm755 target/release/fclones "$pkgdir"/usr/bin/fclones
+}
+
+sha512sums="
+6b31299de1d1d22d6f6ce3aecb9b45f3d81db9e50f172dc28c1093f30510548d887b83756e7c5069f189e9aea851e3b4074c8f83ac460ce8b5e5cc0f7ab8be64  fclones-0.16.1.tar.gz
+"

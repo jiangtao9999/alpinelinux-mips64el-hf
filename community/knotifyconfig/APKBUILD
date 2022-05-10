@@ -1,0 +1,45 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=knotifyconfig
+pkgver=5.88.0
+pkgrel=0
+pkgdesc="Configuration system for KNotify"
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://community.kde.org/Frameworks"
+license="LGPL-2.0-only"
+depends_dev="
+	kcompletion-dev
+	kconfig-dev
+	ki18n-dev
+	kio-dev
+	"
+makedepends="$depends_dev
+	doxygen
+	extra-cmake-modules
+	qt5-qttools-dev
+	"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/knotifyconfig-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_QCH=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+ef518922fc2b189c0f94ef4bf814b3556db7ea563e9469ff63248f4835ed9ac053e3c1d60351b420e989b3f5569120db3d489a302502f3ba6684162cad553992  knotifyconfig-5.88.0.tar.xz
+"

@@ -1,0 +1,60 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=glacier-home
+pkgver=0.36.1
+pkgrel=0
+pkgdesc="The Glacier homescreen"
+url="https://github.com/nemomobile-ux/glacier-home"
+# armhf blocked by libqofonoext
+# s390x and riscv64 blocked by polkit-qt-1
+arch="all !armhf !s390x !riscv64"
+license="BSD-3-Clause AND MIT"
+depends="
+	connman
+	libqofonoext
+	mce
+	nemo-qml-plugin-configuration
+	nemo-qml-plugin-connectivity
+	nemo-qml-plugin-contacts
+	nemo-qml-plugin-devicelock
+	nemo-qml-plugin-notifications
+	nemo-qml-plugin-statusnotifier
+	nemo-qml-plugin-time
+	qt5-qtfeedback
+	qt5-qtgraphicaleffects
+	qt5-qtmultimedia
+	qtmpris
+	qtquickcontrols-nemo
+	usb-moded
+	"
+makedepends="
+	bluez-qt-dev
+	extra-cmake-modules
+	lipstick-dev
+	nemo-qml-plugin-devicelock-dev
+	polkit-qt-1-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	qt5-qttools-dev
+	qt5-qtwayland-dev
+	"
+source="https://github.com/nemomobile-ux/glacier-home/archive/$pkgver/glacier-home-$pkgver.tar.gz"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_INSTALL_SYSCONFDIR=/etc \
+		-DUSE_SYSTEMD=OFF
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+1483b38c06c3d0ca1807c8a563ebf6fcdb218473081661413ab10f8ceec98ff80f2165a498ec832644bb2ba2408999508814b330252cc68daa827f127d487e7c  glacier-home-0.36.1.tar.gz
+"

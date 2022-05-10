@@ -1,0 +1,31 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gedit-plugins
+pkgver=40.1
+pkgrel=0
+pkgdesc="Plugins for gedit, the GNOME text editor"
+url="https://wiki.gnome.org/Apps/Gedit/PluginsLists"
+# s390x, mips64 and riscv64 blocked by librsvg -> gedit
+arch="all !s390x !mips64 !riscv64"
+license="GPL-2.0-only"
+depends="python3 py3-gobject3 vte3 gucharmap py3-dbus libpeas-python3"
+makedepends="glib-dev gtk+3.0-dev gtksourceview4-dev libpeas-dev gedit-dev vala
+	libgit2-glib-dev itstool vte3-dev gucharmap-dev py3-dbus-dev meson"
+checkdepends="appstream-glib"
+subpackages="$pkgname-lang $pkgname-doc"
+source="https://download.gnome.org/sources/gedit-plugins/${pkgver%.*}/gedit-plugins-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="71649d157ac5591e4dd317c44ae167c98fb59e253c45f8c1ff8ef397a9e3f0bb968f0ef2486f9021354269e77defb9e5e305f1538f69818480a250966143c7a3  gedit-plugins-40.1.tar.xz"

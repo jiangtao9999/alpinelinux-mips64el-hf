@@ -1,0 +1,24 @@
+# Contributor: TBK <alpine@jjtc.eu>
+# Maintainer: TBK <alpine@jjtc.eu>
+pkgname=dislocker
+pkgver=0.7.3
+pkgrel=0
+pkgdesc="Read/write Windows BitLocker-ed volumes"
+url="https://github.com/Aorimn/dislocker"
+arch="all"
+license="GPL-2.0-or-later"
+options="!check" # No test suite
+makedepends="cmake fuse-dev mbedtls-dev ruby-dev"
+subpackages="$pkgname-doc $pkgname-libs"
+source="$pkgname-$pkgver.tar.gz::https://github.com/Aorimn/dislocker/archive/v$pkgver.tar.gz"
+
+build() {
+	cmake -DCMAKE_INSTALL_PREFIX=/usr .
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="c62241d70d51f6445a2f6d0f08e099bbc1a4257ca98232471fc43ec63e69d62ae5f702c995ec00b7e1db7d33f4bb3a31ea05bc13862bf3b539feb301a0e034ff  dislocker-0.7.3.tar.gz"

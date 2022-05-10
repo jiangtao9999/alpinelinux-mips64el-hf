@@ -1,0 +1,51 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=libkleo
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="KDE PIM cryptographic library"
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit -> kpimtextedit
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://kontact.kde.org"
+license="GPL-2.0-or-later"
+# TODO: Maybe replace gnupg with specific gnupg subpackages.
+depends="gnupg"
+makedepends="
+	boost-dev
+	extra-cmake-modules
+	gpgme-dev
+	kcodecs-dev
+	kcompletion-dev
+	kconfig-dev
+	kcoreaddons-dev
+	ki18n-dev
+	kitemmodels-dev
+	kpimtextedit-dev
+	kwidgetsaddons-dev
+	kwindowsystem-dev
+	qt5-qtbase-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/libkleo-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+f417c5e4d98212879eaa60a45258ec6eb58193756aa2d0938b152f9afddb2a27ff4a47d18e53262dfc2a15161441c49c14d8c4ac8644949b7d3fa4162c329762  libkleo-21.08.3.tar.xz
+"

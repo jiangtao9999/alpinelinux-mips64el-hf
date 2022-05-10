@@ -1,0 +1,49 @@
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=plasma-phonebook
+pkgver=21.08
+pkgrel=0
+pkgdesc="Contacts application which allows adding, modifying and removing contacts"
+# armhf blocked by extra-cmake-modules
+arch="all !armhf"
+url="https://invent.kde.org/kde/plasma-phonebook"
+license="LicenseRef-KDE-Accepted-GPL"
+depends="
+	kirigami2
+	qt5-qtbase-sqlite
+	qt5-qtquickcontrols
+	"
+makedepends="
+	extra-cmake-modules
+	kcontacts-dev
+	kcoreaddons-dev
+	kirigami2-dev
+	kpeople-dev
+	kpeoplevcard-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	qt5-qtquickcontrols2-dev
+	qt5-qtsvg-dev
+	"
+source="https://download.kde.org/stable/plasma-mobile/$pkgver/plasma-phonebook-$pkgver.tar.xz"
+subpackages="$pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+0c78d0bf88a7678c6ca87fd548bbe6bc24c75358d7ef3250277b335ca1671b206188d686f0783bc59b7d58f3417d3fcaca21de0dac8c42f8396341db01626d24  plasma-phonebook-21.08.tar.xz
+"

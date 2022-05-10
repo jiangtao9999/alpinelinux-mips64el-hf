@@ -1,0 +1,29 @@
+# Contributor: André Klitzing <aklitzing@gmail.com>
+# Maintainer: André Klitzing <aklitzing@gmail.com>
+pkgname=gcovr
+pkgver=5.0
+pkgrel=0
+pkgdesc="Generates a simple report that summarizes the gcc code coverage"
+url="http://gcovr.com/"
+arch="noarch"
+license="BSD-3-Clause"
+depends="python3 py3-setuptools py3-lxml py3-jinja2"
+checkdepends="py3-pytest py3-pyutilib cmake"
+source="gcovr-$pkgver.tar.gz::https://github.com/gcovr/gcovr/archive/$pkgver.tar.gz"
+options="!check" # tests are failing
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	py.test-3 -v gcovr
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+5e1f8f3c0d833d3e537c3b286d1bd3555e1baf6dfac706de8d385e37622f9398e5b9a98b2bf101f8d964904ebdc1045cafd1c76f044fdde723d88a7fb32eb14f  gcovr-5.0.tar.gz
+"

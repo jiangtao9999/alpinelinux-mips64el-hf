@@ -1,0 +1,37 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=lxqt-sudo
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Tools to sudoure LXQt and the underlying operating system"
+url="https://github.com/lxqt/lxqt-sudo"
+arch="all !mips64 !armhf" # blocked by liblxqt-dev
+license="LGPL-2.0-or-later"
+makedepends="
+	cmake libxcursor-dev lxqt-build-tools qt5-qtbase-dev
+	qt5-qttools-dev qt5-qtx11extras-dev xf86-input-libinput-dev
+	libxi-dev libudev-zero-dev libqtxdg-dev liblxqt-dev
+	libkscreen-dev kwindowsystem-dev
+	"
+subpackages="$pkgname-doc"
+options="!check" # No testsuite
+source="https://github.com/lxqt/lxqt-sudo/releases/download/$pkgver/lxqt-sudo-$pkgver.tar.xz"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+72f9eced786e9d57db6d0b3972c2735576aadc0162b8268367813170fb6412184a2ab8d89bc508201aaf4aedfb509ce8c7273824969891935deefe8ffc05a578  lxqt-sudo-1.0.0.tar.xz
+"

@@ -1,0 +1,43 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kde-dev-utils
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kparts-dev
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://kde.org/applications/development/"
+pkgdesc="Small utilities for developers using KDE/Qt libs/frameworks"
+license="(LGPL-2.0-only OR LGPL-3.0-only) AND GPL-2.0-or-later"
+makedepends="
+	extra-cmake-modules
+	kcoreaddons-dev
+	ki18n-dev
+	kparts-dev
+	kwidgetsaddons-dev
+	qt5-qttools-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kde-dev-utils-$pkgver.tar.xz"
+subpackages="$pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+8066388b5bf58e49f4f78092e022c62261a924d717bbd887c9f96092862205116b7382094aaa504f9479b6066d058e2b5ca2df171abc042ccef4a013b659b05c  kde-dev-utils-21.08.3.tar.xz
+"

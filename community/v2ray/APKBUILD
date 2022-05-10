@@ -1,0 +1,84 @@
+# Contributor: nibon7 <nibon7@163.com>
+# Maintainer: nibon7 <nibon7@163.com>
+pkgname=v2ray
+pkgver=4.43.0
+pkgrel=0
+pkgdesc="A platform for building proxies to bypass network restrictions"
+url="https://v2fly.org"
+arch="all"
+license="MIT"
+options="chmod-clean"
+makedepends="go"
+subpackages="$pkgname-openrc"
+_geosite_ver=20211105094648
+_geoip_ver=202111040028
+source="$pkgname-core-$pkgver.tar.gz::https://github.com/v2fly/v2ray-core/archive/v$pkgver.tar.gz
+	geosite-$_geosite_ver.dat::https://github.com/v2fly/domain-list-community/releases/download/$_geosite_ver/dlc.dat
+	geoip-$_geoip_ver.dat::https://github.com/v2fly/geoip/releases/download/$_geoip_ver/geoip.dat
+	v2ray.initd
+	0001-fix-readRequest-API-changed-since-go1.17-1370.patch
+	"
+
+builddir="$srcdir/$pkgname-core-$pkgver"
+
+export CGO_ENABLED=0
+
+build() {
+	local ldflags="
+		-X github.com/v2fly/v2ray-core/v4.codename=$pkgname
+		-X github.com/v2fly/v2ray-core/v4.version=$pkgver
+		-X github.com/v2fly/v2ray-core/v4.build=$SOURCE_DATE_EPOCH
+		-s -w -buildid=
+		"
+	go build -trimpath -ldflags "$ldflags" -o v2ray ./main
+	go build -trimpath -ldflags "$ldflags" -tags confonly -o v2ctl \
+		./infra/control/main
+}
+
+check() {
+	# testing/sceanarios may fail
+	# app/{stats, router},  transport/{pipe, internet/websocket}, proxy/vmess, common/signal fail on armv7
+	# app/router/command, app/dns fail on aarch64
+	# transport/internet/quic, common/task fail on s390x
+	# v4/infra/conf/{rule, geodata/memconservative} may fail
+	# v4/transport/internet/kcp may fail
+	local pkgs=$(go list ./... | grep -v \
+		-e 'app/dns$' \
+		-e 'app/stats$' \
+		-e 'app/router$' \
+		-e 'app/router/command$' \
+		-e 'common/task$' \
+		-e 'common/signal$' \
+		-e 'testing/scenarios$' \
+		-e 'proxy/vmess$' \
+		-e 'transport/pipe$' \
+		-e 'transport/internet/websocket$' \
+		-e 'transport/internet/quic$' \
+		-e 'v4/infra/conf/rule$' \
+		-e 'v4/infra/conf/geodata/memconservative$' \
+		-e 'v4/transport/internet/kcp$' \
+		)
+	go test $pkgs
+}
+
+package() {
+	install -Dm755 -d "$pkgdir"/etc/$pkgname
+	install -m644 release/config/*.json -t "$pkgdir"/etc/$pkgname
+
+	install -Dm755 -d "$pkgdir"/usr/share/$pkgname
+	install -m644 "$srcdir"/geosite-$_geosite_ver.dat \
+		"$pkgdir"/usr/share/$pkgname/geosite.dat
+	install -m644 "$srcdir"/geoip-$_geoip_ver.dat \
+		"$pkgdir"/usr/share/$pkgname/geoip.dat
+
+	install -Dm755 v2ray "$pkgdir"/usr/bin/v2ray
+	install -Dm755 v2ctl "$pkgdir"/usr/bin/v2ctl
+
+	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
+}
+
+sha512sums="210f4a08fe8a04db5e1cd83d03193cca20e78b93ccd0605b975eca17c99455ce86223e13e2ec8548bcd09ef212083a664dd532511c7dbee0a5a91817b6609e94  v2ray-core-4.43.0.tar.gz
+104794d1b2c24a60dd83ca21f381ee948c5838cb2cda45f7605513b8a0da99e7d4bf890e91124580c09fc1235d57bf70a7feeae6ee1b51ff30509e5c8fd98726  geosite-20211105094648.dat
+17617a42590355f0b7b9b078fb460b854c1a7b9202d9e60d2e85cd4e6c86c3d2ade4f75d0cb1702202ebfd9a477b3642993bd4b30ac09ceb3958b1e1e532f232  geoip-202111040028.dat
+f22cd2ef4182a003a4e0f94a550e5805c6c30d608d9e655c98e850b5fd8b3785c30df9a8e07c2d5460e6dac9088316f901018a89143e47c9da168e3aee3b94ca  v2ray.initd
+d5d0d6f2dde30e1b97352fdbe46fa3c75797963d72648778345bd6bbb844b77f1304be26461678a07d7d654401376bca126aca26da76deb8280dc419c0984c0c  0001-fix-readRequest-API-changed-since-go1.17-1370.patch"

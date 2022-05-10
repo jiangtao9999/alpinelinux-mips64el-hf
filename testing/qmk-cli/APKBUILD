@@ -1,0 +1,40 @@
+# Contributor: Galen Abell <galen@galenabell.com>
+# Maintainer: Galen Abell <galen@galenabell.com>
+pkgname=qmk-cli
+pkgver=0.3.5
+pkgrel=0
+pkgdesc="QMK helper CLI"
+url="https://github.com/qmk/qmk_cli"
+arch="noarch"
+license="MIT"
+depends="
+	python3
+	py3-appdirs
+	py3-argcomplete
+	py3-colorama
+	py3-dotty-dict
+	py3-hjson
+	py3-jsonschema
+	py3-milc
+	py3-pygments
+	"
+makedepends="py3-setuptools py3-pip"
+options="!check"  # no tests
+source="$pkgname-$pkgver.tar.gz::https://github.com/qmk/qmk_cli/archive/$pkgver.tar.gz"
+builddir="$srcdir/qmk_cli-$pkgver"
+
+build() {
+	python3 -m pip wheel \
+		--no-deps --wheel-dir=dist \
+		qmk
+}
+
+package() {
+	python3 -m pip install \
+		--no-warn-script-location --ignore-installed --no-deps --root="$pkgdir" \
+		dist/qmk-$pkgver-*.whl
+}
+
+sha512sums="
+625be601a59e29bdff8c8c6f28535e558dbcb2e07be27a26d740462799180f42512a1a93fcc481729ff65c107812f05b4c4ef58a657228d1084db6005eea74ac  qmk-cli-0.3.5.tar.gz
+"

@@ -1,0 +1,36 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=krecorder
+pkgver=21.08
+pkgrel=0
+pkgdesc="Audio recorder for Plasma Mobile (and other platforms)"
+url="https://invent.kde.org/plasma-mobile/krecorder"
+arch="all !armhf" # armhf blocked by extra-cmake-modules
+license="GPL-3.0-or-later"
+depends="kirigami2"
+makedepends="
+	extra-cmake-modules
+	ki18n-dev
+	kirigami2-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	qt5-qtmultimedia-dev
+	qt5-qtquickcontrols2-dev
+	"
+source="https://download.kde.org/stable/plasma-mobile/$pkgver/krecorder-$pkgver.tar.xz"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+5ca0e62762e842c29a11073481940071b751ebf13675e2a32b4668dd0de85412485a55b217312d1170fba761b8ff104adf44107a0391d70fbfc61a05bb91ec50  krecorder-21.08.tar.xz
+"

@@ -1,0 +1,81 @@
+# Contributor Eric Molitor <eric@molitor.org>
+# Contributor Travis Tilley <ttilley@gmail.com>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=compiler-rt
+# Note: Update together with llvm.
+pkgver=12.0.1
+pkgrel=1
+_llvmver=${pkgver%%.*}
+pkgdesc="LLVM compiler-rt runtime libraries"
+arch="all"
+url="https://llvm.org/"
+license="Apache-2.0"
+makedepends="
+	cmake
+	linux-headers
+	clang
+	llvm-dev>=$_llvmver
+	llvm-static>=$_llvmver
+	samurai
+	python3
+	"
+checkdepends="gtest-dev llvm-test-utils>=$_llvmver"
+subpackages="$pkgname-static"
+options="!check" # Doesn't seem to work with linux ld: /lib/ld-musl-x86_64.so.1: cannot load --version: No such file or directory
+source="https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/compiler-rt-$pkgver.src.tar.xz
+	https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/llvm-$pkgver.src.tar.xz
+        disable-sanitizer-common.patch
+        replace-size_t-std-size-t.patch"
+	
+builddir="$srcdir/$pkgname-$pkgver.src"
+
+build() {
+	mkdir -p "$builddir"/build
+	cd "$builddir"/build
+
+	# compiler-rt uses llvm intrinsic types for testing
+	# and therefore requires clang
+	# It also needs LLVM source for testing purposes
+	cmake .. \
+		-DCMAKE_C_COMPILER=clang \
+		-DCMAKE_CXX_COMPILER=clang++ \
+		-DCMAKE_BUILD_TYPE=MinSizeRel \
+		-DCMAKE_C_FLAGS_MINSIZEREL_INIT="$CFLAGS" \
+		-DCMAKE_CXX_FLAGS_MINSIZEREL_INIT="$CXXFLAGS" \
+		-DCMAKE_EXE_LINKER_FLAGS_MINSIZEREL_INIT="$LDFLAGS" \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCOMPILER_RT_INCLUDE_TESTS=ON \
+		-DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+		-DCOMPILER_RT_BUILD_XRAY=OFF \
+		-DLLVM_EXTERNAL_LIT="/usr/bin/lit" \
+		-DLLVM_MAIN_SRC_DIR="$srcdir/llvm-$pkgver.src" \
+		-G Ninja
+	ninja
+}
+
+check() {
+	cd "$builddir"/build
+	# remove test that does not work with PaX kernel
+	rm ../test/builtins/Unit/enable_execute_stack_test.c \
+		../test/builtins/Unit/clear_cache_test.c
+	ninja check-compiler-rt
+}
+
+package() {
+	cd "$builddir"/build
+
+	DESTDIR="$pkgdir" ninja install
+
+	cd "$pkgdir"
+
+	mkdir -p usr/lib/clang/$pkgver/lib
+	case "$CARCH" in
+		ppc64le | s390x) ;;
+		*) mv usr/lib/linux usr/lib/clang/$pkgver/lib;;
+	esac
+}
+
+sha512sums="708780aa47ef289a9700eb76c17cc1f3bab19b8245174e612b5f684c48448030263a72eeef1021b10bdffa6ace2df489adcbba9e7a790ccbcd5fe72056f63f92  compiler-rt-12.0.1.src.tar.xz
+ff674afb4c8eea699a4756f1bb463f15098a7fa354c733de83c024f8f0cf238cd5f19ae3ec446831c7109235e293e2bf31d8562567ede163c8ec53af7306ba0f  llvm-12.0.1.src.tar.xz
+b099dac8ab1da41a3bd12df1ceb2ff6a46e41a82db31f3444fdca1de1e0565131a612cd375e721f894a7da2df1a90a99b53c983b45914d18a8ee6f99a3ec563f  disable-sanitizer-common.patch
+78181b4ea227f30c1c06d12059cf0746bd0ed430f5e2e9752eaa4d59bebc7ee5e3a78df167ff0fdf68562609e5f3ee8ab8a10fa76f42c9f0d5a6836853add6e7  replace-size_t-std-size-t.patch"

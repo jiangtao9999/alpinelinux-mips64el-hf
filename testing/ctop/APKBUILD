@@ -1,0 +1,25 @@
+# Contributor: Shyam Sunder <sgsunder1@gmail.com>
+# Maintainer: Shyam Sunder <sgsunder1@gmail.com>
+pkgname=ctop
+pkgver=0.7.6
+pkgrel=1
+pkgdesc="Top-like interface for container metrics"
+url="https://ctop.sh/"
+license="MIT"
+arch="all"
+depends="docker"
+makedepends="go"
+options="!check" # no test suite
+source="https://github.com/bcicen/ctop/archive/$pkgver/ctop-$pkgver.tar.gz"
+
+build() {
+	make build
+}
+
+package() {
+	install -Dm755 ctop "$pkgdir"/usr/bin/ctop
+}
+
+sha512sums="
+84825614ceee61a470121c9d07c55ca1b188f816c669bab862efc94b260d689316aa55454cf12a0b697a0b4a05ea27d00662e699507f9cd243891fa0a43f96c5  ctop-0.7.6.tar.gz
+"

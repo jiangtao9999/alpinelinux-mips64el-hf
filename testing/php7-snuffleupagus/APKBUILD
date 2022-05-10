@@ -1,0 +1,45 @@
+# Maintainer: Julien (jvoisin) Voisin <julien.voisin+snuffleupagus@dustri.org>
+
+pkgname=php7-snuffleupagus
+_extname=snuffleupagus
+pkgver=0.7.0
+pkgrel=1
+pkgdesc="Security module for PHP 7"
+url="https://snuffleupagus.readthedocs.io"
+arch="all"
+license="LGPL-3.0-only"
+depends="php7-common"
+builddir="$srcdir/$_extname-$pkgver/src"
+makedepends="php7-dev php7-cgi"
+source="php-$_extname-$pkgver.tar.gz::https://github.com/jvoisin/snuffleupagus/archive/v$pkgver.tar.gz"
+
+build() {
+	phpize7
+	./configure \
+		--prefix=/usr \
+		--enable-snuffleupagus \
+		--with-php-config=php-config7
+	make
+}
+
+check() {
+	TEST_PHP_ARGS='-q' REPORT_EXIT_STATUS=1 make test TESTS="tests/cookies_encryption tests/deny_writable"
+	TEST_PHP_ARGS='-q' REPORT_EXIT_STATUS=1 make test TESTS="tests/global_strict"
+	TEST_PHP_ARGS='-q' REPORT_EXIT_STATUS=1 make test TESTS="tests/harden_rand tests/sloppy_comparison tests/unserialize"
+
+	# TODO re-enable these tests
+	#TEST_PHP_ARGS='-q' REPORT_EXIT_STATUS=1 make test TESTS="tests/disable_function"
+	#TEST_PHP_ARGS='-q' REPORT_EXIT_STATUS=1 make test TESTS="tests/xxe"
+	#TEST_PHP_ARGS='-q' REPORT_EXIT_STATUS=1 make test TESTS="tests/eval_blacklist"
+	#TEST_PHP_ARGS='-q' REPORT_EXIT_STATUS=1 make test TESTS="tests/dump_request"
+}
+
+package() {
+	make INSTALL_ROOT="$pkgdir" install
+	local _confdir="$pkgdir"/etc/php7/conf.d
+	install -d $_confdir
+	install -m644 ../config/$_extname.ini $_confdir/$pkgname.ini
+	install -m644 ../config/default.rules $_confdir/$_extname.rules
+}
+
+sha512sums="608ad97a9b8118c30f7c2d39b154233e5398e839d9253d7e9dd4b17ad030c5b6dfe3d794c9a469e30f32c8b21a2fdba24e0d9dba3c46f28144edcf174089fc97  php-snuffleupagus-0.7.0.tar.gz"

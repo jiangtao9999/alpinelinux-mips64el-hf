@@ -1,0 +1,30 @@
+# Contributor: Michał Polański <michal@polanski.me>
+# Maintainer: Michał Polański <michal@polanski.me>
+pkgname=py3-scrypt
+pkgver=0.8.18
+pkgrel=1
+pkgdesc="Python bindings for the scrypt key derivation function"
+url="https://pypi.org/project/scrypt/"
+arch="all"
+license="BSD-2-Clause"
+depends="python3"
+makedepends="python3-dev openssl1.1-compat-dev py3-setuptools"
+source="https://files.pythonhosted.org/packages/source/s/scrypt/scrypt-$pkgver.tar.gz"
+builddir="$srcdir/scrypt-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --skip-build --prefix=/usr --root="$pkgdir"
+
+	# do not install the tests module
+	rm -r "$pkgdir"/usr/lib/python*/site-packages/scrypt/tests
+}
+
+sha512sums="b033203f65dd63c1e915eeff6232c01f806eb01d3ce18e753b6161ae667555095fe775585dd0d4e15ae228f2d4862860093c1a18d5b810b438d032df9fb24d81  scrypt-0.8.18.tar.gz"

@@ -1,0 +1,80 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kalarm
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# ppc64le, s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !ppc64le !s390x !mips64 !riscv64"
+url="https://kontact.kde.org/"
+pkgdesc="Personal alarm scheduler"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+depends="kdepim-runtime"
+makedepends="
+	akonadi-contacts-dev
+	akonadi-dev
+	akonadi-mime-dev
+	extra-cmake-modules
+	kalarmcal-dev
+	kauth-dev
+	kcalendarcore-dev
+	kcalutils-dev
+	kcmutils-dev
+	kcodecs-dev
+	kcompletion-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kdbusaddons-dev
+	kdelibs4support-dev
+	kdoctools-dev
+	kglobalaccel-dev
+	kguiaddons-dev
+	kholidays-dev
+	ki18n-dev
+	kiconthemes-dev
+	kidentitymanagement-dev
+	kidletime-dev
+	kimap-dev
+	kio-dev
+	kjobwidgets-dev
+	kmailtransport-dev
+	kmime-dev
+	knotifications-dev
+	knotifyconfig-dev
+	kpimtextedit-dev
+	kservice-dev
+	kwidgetsaddons-dev
+	kwindowsystem-dev
+	kxmlgui-dev
+	libkdepim-dev
+	libxslt-dev
+	mailcommon-dev
+	phonon-dev
+	pimcommon-dev
+	qgpgme
+	qt5-qtbase-dev
+	qt5-qtx11extras-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kalarm-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+690c89006598e8e87e1fd4b0f9b5d183280efa3f5f2d1fcda01607498b03ffad75a60e49ef4435f8fd66357231446c187a77d9976a6c04d98519f8ca3747a1b7  kalarm-21.08.3.tar.xz
+"

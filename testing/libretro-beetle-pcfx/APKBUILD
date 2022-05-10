@@ -1,0 +1,25 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-beetle-pcfx
+pkgver=0_git20210412
+pkgrel=1
+_commit="ceff11eab32febfcf8507f0bfe618bcdf80e75ef"
+pkgdesc="standalone port of Mednafen PCFX to libretro"
+url="https://github.com/libretro/beetle-pcfx-libretro"
+arch="all !mips !mips64"
+license="GPL-2.0-only"
+makedepends="zlib-dev"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/beetle-pcfx-libretro/archive/$_commit.tar.gz"
+builddir="$srcdir/beetle-pcfx-libretro-$_commit"
+options="!check" # No tests
+
+build() {
+	rm -rf deps/zlib*
+	make SYSTEM_ZLIB=1
+}
+
+package() {
+	install -Dm644 mednafen_pcfx_libretro.so "$pkgdir"/usr/lib/libretro/mednafen_pcfx_libretro.so
+}
+
+sha512sums="c19e9542c6009e658c81cad8128bf9635009f6a052dce819925ba0721f5b8a7c396cf8c3faba9dd73f97e5a8313853e732fcd75eaa359c09083340d12c6870e6  libretro-beetle-pcfx-ceff11eab32febfcf8507f0bfe618bcdf80e75ef.tar.gz"

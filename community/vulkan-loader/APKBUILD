@@ -1,0 +1,41 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=vulkan-loader
+pkgver=1.2.196
+pkgrel=0
+arch="all"
+url="https://www.khronos.org/vulkan"
+pkgdesc="Vulkan Installable Client Driver (ICD) Loader"
+license="Apache-2.0"
+depends_dev="vulkan-headers"
+makedepends="$depends_dev
+	cmake
+	libx11-dev
+	libxrandr-dev
+	python3
+	wayland-dev
+	"
+source="https://github.com/khronosgroup/vulkan-loader/archive/v$pkgver/vulkan-loader-v$pkgver.tar.gz"
+subpackages="$pkgname-dev"
+options="!check" # No tests
+builddir="$srcdir/Vulkan-Loader-$pkgver"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_INSTALL_SYSCONFDIR=/etc \
+		-DCMAKE_INSTALL_DATADIR=share \
+		-DCMAKE_SKIP_RPATH=True \
+		-DVULKAN_HEADERS_INSTALL_DIR=/usr
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+3413c30b685f911f028c7e5d6a673746d74cf109c6b57b0148b79fc9f19d81aa28b0733efdcb95da805e8fbba88e21df57844b93a1df07773fa6d3e03c85b8a1  vulkan-loader-v1.2.196.tar.gz
+"

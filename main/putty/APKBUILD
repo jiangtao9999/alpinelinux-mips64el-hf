@@ -1,0 +1,43 @@
+# Maintainer: Jeff Bilyk <jbilyk@alpinelinux.org>
+pkgname=putty
+pkgver=0.76
+pkgrel=0
+pkgdesc="SSH and telnet client"
+url="https://www.chiark.greenend.org.uk/~sgtatham/putty/"
+arch="all"
+license="MIT"
+depends="ncurses-terminfo-base"
+makedepends="linux-headers"
+subpackages="$pkgname-doc"
+source="http://the.earth.li/~sgtatham/putty/$pkgver/putty-$pkgver.tar.gz"
+options="!check" # no test suite
+
+# secfixes:
+#   0.76-r0:
+#     - CVE-2021-36367
+#   0.74-r0:
+#     - CVE-2020-14002
+#   0.73-r0:
+#     - CVE-2019-17068
+#     - CVE-2019-17069
+#   0.71-r0:
+#     - CVE-2019-9894
+#     - CVE-2019-9895
+#     - CVE-2019-9897
+#     - CVE-2019-9898
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+4576b359593928c6eba923f2d7b66ac0f2cf00e0c217cdbbb124471c3b35feb090e623847bfc507a4ef106cb3067aac47419e241b11dd8bf4ae554061fa93c25  putty-0.76.tar.gz
+"

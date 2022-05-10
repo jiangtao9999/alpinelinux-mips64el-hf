@@ -1,0 +1,39 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer: Drew DeVault <sir@cmpwn.com>
+pkgname=stellarium
+pkgver=0.21.1
+pkgrel=2
+pkgdesc="A stellarium with great graphics and a nice database of sky-objects"
+url="http://stellarium.org/"
+arch="all !mips !mips64 !armhf" # Limited by qt5-qtmultimedia-dev
+license="GPL-2.0-or-later"
+makedepends="
+	cmake boost-dev mesa-dev qt5-qttools-dev libpng-dev freetype-dev
+	openssl1.1-compat-dev qt5-qtscript-dev qt5-qtserialport-dev qt5-qtmultimedia-dev
+	qt5-qtlocation-dev gpsd-dev
+"
+subpackages="$pkgname-doc"
+source="https://github.com/Stellarium/stellarium/releases/download/v$pkgver/stellarium-$pkgver.tar.gz"
+[ "$CARCH" = "x86" ] && options="!check"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DENABLE_TESTING=1
+	cmake --build build
+}
+
+check() {
+	cd build
+	# Exclude a broken locale test
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest -E 'test(INDIConnection|TelescopeControl_INDI|TelescopeClientINDI|StelSkyCultureMgr)'
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+6dd935808c711da32c793a0cedad464a15bf35ede60cff385e96f1d5868e751ed2e09b61551f7a6fe599b702a6f4d0a62d4494a40b68e77685ba57b6a63b5031  stellarium-0.21.1.tar.gz
+"

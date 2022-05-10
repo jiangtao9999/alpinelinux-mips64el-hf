@@ -1,0 +1,42 @@
+# Contributor: Henrik Riomar <henrik.riomar@gmail.com>
+# Maintainer: Henrik Riomar <henrik.riomar@gmail.com>
+pkgname=virt-what
+pkgver=1.21
+pkgrel=1
+pkgdesc="Detect if we are running in a virtual machine"
+url="https://people.redhat.com/~rjones/virt-what/"
+arch="x86 x86_64 ppc64le aarch64"
+license="GPL-2.0-or-later"
+checkdepends="checkbashisms"
+makedepends="automake autoconf perl-dev"
+subpackages="$pkgname-doc"
+source="https://people.redhat.com/~rjones/$pkgname/files/$pkgname-$pkgver.tar.gz
+	"
+builddir="$srcdir/$pkgname-$pkgver"
+
+prepare() {
+	default_prepare
+
+	autoreconf -ivf
+}
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--mandir=/usr/share/man
+	make
+}
+
+check() {
+	make check
+
+	checkbashisms ./virt-what
+}
+
+package() {
+	make install DESTDIR="$pkgdir"
+}
+
+sha512sums="14ace184c4aee5a09b855c1f5acaa619057aed1b9bf03c91ed1003e6a39ea69162c9fe452ea8162c7fe29825e0e2202cfc7d76e82f0cecea3e32405e5eb9f717  virt-what-1.21.tar.gz"

@@ -1,0 +1,47 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kmplot
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kparts
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://edu.kde.org/kmplot"
+pkgdesc="Mathematical Function Plotter"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	extra-cmake-modules
+	kcrash-dev
+	kdbusaddons-dev
+	kdoctools-dev
+	kguiaddons-dev
+	ki18n-dev
+	kparts-dev
+	kwidgetsaddons-dev
+	qt5-qtbase-dev
+	qt5-qtsvg-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kmplot-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+f2b427233582962bb195788ef390bd155f554fc7b7221c1bfc4e07af4837a977b906e589f2d606b8347b413149e8245d61933c4f3c4c1a3ab0c2f35a565ed136  kmplot-21.08.3.tar.xz
+"

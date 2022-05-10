@@ -1,0 +1,91 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=mycroft-core
+pkgver=21.2.1
+pkgrel=1
+pkgdesc="Mycroft Core, the Mycroft Artificial Intelligence platform"
+url="https://mycroft.ai/"
+# mips, mips64 and s390x blocked by py3-precise-runner
+# s390x blocked by mimic1
+arch="noarch !mips !mips64 !s390x"
+license="Apache-2.0"
+depends="
+	mimic1
+	mycroft-skills-kit
+	mycroft-skills-manager
+	py3-adapt-parser
+	py3-dateutil
+	py3-fann2
+	py3-fasteners
+	py3-gtts
+	py3-inflection
+	py3-lingua-franca
+	py3-mycroft-messagebus-client
+	py3-padaos
+	py3-padatious
+	py3-petact
+	py3-pillow
+	py3-pocketsphinx
+	py3-precise-runner
+	py3-psutil
+	py3-pyaudio
+	py3-pyee
+	py3-requests
+	py3-requests-futures
+	py3-pyserial
+	py3-speechrecognition
+	py3-tornado
+	py3-websocket-client
+	py3-xdg
+	py3-yaml
+	python3
+	"
+# These dependencies are required to play audio with the local backend
+# mpg123: mpg123
+# pulseaudio-utils: paplay
+# vorbis-tools: ogg123
+depends="$depends
+	mpg123
+	pulseaudio-utils
+	vorbis-tools
+	"
+makedepends="py3-setuptools"
+checkdepends="
+	py3-pytest
+	py3-vlc
+	py3-wheel
+	"
+install="$pkgname.post-install"
+source="$pkgname-$pkgver.tar.gz::https://github.com/MycroftAI/mycroft-core/archive/release/v$pkgver.tar.gz
+	profile.sh
+	0001-Upgrade-websocket-client-to-1.2.1.patch
+	0003-system-wide-setups.patch
+	0004-skills-from-xdg.patch
+	"
+# Net is required for tests
+# Some tests are broken still, will be enabled later
+options="!check"
+builddir="$srcdir/mycroft-core-release-v$pkgver"
+
+build() {
+	MYCROFT_LOOSE_REQUIREMENTS=1 python3 setup.py build
+}
+
+check() {
+	# test_hotword_factory and test_local_recognizer fail
+	# https://github.com/MycroftAI/mycroft-core/issues/2574
+	PYTHONPATH="$PWD/build/lib" pytest -rRxs -k 'not testInvalid and not testListenerConfig'
+}
+
+package() {
+	MYCROFT_LOOSE_REQUIREMENTS=1 python3 setup.py install --prefix=/usr --root="$pkgdir"
+
+	install -Dm644 "$srcdir"/profile.sh "$pkgdir"/etc/profile.d/mycroft.sh
+}
+sha512sums="
+ee74058aae496239a66970237709fae945621072a4bc35bb8a2f590b59b5e624286a15258fb7dd9db92c087910a94ff956b10c48e8ad3dac462ed689f3bb538a  mycroft-core-21.2.1.tar.gz
+c3d1a605a0b574c8e2c4031f592bdbf023f5ed9b2e1ba0cea38cf79278331f245dbe4e220e7f81de73fe612ffd722253805058dae04ba89c3d01c361b329e4ef  profile.sh
+eaf9674cc24e3128775cc4ef0de89e7950ab07f7c3b2b5a0fcef9f6258be6307c518dc3ab2744f60f06335c1f28a5560ffb4a61667ae03fda2e3ec56803fccf9  0001-Upgrade-websocket-client-to-1.2.1.patch
+827e0a4b46d7ee5fa37c872d1b58f4445009f867992b92589a9b1619abd9213c3803e6af2c1672e474ef23c6dcbbf03782e98b321d3f92329a5759cbd9e648cf  0003-system-wide-setups.patch
+6628a97a528ea005f291b59e975a11b315cf13fb6270b826f4e33a7aa017026a53b7b1c6a5a61844330267a3852b395a59723185a391c8d1510939b0e98654fe  0004-skills-from-xdg.patch
+"

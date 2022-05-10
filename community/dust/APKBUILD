@@ -1,0 +1,42 @@
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=dust
+pkgver=0.6.2
+pkgrel=0
+pkgdesc="A more intuitive version of du in Rust"
+url="https://github.com/bootandy/dust"
+arch="x86_64 armv7 armhf aarch64 x86 ppc64le"  # limited by rust/cargo
+license="Apache-2.0"
+makedepends="cargo"
+source="https://github.com/bootandy/dust/archive/v$pkgver/dust-$pkgver.tar.gz"
+
+prepare() {
+	default_prepare
+
+	# Optimize binary for size (2.5 -> 1.6 MiB).
+	cat >> Cargo.toml <<-EOF
+
+		[profile.release]
+		codegen-units = 1
+		lto = true
+		opt-level = "z"
+		panic = "abort"
+	EOF
+}
+
+build() {
+	cargo build --release --locked
+}
+
+check() {
+	cargo test --release --locked
+}
+
+package() {
+	cargo install --locked --path . --root="$pkgdir/usr"
+	rm "$pkgdir"/usr/.crates*
+}
+
+sha512sums="
+49a1f20a1e8cfbbdc3aaa9896fe9fb49a641bcc32dbe569c98b5af386a9c95cfa42573accd6d3cf3290eeaac6341b62d52dc5e7b5e4acde7a090183495761af3  dust-0.6.2.tar.gz
+"

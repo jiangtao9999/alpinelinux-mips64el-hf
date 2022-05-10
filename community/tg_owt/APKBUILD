@@ -1,0 +1,88 @@
+# Contributor: Newbyte <newbie13xd@gmail.com>
+# Contributor: Nulo <git@nulo.in>
+# Maintainer: Newbyte <newbie13xd@gmail.com>
+pkgname=tg_owt
+pkgver=20211105
+pkgrel=0
+pkgdesc="Telegram Desktop's fork of Google's WebRTC"
+url="https://github.com/desktop-app/tg_owt"
+arch="all !x86 !ppc64le !s390x !mips !mips64 !armhf"
+# x86: contains textrels, mips64, s390x: due to alleged issues on Big Endian platforms
+# ppc64le: undefined sse2 optimizations, armhf: telegram-desktop misses some dependencies
+
+license="BSD-3-Clause"
+makedepends="
+	ffmpeg-dev
+	glib-dev
+	jpeg-dev
+	openssl1.1-compat-dev
+	opus-dev
+	pipewire-dev
+	libvpx-dev
+	libx11-dev
+	libxcomposite-dev
+	libxdamage-dev
+	libxext-dev
+	libxfixes-dev
+	libxrender-dev
+	libxrandr-dev
+	libxtst-dev
+	protobuf-dev
+	libevent-dev
+
+	alsa-lib-dev
+	pulseaudio-dev
+
+	cmake
+	yasm
+	"
+# TODO: The package is being built with the bundled libusrsctp instead of the
+# packaged one. I couldn't find a way to make the cmake detect the packaged one.
+# TODO: Bundled OpenH264 is being used because packaged one is in testing.
+# TODO: It is also being built with the bundled Abseil because of linking errors with
+# the packaged one.
+_commit="d578c760dc6f1ae5f0f3bb5317b0b2ed04b79138"
+_libyuv_commit="fa043c7a6466d264ba7a28ec7f21ed012e02522f"
+subpackages="$pkgname-dev"
+source="
+	$pkgname-$_commit.tar.gz::https://github.com/desktop-app/tg_owt/archive/$_commit.tar.gz
+	libyuv-$_libyuv_commit.zip::https://codeload.github.com/catdevnull/libyuv/zip/$_libyuv_commit
+	cmake_vpx_fixes.patch"
+builddir="$srcdir/$pkgname-$_commit"
+
+prepare() {
+	default_prepare
+	mv ../libyuv-$_libyuv_commit/* src/third_party/libyuv
+}
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	export CFLAGS="$CFLAGS -fPIC"
+	export CXXFLAGS="$CXXFLAGS -fPIC"
+
+	cmake -B build \
+		-DTG_OWT_PACKAGED_BUILD=True \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_BUILD_TYPE=None \
+		$CMAKE_CROSSOPTS .
+
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="
+cc365666355fcc22241344dc55baa427454bff342401113a3e8eb72d63266721be30fa07eecc37a075e9e6a026763b24e0051f953a53d6d70974f29411c351e4  tg_owt-d578c760dc6f1ae5f0f3bb5317b0b2ed04b79138.tar.gz
+5392fc314af03baa71e565dc9b9b9e877b8f0ac43c536a9c6fd939f0e1a9cf19b88e012123452ed7332a022d0b8f3f8fc80d22b9e24288bc6ce704fcde69f557  libyuv-fa043c7a6466d264ba7a28ec7f21ed012e02522f.zip
+5254dc5b540ff2225134951cdaea192dd82cca8d72f74c770f6bd5b6c8525f1fde916b203a5b41488101f30dba6e4276d19d0440ed7704c8e2fde60e0af565d0  cmake_vpx_fixes.patch
+"

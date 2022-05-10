@@ -1,0 +1,16 @@
+#!/sbin/openrc-run
+
+: ${coredns_config:="${COREDNS_CONF:-/etc/coredns/Corefile}"}
+: ${coredns_listen_port:="${COREDNS_PORT:-53}"}
+
+supervisor="supervise-daemon"
+description="CoreDNS service"
+command="/usr/bin/coredns"
+command_args="-conf ${coredns_config} -dns.port ${coredns_listen_port}"
+user=${user:-coredns}
+group=${group:-coredns}
+
+depend() {
+	after net
+	provide dns
+}

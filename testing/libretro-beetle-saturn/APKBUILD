@@ -1,0 +1,25 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-beetle-saturn
+pkgver=0_git20210412
+pkgrel=1
+_commit="f7515829166660a61c6692160bb2b2d2633df9fc"
+pkgdesc="standalone port of Mednafen Saturn to the libretro API"
+url="https://github.com/libretro/beetle-saturn-libretro"
+arch="all !mips !mips64" # fails to build on mips
+license="GPL-2.0-only"
+makedepends="zlib-dev"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/beetle-saturn-libretro/archive/$_commit.tar.gz"
+builddir="$srcdir/beetle-saturn-libretro-$_commit"
+options="!check" # No tests
+
+build() {
+	rm -rf deps/zlib*
+	make SYSTEM_ZLIB=1
+}
+
+package() {
+	install -Dm644 mednafen_saturn_libretro.so "$pkgdir"/usr/lib/libretro/mednafen_saturn_libretro.so
+}
+
+sha512sums="c1a23fef93a3e38ff81e62c4e355b3be6cd5a74cb6abf21075dc6bb5e0fb6fcd588d8e28e0d77d627473c5f37bc29022a911b45481e513b4fa7f2284e47eec1c  libretro-beetle-saturn-f7515829166660a61c6692160bb2b2d2633df9fc.tar.gz"

@@ -1,0 +1,36 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=libdazzle
+pkgver=3.42.0
+pkgrel=0
+pkgdesc="Library to delight your users with fancy features"
+url="https://gitlab.gnome.org/GNOME/libdazzle"
+arch="all"
+license="GPL-3.0-or-later"
+makedepends="gtk+3.0-dev vala gobject-introspection-dev gtk-doc meson"
+checkdepends="xvfb-run"
+subpackages="$pkgname-dev"
+source="https://download.gnome.org/sources/libdazzle/${pkgver%.*}/libdazzle-$pkgver.tar.xz"
+
+if [ "$CARCH" = "armhf" ]; then
+	options="!check"; # tests fail on armhf
+fi
+
+build() {
+	abuild-meson \
+		-Denable_gtk_doc=false \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	xvfb-run meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+db6ac54deba034627726747b8c15472aa2f640617473825698e23ca6527d5b69e9103dd82141e82b7dd7fa8bd57eadf054cdd300d46e1b65ced0fffcbc55a301  libdazzle-3.42.0.tar.xz
+"

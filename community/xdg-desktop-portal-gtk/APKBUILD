@@ -1,0 +1,49 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=xdg-desktop-portal-gtk
+pkgver=1.8.0
+pkgrel=0
+pkgdesc="Gtk implementation of xdg-desktop-portal"
+url="https://github.com/flatpak/xdg-desktop-portal-gtk"
+# riscv64 disabled due to missing rust in recursive dependency
+arch="all !mips !mips64 !s390x !riscv64" # xdg-desktop-portal->flatpak->polkit
+license="LGPL-2.1-or-later"
+depends="xdg-desktop-portal"
+makedepends="gtk+3.0-dev dbus-dev gnome-desktop-dev"
+subpackages="$pkgname-lang"
+source="https://github.com/flatpak/xdg-desktop-portal-gtk/releases/download/$pkgver/xdg-desktop-portal-gtk-$pkgver.tar.xz
+	"
+
+prepare() {
+	default_prepare
+
+	sed 's|/usr/bin/sh|/bin/sh|' \
+		-i compile \
+		-i missing \
+		-i install-sh \
+		-i depcomp \
+		-i config.sub \
+		-i config.guess
+}
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	rm -rf "$pkgdir"/usr/lib/systemd
+}
+
+sha512sums="832b3c4cb9ea738f2ab7641fbd7e14beaa5f6a1ae88f012cd44b12f4bc51588f61868b5982301e3dfd67965d6a69fd8669a9832b6ec7017168d611c87d76689b  xdg-desktop-portal-gtk-1.8.0.tar.xz"

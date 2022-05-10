@@ -1,0 +1,200 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=pipewire
+pkgver=0.3.40
+pkgrel=1
+pkgdesc="Multimedia processing graphs"
+url="https://pipewire.org/"
+# s390x blocked due to failing tests on big-endian
+arch="all !s390x"
+license="LGPL-2.1-or-later"
+makedepends="
+	alsa-lib-dev
+	avahi-dev
+	bash
+	bluez-dev
+	dbus-dev
+	doxygen
+	eudev-dev
+	fdk-aac-dev
+	glib-dev
+	graphviz
+	gst-plugins-base-dev
+	gstreamer-dev
+	jack-dev
+	libfreeaptx-dev
+	libldac-dev
+	libusb-dev
+	libx11-dev
+	meson
+	ncurses-dev
+	pulseaudio-dev
+	py3-docutils
+	sbc-dev
+	vulkan-loader-dev
+	xmltoman
+	"
+subpackages="
+	$pkgname-dev
+	$pkgname-doc
+	$pkgname-alsa
+	$pkgname-pulse
+	$pkgname-jack
+	gst-plugin-pipewire:gst_plugin
+	$pkgname-zeroconf
+	$pkgname-spa-bluez
+	$pkgname-spa-vulkan
+	$pkgname-tools
+	$pkgname-spa-tools:spa_tools
+	$pkgname-libs
+	$pkgname-lang
+	"
+install="$pkgname.post-upgrade"
+source="https://gitlab.freedesktop.org/PipeWire/pipewire/-/archive/$pkgver/pipewire-$pkgver.tar.gz
+	0001-fix-intl-lookup.patch
+	0002-Revert-pulse-tunnel-use-format-channels-and-rate-pro.patch
+	pipewire.desktop
+	pipewire-launcher.sh
+	"
+
+case "$CARCH" in
+	# Limited by webrtc-audio-processing-dev
+	x86 | x86_64 | aarch64)
+		makedepends="$makedepends webrtc-audio-processing-dev"
+		subpackages="$subpackages $pkgname-echo-cancel:echo_cancel"
+	;;
+esac
+
+build() {
+	abuild-meson \
+		-Dlibjack-path=/usr/lib \
+		-Dlibv4l2-path=/usr/lib \
+		-Ddocs=disabled \
+		-Dman=enabled \
+		-Dgstreamer=enabled \
+		-Dexamples=enabled \
+		-Dffmpeg=disabled \
+		-Dsystemd=disabled \
+		-Dvulkan=enabled \
+		-Dsdl2=disabled \
+		-Dsession-managers=[] \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+
+	install -Dm644 "$srcdir"/pipewire.desktop -t "$pkgdir"/etc/xdg/autostart/
+	install -Dm755 "$srcdir"/pipewire-launcher.sh "$pkgdir"/usr/libexec/pipewire-launcher
+}
+
+dev() {
+	default_dev
+
+	mv "$subpkgdir"/usr/lib/libjack* "$pkgdir"/usr/lib/
+}
+
+alsa() {
+	pkgdesc="ALSA support for pipewire"
+	replaces="$pkgname"  # for backward compatibility
+
+	amove usr/lib/alsa-lib
+	amove usr/share/alsa/alsa.conf.d
+
+	cd "$subpkgdir"
+
+	mkdir -p etc/alsa/conf.d
+	cp usr/share/alsa/alsa.conf.d/* etc/alsa/conf.d
+}
+
+pulse() {
+	pkgdesc="Pulseaudio support for pipewire"
+	depends="pipewire-session-manager"
+	provides="pulseaudio=$pkgver-r$pkgrel pulseaudio-bluez=$pkgver-r$pkgrel pulseaudio-alsa=$pkgver-r$pkgrel"
+	provider_priority=1
+
+	amove usr/bin/pipewire-pulse
+	amove usr/lib/pipewire-${pkgver%.*}/libpipewire-module-protocol-pulse.so
+	amove usr/lib/pipewire-${pkgver%.*}/libpipewire-module-pulse-tunnel.so
+	amove usr/share/pipewire/pipewire-pulse.conf
+
+}
+
+jack() {
+	pkgdesc="JACK support for pipewire"
+	depends="pipewire-session-manager"
+	provides="jack=$pkgver-r$pkgrel"
+	replaces="jack"
+
+	amove usr/lib/libjack*
+	amove usr/bin/pw-jack
+	amove usr/lib/spa-*/jack/libspa-jack.so
+	amove usr/share/pipewire/jack.conf
+}
+
+gst_plugin() {
+	pkgdesc="Multimedia graph framework - PipeWire plugin"
+	depends="pipewire-session-manager gst-plugins-base"
+
+	amove usr/lib/gstreamer-1.0
+}
+
+echo_cancel() {
+	pkgdesc="WebRTC-based echo canceller module for PipeWire"
+	depends="$pkgname=$pkgver-r$pkgrel"
+
+	amove usr/lib/pipewire-${pkgver%.*}/libpipewire-module-echo-cancel.so
+}
+
+zeroconf() {
+	pkgdesc="$pkgdesc - Zeroconf support"
+	depends=""
+	provides="pulseaudio-zeroconf=$pkgver-r$pkgrel"
+	provider_priority=1
+
+	amove usr/lib/pipewire-${pkgver%.*}/libpipewire-module-zeroconf-discover.so
+}
+
+bluez() {
+	pkgdesc="PipeWire BlueZ5 SPA plugin (Bluetooth)"
+	depends=""
+	replaces="$pkgname"  # for backward compatibility
+
+	amove usr/lib/spa-*/bluez5
+}
+
+vulkan() {
+	pkgdesc="PipeWire Vulkan SPA plugin"
+	depends=""
+
+	amove usr/lib/spa-*/vulkan
+}
+
+tools() {
+	pkgdesc="PipeWire tools"
+	depends="$pkgname=$pkgver-r$pkgrel"
+	replaces="$pkgname"  # for backward compatibility
+
+	amove usr/bin/pw-*
+}
+
+spa_tools() {
+	pkgdesc="PipeWire SPA tools"
+	depends=""
+	replaces="$pkgname"  # for backward compatibility
+
+	amove usr/bin/spa-*
+}
+
+sha512sums="
+63109b87d50be160a6cde632470849564d4743f4cb469f5e3713bb1cbefc08f80416210ddedc09439555b702193c0266a1b9724e366a3b850bdf1a346c5e80cb  pipewire-0.3.40.tar.gz
+04f7420cb9aedde53f9d51061bbe010913690934630bc5f1ee8d1c3f6a9fd66ac2c2660f2410d63f69a16c6cba17d1764c9183a0aec8ccd3cef0a035aa9e4f45  0001-fix-intl-lookup.patch
+4ecd9ffcb61bed7f668183e22984037baa6391fbf7509440678efe5f113e7c5174de81cc9dea167826f61340b3c3971ea8229e5758ef605c1cb5f5a08a89331f  0002-Revert-pulse-tunnel-use-format-channels-and-rate-pro.patch
+d5d8bc64e42715aa94296e3e26e740142bff7f638c7eb4fecc0301e46d55636d889bdc0c0399c1eb523271b20f7c48cc03f6ce3c072e0e8576c821ed1ea0e3dd  pipewire.desktop
+61d616a19e15fbed41450c61a11cbdfe23def1d209e017539abdabf1c4d6511672db4e46de78522cb9979a0ab44b61f2e3773cac02258f2e273620c62eb65079  pipewire-launcher.sh
+"

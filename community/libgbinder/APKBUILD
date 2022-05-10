@@ -1,0 +1,44 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=libgbinder
+pkgver=1.1.13
+pkgrel=0
+pkgdesc="GLib-style interface to binder"
+url="https://github.com/mer-hybris/libgbinder"
+# s390x has failing tests and is unsupported upstream
+arch="all !s390x"
+license="BSD-3-Clause"
+makedepends="
+	glib-dev
+	libglibutil-dev
+	"
+subpackages="$pkgname-dev $pkgname-tools"
+source="https://github.com/mer-hybris/libgbinder/archive/$pkgver/libgbinder-$pkgver.tar.gz"
+
+build() {
+	make KEEP_SYMBOLS=1 release pkgconfig
+	make -C test/binder-bridge KEEP_SYMBOLS=1 release
+	make -C test/binder-list KEEP_SYMBOLS=1 release
+	make -C test/binder-ping KEEP_SYMBOLS=1 release
+}
+
+check() {
+	make -C unit test
+}
+
+package() {
+	make DESTDIR="$pkgdir" install-dev
+}
+
+tools() {
+	pkgdesc="$pkgdesc (tools)"
+
+	cd "$builddir"
+	make DESTDIR="$subpkgdir" -C test/binder-bridge KEEP_SYMBOLS=1 install
+	make DESTDIR="$subpkgdir" -C test/binder-list KEEP_SYMBOLS=1 install
+	make DESTDIR="$subpkgdir" -C test/binder-ping KEEP_SYMBOLS=1 install
+}
+
+sha512sums="
+2f6922dca0bc3cb69e7769b00702d15339df8bc593d1c8782113144fae3d4f5dd68a5fae0500b09ad4b9c722234d12d5131826f9a40ced85d104262726e1ef5f  libgbinder-1.1.13.tar.gz
+"

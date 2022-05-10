@@ -1,0 +1,33 @@
+# Contributor: Timo Teräs <timo.teras@iki.fi>
+# Maintainer: Timo Teräs <timo.teras@iki.fi>
+pkgname=libbluray
+pkgver=1.3.0
+pkgrel=0
+pkgdesc="Library for Blu-Ray disc playback"
+url="https://www.videolan.org/developers/libbluray.html"
+arch="all"
+license="LGPL-2.1-or-later"
+subpackages="$pkgname-dev"
+source="https://download.videolan.org/pub/videolan/libbluray/$pkgver/libbluray-$pkgver.tar.bz2"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info \
+		--localstatedir=/var \
+		--disable-bdjava-jar \
+		--without-libxml2 \
+		--without-freetype \
+		--disable-static
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="3d5145e6fd7de099c07f937282112c7abb12a5590b7c0b965b00bddee3837ddfd1a30076aaa6d6278d07a5beee3856f602125983ae075ab30eceb6ac1bd9bcdc  libbluray-1.3.0.tar.bz2"

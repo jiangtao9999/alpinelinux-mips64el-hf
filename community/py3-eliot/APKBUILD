@@ -1,0 +1,33 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer: Leo <thinkabit.ukim@gmail.com>
+pkgname=py3-eliot
+pkgver=1.13.0
+pkgrel=1
+pkgdesc="Logging system that tells you why it happened"
+# Requires unpackaged dask and cffi for testing journald
+options="!check"
+url="https://github.com/itamarst/eliot"
+arch="noarch"
+license="Apache-2.0"
+depends="python3 py3-six py3-zope-interface py3-pyrsistent py3-boltons
+	py3-twisted"
+makedepends="py3-setuptools"
+checkdepends="py3-hypothesis py3-testtools py3-pytest"
+source="$pkgname-$pkgver.tar.gz::https://github.com/itamarst/eliot/archive/$pkgver.tar.gz"
+builddir="$srcdir/eliot-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+a7631663b1ca1021e41a670df0f1b549711ffd080b4781d4fd28ca9a0cea59c642d1ac87f4fab58bdb8bb1688805b16eaa2e0dc3c6002e57dfc1cefa488aa491  py3-eliot-1.13.0.tar.gz
+"

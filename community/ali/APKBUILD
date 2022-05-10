@@ -1,0 +1,38 @@
+# Contributor: Marvin Preuss <marvin@xsteadfastx.org>
+# Maintainer: Marvin Preuss <marvin@xsteadfastx.org>
+pkgname=ali
+pkgver=0.7.3
+# this is used for the help command to print the commit.
+# needs to be changed on every release.
+_rev=22d6aed
+pkgrel=0
+pkgdesc="Generate HTTP load and plot the results in real-time"
+url="https://github.com/nakabonne/ali"
+arch="all"
+license="MIT"
+options="chmod-clean"
+makedepends="go"
+source="$pkgname-$pkgver.tar.gz::https://github.com/nakabonne/ali/archive/refs/tags/v$pkgver.tar.gz"
+
+export GOPATH="$srcdir"
+export GOFLAGS="$GOFLAGS -modcacherw"
+
+build() {
+	go build \
+		-ldflags "
+		-X \"main.version=$pkgver\" \
+		-X \"main.date=$(date -u "+%Y-%m-%dT%TZ" ${SOURCE_DATE_EPOCH:+-d @$SOURCE_DATE_EPOCH})\" \
+		-X \"main.commit=$_rev\" \
+		"
+}
+
+check() {
+	go test ./...
+}
+
+package() {
+	install -Dm755 $pkgname "$pkgdir"/usr/bin/"$pkgname"
+}
+sha512sums="
+d10cfb882707a8a366982316247edefdf88bf2f2c3f5f4c554c6d3834edbe587ff9a7de7e128b1c742593ed4f1a145e9ed4b2dc2e7ef7b26c058beb3e1576360  ali-0.7.3.tar.gz
+"

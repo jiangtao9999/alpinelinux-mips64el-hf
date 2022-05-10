@@ -1,0 +1,36 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=lxqt-policykit
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="LXQt PolicyKit agent"
+url="https://github.com/lxqt/lxqt-policykit"
+# s390x, riscv64: blocked by polkit-qt
+# armhf blocked by liblxqt-dev
+arch="all !s390x !armhf !mips64 !riscv64"
+license="LGPL-2.0-or-later"
+makedepends="
+	cmake lxqt-build-tools liblxqt-dev qt5-qttools-dev
+	polkit-qt-1-dev kwindowsystem-dev
+	"
+subpackages="$pkgname-doc"
+source="https://github.com/lxqt/lxqt-policykit/releases/download/$pkgver/lxqt-policykit-$pkgver.tar.xz"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+c0d7c5ff8a5e95e74eefd094625d71603026e9d30c033e224fc4e62eba63f1bfe76ddf666eb1875a14c2c1bea3d21e4ac6d191e90bc2442f7e4e62845a63a3f0  lxqt-policykit-1.0.0.tar.xz
+"

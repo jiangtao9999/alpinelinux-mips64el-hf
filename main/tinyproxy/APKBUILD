@@ -1,0 +1,38 @@
+# Contributor: Michael Mason <ms13sp@gmail.com>
+# Maintainer: Michael Mason <ms13sp@gmail.com>
+pkgname=tinyproxy
+pkgver=1.11.0
+pkgrel=0
+pkgdesc="Lightweight HTTP proxy"
+pkgusers="tinyproxy"
+pkggroups="tinyproxy"
+url="https://tinyproxy.github.io/"
+arch="all"
+license="GPL-2.0-or-later"
+install="tinyproxy.pre-install"
+subpackages="$pkgname-doc $pkgname-openrc"
+source="https://github.com/tinyproxy/tinyproxy/releases/download/$pkgver/tinyproxy-$pkgver.tar.gz
+	tinyproxy.initd"
+pkgusers="tinyproxy"
+pkggroups="tinyproxy"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--localstatedir=/var \
+		--sysconfdir=/etc \
+		--disable-dependency-tracking \
+		--enable-reverse
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	install -d -D -o tinyproxy -g tinyproxy "$pkgdir"/var/log/tinyproxy
+	install -Dm755 "$srcdir"/tinyproxy.initd "$pkgdir"/etc/init.d/tinyproxy
+}
+
+sha512sums="4917e8ebdb1c900387c686a6d490fc940993eb68419d46c7a666f2dfef7c4fa2268fba00b8c72db1a809d7118ec7dad1e4ba07c91cbc4119e37a76aad2856edf  tinyproxy-1.11.0.tar.gz
+e1b12989d1ee5eb6abe4749a687db4c2d0ddea1a3ec24a919d597a5cd673f509cce647ae7923993994dfb92b9f55fbf0ee0192c5f4e177da57599e917a2f4949  tinyproxy.initd"

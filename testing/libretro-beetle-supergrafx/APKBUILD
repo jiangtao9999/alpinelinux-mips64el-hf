@@ -1,0 +1,25 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-beetle-supergrafx
+pkgver=0_git20210412
+pkgrel=1
+_commit="7a84c5e3b9e0dc44266d3442130296888f3c573a"
+pkgdesc="standalone port of Mednafen PCE Fast to libretro"
+url="https://github.com/libretro/beetle-supergrafx-libretro"
+arch="all"
+license="GPL-2.0-only"
+makedepends="zlib-dev"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/beetle-supergrafx-libretro/archive/$_commit.tar.gz"
+builddir="$srcdir/beetle-supergrafx-libretro-$_commit"
+options="!check" # No tests
+
+build() {
+	rm -rf deps/zlib*
+	make SYSTEM_ZLIB=1
+}
+
+package() {
+	install -Dm644 mednafen_supergrafx_libretro.so "$pkgdir"/usr/lib/libretro/mednafen_supergrafx_libretro.so
+}
+
+sha512sums="93b15a63902fea59ee5b61093d7cd5cbe12a3a72a5b5b576a20979dfa82a126b9c0977bef90e96060cda30f34a49c50c256e325ce94a9f67c73bda727bc5265d  libretro-beetle-supergrafx-7a84c5e3b9e0dc44266d3442130296888f3c573a.tar.gz"

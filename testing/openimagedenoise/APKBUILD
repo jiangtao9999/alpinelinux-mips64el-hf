@@ -1,0 +1,33 @@
+# Contributor: Leon Marz <main@lmarz.org>
+# Maintainer: Leon Marz <main@lmarz.org>
+pkgname=openimagedenoise
+pkgver=1.4.2
+pkgrel=0
+pkgdesc="Intel Open Image Denoise library"
+url="https://www.openimagedenoise.org/"
+arch="x86_64" # openimagedenoise only really supports x86_64
+license="Apache-2.0"
+makedepends="cmake python3 libtbb-dev ispc openimageio-dev"
+subpackages="$pkgname-dev $pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/OpenImageDenoise/oidn/releases/download/v$pkgver/oidn-$pkgver.src.tar.gz"
+builddir="$srcdir/oidn-$pkgver"
+options="!check" # doesn't have a test suite
+
+build() {
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		-DCMAKE_BUILD_TYPE=None \
+		-DOIDN_APPS=OFF
+
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+8b464cedc91ef7a88cfc97c3fde80275b12058cdd26b352718d90f8f20b3462c4ac65b2b1ad5548a520590fbd015fcc8ab9f964633bc8b89d72901fe8a13e352  openimagedenoise-1.4.2.tar.gz
+"

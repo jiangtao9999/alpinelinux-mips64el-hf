@@ -1,0 +1,23 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-nxengine
+pkgver=0_git20210309
+pkgrel=0
+_commit="9cc51b58b7b489de23abf92773b85958498dd481"
+pkgdesc="port of NxEngine to the libretro API"
+url="https://github.com/libretro/nxengine-libretro"
+arch="all"
+license="GPL-3.0-only"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/nxengine-libretro/archive/$_commit.tar.gz"
+builddir="$srcdir/nxengine-libretro-$_commit"
+options="!check" # No tests
+
+build() {
+	make
+}
+
+package() {
+	install -Dm644 nxengine_libretro.so "$pkgdir"/usr/lib/libretro/nxengine_libretro.so
+}
+
+sha512sums="e66228c9b0db6af05a66c6b8e09fc4030ec27e516a2c2f659d9ffc3b6286831bbe43e913a7e7efb5162e622d95e4627d2dca53df4721f1dae6376aa15c2014fd  libretro-nxengine-9cc51b58b7b489de23abf92773b85958498dd481.tar.gz"

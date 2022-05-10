@@ -1,0 +1,74 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=plasma-framework
+pkgver=5.88.0
+pkgrel=0
+pkgdesc="Plasma library and runtime components based upon KF5 and Qt5"
+# armhf blocked by qt5-qtdeclarative
+# mips64, s390x and riscv64 blocked by polkit
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://community.kde.org/Frameworks"
+license="LGPL-2.1-or-later AND GPL-2.0-or-later"
+depends_dev="
+	kactivities-dev
+	karchive-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	kdbusaddons-dev
+	kdeclarative-dev
+	kglobalaccel-dev
+	kguiaddons-dev
+	ki18n-dev
+	kiconthemes-dev
+	kio-dev
+	kirigami2-dev
+	knotifications-dev
+	kpackage-dev
+	kservice-dev
+	kwayland-dev
+	kwindowsystem-dev
+	kxmlgui-dev
+	mesa-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	qt5-qtquickcontrols2-dev
+	"
+makedepends="$depends_dev
+	doxygen
+	extra-cmake-modules
+	graphviz
+	kdoctools-dev
+	qt5-qttools-dev
+	"
+checkdepends="
+	hicolor-icon-theme
+	xvfb-run
+	"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/plasma-framework-$pkgver.tar.xz
+	0001-fix-build.patch
+	"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+options="!check" # 8 out of 13 tests fail
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_QCH=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+b99c8d5722198d7f2096734f62f913f74471810331980a2722f1864602f3facf796c17a494d16fca7dbbe4389fd5db64b9fe82fd34f148f4ff6230ffde0ded93  plasma-framework-5.88.0.tar.xz
+129400a76159f998a13db87195e1a356ddf9f4b166f271fdd454d0e968c774cbff298ba908fab2378bbd4d758f361a2e8deff737bfccc66de4f0811d4ccfd760  0001-fix-build.patch
+"

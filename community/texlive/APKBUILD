@@ -1,0 +1,206 @@
+# Contributor: Isaac Dunham <ibid.ag@gmail.com>
+# Maintainer: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+pkgname=texlive
+pkgver=20210325
+pkgrel=5
+pkgdesc="Comprehensive TeX document production system"
+url="https://tug.org/texlive/"
+# mips64, s390x and riscv64 blocked by failing luatex
+# ppc64le: fails with "texk/web2c/mplibdir/psout.w:5342:1: error: unknown type name 'mp_gr_knot'"
+arch="all !mips64 !s390x !riscv64 !ppc64le"
+license="GPL-2.0-or-later AND GPL-3.0-or-later"
+options="!check" # no unit tests provided
+depends="perl texmf-dist>=2020.55416"
+makedepends="
+	cairo-dev
+	fontconfig-dev
+	freetype-dev
+	gd-dev
+	gmp-dev
+	graphite2-dev
+	harfbuzz-dev
+	icu-dev
+	libpaper-dev
+	libpng-dev
+	libxaw-dev
+	libxmu-dev
+	motif-dev
+	mpfr-dev
+	pixman-dev
+	poppler-dev
+	zziplib-dev
+	"
+triggers="$pkgname.trigger=/usr/share/texmf-dist"
+subpackages="
+	$pkgname-static
+	$pkgname-dev
+	$pkgname-doc
+	xdvik:xdvi
+	$pkgname-dvi:dvi
+	$pkgname-full:meta:noarch
+	$pkgname-xetex:xetex
+	$pkgname-luatex:lua
+	"
+source="https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/${pkgver:0:4}/texlive-$pkgver-source.tar.xz"
+
+builddir="$srcdir"/texlive-$pkgver-source
+
+_luatex="dvilualatex dviluatex lualollipop lualatex"
+_pdftex="amstex cslatex csplain eplain etex jadetex latex lollipop mex
+	mllatex mltex pdfetex pdfcslatex pdfcsplain pdfjadetex pdflatex
+	pdfmex pdfxmltex texsis utf8mex xmltex"
+_xetex="xelatex xelollipop"
+_dvi="afm2tfm bbox dvigif dvipng dvips epsffit extractres includeres ps2eps psbook psjoin psnup psresize psselect pstops"
+
+build() {
+	mkdir -p $builddir/build && cd $builddir/build
+
+	# builders keep failing when -jN == nproc
+	export MAKEFLAGS="$MAKEFLAGS -j$((JOBS<16 ? JOBS : 16))"
+
+	../configure -C \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info \
+		--localstatedir=/var \
+		--enable-biber \
+		--enable-epsfwin \
+		--enable-ipc \
+		--enable-luatex \
+		--enable-mftalkwin \
+		--enable-regiswin \
+		--enable-shared \
+		--enable-tektronixwin \
+		--enable-unitermwin \
+		--enable-xetex \
+		--enable-dvipng \
+		--enable-dvipsk \
+		--enable-ps2eps \
+		--enable-psutils \
+		--disable-bibtex-x \
+		--disable-chktex \
+		--disable-cjkutils \
+		--disable-detex \
+		--disable-dialog \
+		--disable-dvi2tty \
+		--disable-dvisvgm \
+		--disable-largefile \
+		--disable-lcdf-typetools \
+		--disable-multiplatform \
+		--disable-native-texlive-build \
+		--disable-pdfopen \
+		--disable-ps2pkm \
+		--disable-t1utils \
+		--disable-tex4htk \
+		--disable-ttf2pk2 \
+		--disable-vlna \
+		--disable-xindy \
+		--disable-xpdfopen \
+		--with-ps=gs \
+		--with-banner-add="/Alpine Linux" \
+		--with-system-cairo \
+		--with-system-freetype2 \
+		--with-system-gd \
+		--with-system-gmp \
+		--with-system-graphite2 \
+		--with-system-harfbuzz \
+		--with-system-icu \
+		--with-system-libpaper \
+		--with-system-libpng \
+		--with-system-mpfr \
+		--with-system-pixman \
+		--with-system-poppler \
+		--with-system-zlib \
+		--with-system-zziplib \
+		--with-x-dvi-toolkit=motif \
+		--without-texinfo
+	make
+}
+
+package() {
+	cd $builddir/build
+
+	make DESTDIR="$pkgdir" install
+
+	local texcmd; for texcmd in $_pdftex; do
+		ln -s pdftex "$pkgdir"/usr/bin/$texcmd
+	done
+	ln -s eptex "$pkgdir"/usr/bin/platex
+	ln -s euptex "$pkgdir"/usr/bin/uplatex
+
+	# As Alpine has packaged all TeXlive packages, there is no need for a
+	# separate package manager. apk should be used to get and update texmf-dist
+	rm "$pkgdir"/usr/bin/tlmgr
+
+	# texmf-dist is not platform dependent, those are packaged in the
+	# texmf-dist package
+	rm -rf "$pkgdir"/usr/share/texmf-dist
+}
+
+xetex() {
+	# Split off XeTeX because it depends on graphite/harfbuzz/icu
+	pkgdesc="TeX typesetting engine supporting modern typography and bidirectional text"
+	depends="$pkgname"
+
+	install -d -m 0755 "$subpkgdir"/usr/bin
+	mv "$pkgdir"/usr/bin/xetex "$subpkgdir"/usr/bin/
+
+	local texcmd; for texcmd in $_xetex; do
+		ln -s xetex "$subpkgdir"/usr/bin/$texcmd
+	done
+}
+
+meta() {
+	pkgdesc="A complete TeX distribution"
+	depends="$pkgname $pkgname-doc $pkgname-luatex $pkgname-xetex xdvik $pkgname-dvi texmf-dist-full"
+
+	mkdir -p "$subpkgdir"
+}
+
+dvi() {
+	pkgdesc="Tools for dvi based workflow (e.g. dvips)"
+	depends="$pkgname"
+
+	install -d -m 0755 "$subpkgdir"/usr/bin
+		for tool in $_dvi; do
+		mv "$pkgdir/usr/bin/$tool" "$subpkgdir/usr/bin/"
+	done
+}
+
+lua() {
+	pkgdesc="LuaTeX is an extended version of pdfTeX, scriptable in Lua"
+	depends="bash $pkgname"  # lua2dox_filter is a bash script
+
+	mkdir -p "$subpkgdir" && cd "$subpkgdir"
+
+	install -d -m 0755 usr/bin usr/lib
+
+	mv "$pkgdir"/usr/bin/*lua* "$subpkgdir"/usr/bin/
+	mv "$pkgdir"/usr/lib/lib*lua*.so.* "$subpkgdir"/usr/lib/
+
+	local texcmd; for texcmd in $_luatex
+		do ln -s luatex "$subpkgdir"/usr/bin/$texcmd
+	done
+	cd -
+}
+
+xdvi() {
+	# currently, xdvi needs a number of files and scripts from texlive;
+	# we split it off so that it doesn't drag in X and Motif.
+	depends="texlive"
+	pkgdesc="Xdvi from texlive, using the texlive libraries"
+	provides="xdvi"
+
+	mkdir -p "$subpkgdir" && cd "$subpkgdir"
+
+	install -d -m 0755 usr/bin
+
+	mv "$pkgdir"/usr/bin/xdvi "$pkgdir"/usr/bin/xdvi-* usr/bin/
+}
+
+sha512sums="
+afd6eb24efaeac7c58d43ff24162aece919079a9ae02934509f068c7a3828223c33c14d9db11ff7fea3560b08a06f352446ba7f845eefb4a56a87b96f088f213  texlive-20210325-source.tar.xz
+"

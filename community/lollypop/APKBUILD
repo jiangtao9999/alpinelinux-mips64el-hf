@@ -1,0 +1,67 @@
+# Contributor: Pellegrino Prevete <pellegrinoprevete@gmail.com>
+# Maintainer: Newbyte <newbytee@protonmail.com>
+pkgname=lollypop
+pkgver=1.4.23
+# See the git submodule in subprojects/po for the right version
+_pover=e07908589267fc333769e74898a81cca12e04d65
+pkgrel=0
+pkgdesc="Music player for GNOME"
+url="https://gitlab.gnome.org/World/Lollypop"
+# riscv64 disabled due to missing rust in recursive dependency
+arch="noarch !mips !mips64 !s390x !riscv64" # libhandy missing
+license="GPL-3.0-only"
+depends="
+	gst-plugins-good
+	libhandy1
+	libsecret
+	libsoup
+	py3-cairo
+	py3-gobject3
+	py3-gst
+	py3-pillow
+	py3-pylast
+	python3
+	totem-pl-parser
+	"
+makedepends="
+	gobject-introspection-dev
+	gtk+3.0-dev
+	libhandy1-dev
+	libsoup-dev
+	meson
+	py3-gobject3-dev
+	"
+checkdepends="
+	appstream-glib
+	desktop-file-utils
+	"
+subpackages="$pkgname-lang $pkgname-doc"
+source="https://gitlab.gnome.org/World/lollypop/-/archive/$pkgver/lollypop-$pkgver.tar.gz
+	https://gitlab.gnome.org/gnumdk/lollypop-po/-/archive/$_pover/lollypop-po-$_pover.tar.gz
+	dont-require-py3-gettext-support.patch
+	"
+
+prepare() {
+	default_prepare
+
+	mv $srcdir/lollypop-po*/* $srcdir/lollypop-$pkgver/subprojects/po/
+}
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+86e9165598cdcee3d1267ed71e35032f724b93e0dbea047386872aad83280836bd6933255a062e3ec4517cbc69fc4cfa9679fa3a4d46e5a029d5c104442cc8ef  lollypop-1.4.23.tar.gz
+a883d1aef5ddf0362130385488736775e50c265bb3d25756c72cbf9af7f8e3e21221d83029c59ebc9a6db24c5a368bf82ffd3b80cb36c15113c6d760333be114  lollypop-po-e07908589267fc333769e74898a81cca12e04d65.tar.gz
+1d514dff539d6d41bed36249d5d5372df81983f6a940657a55a4fa01c94a5389306d8dee48754d07623c913f70d7a59422cb0320975ae78b13e3efe2b66891b5  dont-require-py3-gettext-support.patch
+"

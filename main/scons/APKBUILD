@@ -1,0 +1,44 @@
+# Contributor:
+# Maintainer:
+pkgname=scons
+_pkgname=SCons
+pkgver=4.2.0
+pkgrel=0
+pkgdesc="Software construction system"
+url="https://scons.org/"
+arch="noarch"
+license="MIT"
+depends="python3"
+makedepends="py3-setuptools"
+subpackages="$pkgname-doc"
+source="https://downloads.sourceforge.net/scons/scons-$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+prepare() {
+	default_prepare
+	# to avoid build error
+	install -dm0755 "$builddir"/build/doc/man
+	cp ./*.1 "$builddir"/build/doc/man
+}
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py check
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+
+	# find and remove directories containing docbook files
+	find "$pkgdir" -name 'docbook' -type d -exec rm -rf {} +
+
+	install -dm0755 "$pkgdir"/usr/share/man/man1
+	mv "$pkgdir"/usr/*.1 "$pkgdir"/usr/share/man/man1/
+}
+
+sha512sums="
+91d77c858a888621d41432f39970547830997c8e28a851bbab7c0f181afda564abef321befaa33cbe6fd5fc4ac85fa80f2349994956edcc99c027cf7f526bbf0  scons-4.2.0.tar.gz
+"

@@ -1,0 +1,29 @@
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=certbot-apache
+pkgver=1.21.0
+pkgrel=0
+pkgdesc="Apache plugin for Certbot client"
+url="https://pypi.org/project/certbot-apache/"
+arch="noarch"
+license="Apache-2.0"
+depends="certbot py3-acme py3-mock py3-augeas
+	py3-setuptools py3-pip py3-zope-component py3-zope-interface"
+checkdepends="py3-pytest"
+source="https://pypi.io/packages/source/c/certbot-apache/certbot-apache-$pkgver.tar.gz"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+8b461220d55dd522885cd42b4b5c5a1c3024606845bc86facfbbbfed0317f41d9c7b15bcfd4854c16d23eea40b97d89483aa5a2bc6b80275d00abc94d6645224  certbot-apache-1.21.0.tar.gz
+"

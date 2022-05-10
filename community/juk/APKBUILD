@@ -1,0 +1,58 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=juk
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit -> kio
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://juk.kde.org/"
+pkgdesc="A jukebox, tagger and music collection manager"
+license="GPL-2.0-or-later"
+depends="phonon-backend-gstreamer"
+makedepends="
+	extra-cmake-modules
+	kcompletion-dev
+	kconfig-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kdoctools-dev
+	kglobalaccel-dev
+	ki18n-dev
+	kiconthemes-dev
+	kio-dev
+	kjobwidgets-dev
+	knotifications-dev
+	ktextwidgets-dev
+	kwallet-dev
+	kwidgetsaddons-dev
+	kwindowsystem-dev
+	kxmlgui-dev
+	phonon-dev
+	qt5-qtbase-dev
+	qt5-qtsvg-dev
+	taglib-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/juk-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+68d36965ba7b91e348cad228c10ec9d5b17e1a0f53da2921dc659b27daa60a060faf798d0f89741bfb972c654f7968dc3e2636176080a799d93b9663568d4c2d  juk-21.08.3.tar.xz
+"

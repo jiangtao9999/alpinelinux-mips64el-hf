@@ -1,0 +1,38 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Fabian Affolter <fabian@affolter-engineering.ch>
+pkgname=py3-unidecode
+_pkgname=Unidecode
+pkgver=1.2.0
+pkgrel=0
+pkgdesc="Python3 ASCII transliterations of Unicode text"
+url="https://pypi.python.org/pypi/Unidecode"
+arch="noarch"
+license="GPL-2.0-or-later"
+depends="python3"
+makedepends="py3-setuptools"
+source="https://files.pythonhosted.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+
+	# Add version suffix to executable files.
+	local path; for path in "$pkgdir"/usr/bin/*; do
+		mv "$path" "$path"-3
+	done
+
+	mkdir -p "$pkgdir"/usr/bin
+	ln -s unidecode-3 "$pkgdir"/usr/bin/unidecode
+}
+
+sha512sums="
+aedc16be1b676dbde7e45444e297be916b1ca2874a76f07316e2df3aff9687dcf73def24b2441e147c94641f4407cc745ac35937508e09c670f8aa1473977859  Unidecode-1.2.0.tar.gz
+"

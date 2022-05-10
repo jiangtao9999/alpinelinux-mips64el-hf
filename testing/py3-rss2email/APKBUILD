@@ -1,0 +1,29 @@
+# Contributor: Galen Abell <galen@galenabell.com>
+# Maintainer: Galen Abell <galen@galenabell.com>
+pkgname=py3-rss2email
+_pyname=rss2email
+pkgver=3.13.1
+pkgrel=0
+pkgdesc="Forward RSS feeds to your email address, community maintained"
+url="https://github.com/rss2email/rss2email"
+arch="noarch"
+license="GPL-2.0-only"
+depends="python3 py3-feedparser py3-html2text py3-beautifulsoup4 py3-sgmllib3k"
+makedepends="py3-setuptools"
+source="$_pyname-$pkgver.tar.gz::https://github.com/rss2email/rss2email/archive/v$pkgver.tar.gz"
+builddir="$srcdir/$_pyname-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+sha512sums="
+fbfd47c3512fc86a4db692245f7765281515b733cfd9bb13e8f7d225c8fe20a816469be2f1f9e71e925216686e6f470349c16573ab9c662d8e2b4e9d1b6debe6  rss2email-3.13.1.tar.gz
+"

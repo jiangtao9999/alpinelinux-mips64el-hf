@@ -1,0 +1,34 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=minuet
+pkgver=21.08.3
+pkgrel=0
+arch="all !armhf" # armhf blocked by qt5-qtdeclarative
+url="https://minuet.kde.org/"
+pkgdesc="Minuet Music Education"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="extra-cmake-modules qt5-qtbase-dev qt5-qtdeclarative-dev qt5-qtquickcontrols2-dev qt5-qtsvg-dev kcoreaddons-dev ki18n-dev kcrash-dev kdoctools-dev fluidsynth-dev"
+source="https://download.kde.org/stable/release-service/$pkgver/src/minuet-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang $pkgname-dev"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="
+2b4c695bbd4df70ad3fcddd3aece28f95b5b19054ed541ca20a982899dd540fbc79b47e0896768b01edcd7084e7c47d69d97d8be4f6245c92aefa388024a2d1d  minuet-21.08.3.tar.xz
+"

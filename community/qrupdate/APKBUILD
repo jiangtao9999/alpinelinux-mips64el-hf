@@ -1,0 +1,41 @@
+# Contributor: Duncan Bellamy <dunk@denkimushi.com>
+# Maintainer: Duncan Bellamy <dunk@denkimushi.com>
+pkgname=qrupdate
+pkgver=1.1.4
+pkgrel=0
+pkgdesc="Fork of the qrupdate library for future maintenance"
+url="https://gitlab.mpi-magdeburg.mpg.de/koehlerm/qrupdate-ng"
+arch="all"
+license="GPL-3.0-only"
+makedepends="cmake lapack-dev gfortran"
+subpackages="$pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://gitlab.mpi-magdeburg.mpg.de/koehlerm/qrupdate-ng/-/archive/v$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-ng-v$pkgver-8861abb3c945bb8602eb90a057a424f189f2b86f"
+
+case "$CARCH" in
+	mips*) makedepends="$makedepends blas-dev" ;;
+	*) makedepends="$makedepends openblas-dev" ;;
+esac
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		-DCMAKE_BUILD_TYPE=None \
+		$CMAKE_CROSSOPTS .
+	make -C build
+}
+
+check() {
+	CTEST_OUTPUT_ON_FAILURE=1 make -C build test
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+sha512sums="4ff01a42cbdebefdd13a74ddc5a8d450452fb56f40f7a5238e016e178d74568e425f1834f950e7e28476fcc727cfc51b62216cc424473bbfeee2a024f1f9dda4  qrupdate-1.1.4.tar.gz"

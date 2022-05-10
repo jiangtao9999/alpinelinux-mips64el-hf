@@ -1,0 +1,38 @@
+# Contributor: TBK <alpine@jjtc.eu>
+# Maintainer: TBK <alpine@jjtc.eu>
+pkgname=php7-pecl-protobuf
+_extname=protobuf
+pkgver=3.19.1
+pkgrel=0
+pkgdesc="PHP 7 extension: Google's language-neutral, platform-neutral, extensible mechanism for serializing structured data."
+url="https://pecl.php.net/package/protobuf"
+arch="all"
+license="BSD-3-Clause"
+depends="php7-common"
+makedepends="php7-dev"
+source="php-pecl-$_extname-$pkgver.tgz::https://pecl.php.net/get/$_extname-$pkgver.tgz"
+builddir="$srcdir/$_extname-$pkgver"
+provides="php7-protobuf=$pkgver-r$pkgrel" # for backward compatibility
+replaces="php7-protobuf" # for backward compatibility
+
+build() {
+	phpize7
+	./configure --prefix=/usr --with-php-config=php-config7
+	make
+}
+
+check() {
+	# Test suite is not a part of pecl release.
+	php7 -d extension=modules/$_extname.so --ri $_extname
+}
+
+package() {
+	make INSTALL_ROOT="$pkgdir" install
+	local _confdir="$pkgdir"/etc/php7/conf.d
+	install -d $_confdir
+	echo "extension=$_extname" > $_confdir/$_extname.ini
+}
+
+sha512sums="
+53dfe59bcf1a1f5d0599a9bc09006a122caffd5f1a22ba5e5225498c84e35956d5f0b43ba033bb6ba8fbae7fb2331481cf4aa9cdf5868fdca91c96474cbb3f8e  php-pecl-protobuf-3.19.1.tgz
+"

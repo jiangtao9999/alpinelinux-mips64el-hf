@@ -1,0 +1,52 @@
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=czkawka
+pkgver=3.2.0
+pkgrel=0
+pkgdesc="Multi functional app to find duplicates, empty folders, similar images etc. (CLI)"
+url="https://github.com/qarmin/czkawka"
+arch="x86_64 armv7 armhf aarch64 x86 ppc64le"  # limited by rust/cargo
+license="MIT"
+makedepends="alsa-lib-dev bzip2-dev cargo gtk+3.0-dev"
+subpackages="$pkgname-gui $pkgname-doc"
+source="https://github.com/qarmin/czkawka/archive/$pkgver/$pkgname-$pkgver.tar.gz
+	minimize-size.patch
+	"
+
+build() {
+	cargo build --release --locked
+}
+
+check() {
+	cargo test --locked
+}
+
+package() {
+	install -D -m 755 target/release/czkawka_cli "$pkgdir"/usr/bin/czkawka
+	ln -s czkawka "$pkgdir"/usr/bin/czkawka_cli
+
+	install -D -m 644 LICENSE -t "$pkgdir"/usr/share/licenses/$pkgname/
+}
+
+gui() {
+	pkgdesc="${pkgdesc/CLI/GUI}"
+	license="$license AND CC-BY-4.0"
+
+	cd "$builddir"
+
+	install -D -m 755 ./target/release/czkawka_gui -t "$subpkgdir"/usr/bin/
+
+	install -D -m 644 ./data/icons/com.github.qarmin.czkawka.svg \
+		-t "$subpkgdir"/usr/share/icons/hicolor/scalable/apps/
+
+	install -D -m 644 ./pkgs/com.github.qarmin.czkawka.desktop \
+		-t "$subpkgdir"/usr/share/applications/
+
+	install -D -m 644 ./data/com.github.qarmin.czkawka.metainfo.xml \
+		-t "$subpkgdir"/usr/share/metainfo/
+}
+
+sha512sums="
+ff69cbe4de61872773b5c70fc78314799841aa4bc6ca3d42dda4d7e153d40f40e0a98362c2617b89008c04558c1e2edbb497f38788ca845c2b1fbe4c9071562f  czkawka-3.2.0.tar.gz
+f3215f6999ab5f20f8227eca123981638f9c4cfda7876c21ba192f367755756d8a4774482a39c151af309331b666af343b29d0cb951b7389368b322a39098bfa  minimize-size.patch
+"

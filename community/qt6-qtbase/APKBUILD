@@ -1,0 +1,148 @@
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=qt6-qtbase
+pkgver=6.2.1
+pkgrel=2
+pkgdesc="A cross-platform application and UI framework"
+url="https://qt.io/"
+arch="all"
+license="LGPL-2.1-only AND LGPL-3.0-only AND GPL-3.0-only AND Qt-GPL-exception-1.0"
+_sub="
+	$pkgname-mysql
+	$pkgname-odbc
+	$pkgname-postgresql
+	$pkgname-sqlite
+	$pkgname-x11
+	"
+depends="xdg-utils"
+# TODO: Add vulkan-loader-dev, right now it's linked wrongly
+depends_dev="$_sub
+	cups-dev
+	dbus-dev
+	double-conversion-dev
+	eudev-dev
+	fontconfig-dev
+	freetype-dev
+	glib-dev
+	gtk+3.0-dev
+	harfbuzz-dev
+	icu-dev
+	libb2-dev
+	libinput-dev
+	libjpeg-turbo-dev
+	libpng-dev
+	libpq-dev
+	libproxy-dev
+	libxkbcommon-dev
+	mariadb-dev
+	mesa-dev
+	openssl1.1-compat-dev
+	pcre2-dev
+	sqlite-dev
+	tslib-dev
+	unixodbc-dev
+	vulkan-headers
+	vulkan-loader-dev
+	wayland-dev
+	xcb-util-dev
+	xcb-util-image-dev
+	xcb-util-keysyms-dev
+	xcb-util-renderutil-dev
+	xcb-util-wm-dev
+	zlib-dev
+	"
+makedepends="$depends_dev
+	cmake
+	perl
+	samurai
+	xmlstarlet
+	"
+subpackages="$pkgname-dbg $pkgname-dev $pkgname-doc $_sub"
+builddir="$srcdir/qtbase-everywhere-src-${pkgver/_/-}"
+
+case $pkgver in
+	*_alpha*|*_beta*|*_rc*) _rel=development_releases;;
+	*) _rel=official_releases;;
+esac
+
+source="https://download.qt.io/$_rel/qt/${pkgver%.*}/${pkgver/_/-}/submodules/qtbase-everywhere-src-${pkgver/_/-}.tar.xz"
+
+case "$CTARGET_ARCH" in
+	arm*|aarch64) _opengl="-DQT_FEATURE_opengles2=ON" ;;
+esac
+
+[ "$CARCH" = "riscv64" ] && options="$options textrels"
+
+build() {
+	cmake -B build -G Ninja \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DINSTALL_BINDIR=lib/qt6/bin \
+		-DINSTALL_DOCDIR=share/doc/qt6 \
+		-DINSTALL_ARCHDATADIR=lib/qt6 \
+		-DINSTALL_DATADIR=share/qt6 \
+		-DINSTALL_INCLUDEDIR=include/qt6 \
+		-DINSTALL_MKSPECSDIR=lib/qt6/mkspecs \
+		-DINSTALL_EXAMPLESDIR=share/doc/qt6/examples \
+		-DQT_FEATURE_journald=OFF \
+		-DQT_FEATURE_openssl_linked=ON \
+		-DQT_FEATURE_vulkan=ON \
+		$_opengl
+	cmake --build build --parallel
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sqlite() {
+	pkgdesc="SQLite driver for Qt6's SQL classes"
+	cd "$pkgdir"
+	amove usr/lib/qt6/plugins/sqldrivers/libqsqlite*
+}
+
+odbc() {
+	pkgdesc="ODBC driver for Qt6's SQL classes"
+	cd "$pkgdir"
+	amove usr/lib/qt6/plugins/sqldrivers/libqsqlodbc*
+}
+
+postgresql() {
+	pkgdesc="PostgreSQL driver for Qt6's SQL classes"
+	cd "$pkgdir"
+	amove usr/lib/qt6/plugins/sqldrivers/libqsqlpsql*
+}
+
+mysql() {
+	pkgdesc="MySQL driver for Qt6's SQL classes"
+	cd "$pkgdir"
+	amove usr/lib/qt6/plugins/sqldrivers/libqsqlmysql*
+}
+
+x11() {
+	pkgdesc="Qt6 GUI-related libraries"
+	depends="hicolor-icon-theme"
+	cd "$pkgdir"
+	amove \
+		usr/lib/libQt6EglFSDeviceIntegration.so.* \
+		usr/lib/libQt6EglFsKms*Support.so.* \
+		usr/lib/libQt6Gui.so.* \
+		usr/lib/libQt6OpenGL*.so.* \
+		usr/lib/libQt6XcbQpa.so.* \
+		usr/lib/libQt6PrintSupport.so.* \
+		usr/lib/libQt6Widgets.so.* \
+		usr/lib/qt6/plugins/egldeviceintegrations \
+		usr/lib/qt6/plugins/generic \
+		usr/lib/qt6/plugins/image* \
+		usr/lib/qt6/plugins/platform* \
+		usr/lib/qt6/plugins/printsupport* \
+		usr/lib/qt6/plugins/xcbglintegrations/libqxcb*
+}
+
+sha512sums="
+9c1c3db8589ce085e1e895dfe6346f2f7a1928defb19e5ea87829f05138f4ceb78e8390c70bda86f430f5c059c4ab73a28e230f792be3cccf38951bdc1ee5dc2  qtbase-everywhere-src-6.2.1.tar.xz
+"

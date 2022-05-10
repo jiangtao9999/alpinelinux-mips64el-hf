@@ -1,0 +1,71 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=akonadi-search
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="Libraries and daemons to implement searching in Akonadi"
+# armhf blocked by extra-cmake-modules
+# mips64 and riscv64 blocked by akonadi
+# s390x blocked by multiple KDE Frameworks
+# ppc64le blocked by qt5-qtwebengine -> akonadi
+arch="all !armhf !mips64 !s390x !riscv64 !ppc64le"
+url="https://community.kde.org/KDE_PIM"
+license="(GPL-2.0-only OR GPL-3.0-only) AND (LGPL-2.1-only OR LGPL-3.0-only)"
+depends_dev="
+	akonadi-dev>=$pkgver
+	akonadi-mime-dev>=$pkgver
+	kcalendarcore-dev
+	kcmutils-dev
+	kconfig-dev
+	kcontacts-dev
+	kcrash-dev
+	kdbusaddons-dev
+	ki18n-dev
+	kio-dev
+	kmime-dev
+	krunner-dev
+	qt5-qtbase-dev
+	xapian-core-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/akonadi-search-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+
+	# akonadi-sqlite-schedulertest, konadi-sqlite-collectionindexingjobtest,
+	# akonadi-mysql-schedulertest and akonadi-mysql-collectionindexingjobtest
+	# require running dbus server
+
+	# Prevent the lines using more than 80 characters by looping
+	local skipped_tests="("
+	local tests="
+		akonadi-sqlite-scheduler
+		akonadi-sqlite-collectionindexingjob
+		akonadi-mysql-scheduler
+		akonadi-mysql-collectionindexingjob"
+	for test in $tests; do
+		skipped_tests="$skipped_tests|$test"
+	done
+	skipped_tests="$skipped_tests)test"
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest -E "$skipped_tests"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+749f857b96223ddfc1906de546d9c5feb065afce4545d1410a8cb6260bd8f6c7d2b165082e77685c683081bd5223ea0dc7b902edf6b84956afd66164806a5da4  akonadi-search-21.08.3.tar.xz
+"

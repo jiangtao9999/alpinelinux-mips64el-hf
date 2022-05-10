@@ -1,0 +1,33 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gst-editing-services
+pkgver=1.18.5
+pkgrel=0
+pkgdesc="GStreamer Editing Services Library"
+url="https://gstreamer.freedesktop.org"
+# s390x blocked by 7 failing tests
+arch="all !s390x"
+license="LGPL-2.0-or-later"
+makedepends="gstreamer-dev gtk-doc python3 gobject-introspection-dev py3-gobject3-dev
+	glib-dev gst-plugins-good gst-plugins-bad-dev gst-plugins-base-dev
+	libxml2-dev flex meson"
+subpackages="$pkgname-dev $pkgname-doc"
+source="https://gstreamer.freedesktop.org/src/gst-editing-services/gst-editing-services-$pkgver.tar.xz"
+options="!check" # https://gitlab.freedesktop.org/gstreamer/gst-editing-services/-/issues/125
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+b2107f2c5f1934721dd029c818f09f62a458ddfb0111060afd0fbbd2e8df9814218750ceff800aedac9878d4c5ae0f3f9fc08b8f8e82cadd1aa14b436737dcad  gst-editing-services-1.18.5.tar.xz
+"

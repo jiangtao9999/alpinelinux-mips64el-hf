@@ -1,0 +1,40 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=py3-ovos-utils
+pkgver=0.0.8
+pkgrel=1
+pkgdesc="Collection of simple utilities for use across the MyCroft ecosystem"
+url="https://github.com/OpenVoiceOS/ovos_utils"
+arch="noarch"
+license="Apache-2.0"
+depends="
+	py3-colour
+	py3-inflection
+	py3-json-database
+	py3-kthread
+	py3-mycroft-messagebus-client
+	py3-pexpect
+	py3-phoneme-guesser
+	py3-pronouncing
+	py3-requests
+	python3
+	"
+makedepends="py3-setuptools"
+checkdepends="py3-pytest"
+source="https://github.com/OpenVoiceOS/ovos_utils/archive/v$pkgver/ovos_utils-v$pkgver.tar.gz"
+builddir="$srcdir/ovos_utils-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	# test_lang.py requires a network connection
+	PYTHONPATH="$PWD/build/lib" pytest
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="2449d4964277ef965f86762e3368fcbe5df296dc3947dac7ef473abea0d75b3e6993addba43072f352684a5347711bb137bd80b3f94fec76f05041da38f7ca2c  ovos_utils-v0.0.8.tar.gz"

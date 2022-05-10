@@ -1,0 +1,54 @@
+# Contributor: Sander Maijers <S.N.Maijers+Alpine@gmail.com>
+# Maintainer: Sander Maijers <S.N.Maijers+Alpine@gmail.com>
+pkgname=xmlsec
+pkgver=1.2.33
+pkgrel=0
+pkgdesc="C based implementation for XML Signature Syntax and Processing and XML Encryption Syntax and Processing"
+url="https://github.com/lsh123/xmlsec/"
+arch="all"
+license="MIT"
+makedepends="libxml2-dev libxslt-dev openssl1.1-compat-dev nss-dev
+	autoconf automake libtool"
+checkdepends="nss-tools"
+options="libtool !check" # disable tests til https://github.com/lsh123/xmlsec/issues/308 is fixed
+subpackages="$pkgname-nss $pkgname-dev $pkgname-doc"
+source="https://github.com/lsh123/xmlsec/archive/xmlsec-${pkgver//./_}.tar.gz"
+builddir="$srcdir/$pkgname-$pkgname-${pkgver//./_}"
+
+prepare() {
+	default_prepare
+	autoreconf -fi
+}
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--disable-static \
+		--enable-pkgconfig \
+		--with-openssl=/usr \
+		--without-gnutls \
+		--without-gcrypt \
+		--with-default-crypto=openssl
+	make
+}
+
+check() {
+	make -k check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+nss() {
+	pkgdesc="xmlsec nss plugin"
+	install_if="$pkgname=$pkgver-r$pkgrel nss"
+	mkdir -p "$subpkgdir"/usr/lib/
+	mv "$pkgdir"/usr/lib/libxmlsec1-nss.so* "$subpkgdir"/usr/lib/
+}
+
+sha512sums="
+0b1bb0e544f49f3e3d0c8a974bff18129093ce88d6db217ff33790a2acf4af5135479124b1d9e49d26638816d4da8049170b62faa724561657798545ce5f9c13  xmlsec-1_2_33.tar.gz
+"

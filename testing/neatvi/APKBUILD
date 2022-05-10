@@ -1,0 +1,26 @@
+# Maintainer:
+pkgname=neatvi
+pkgver=09
+pkgrel=0
+pkgdesc="vi/ex editor with support for bidirectional UTF-8 text, syntax highlight and infinite undo/redo"
+url="https://github.com/aligrudi/neatvi"
+arch="all"
+license="ISC" # vi.c
+subpackages="$pkgname-doc"
+options="!check" # no test suite
+source="$pkgname-$pkgver.tar.gz::https://github.com/aligrudi/neatvi/archive/$pkgver.tar.gz
+	conf.patch"
+
+build() {
+	make CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS"
+}
+
+package() {
+	install -Dm755 "$builddir"/vi "$pkgdir"/usr/bin/neatvi
+	install -Dm644 "$builddir"/README -t "$pkgdir"/usr/share/doc/neatvi
+}
+
+sha512sums="
+11b0c34525210bcb96fc0128056a0c350cdea3318cc26b3c3aac5bce59809d8eab0dd63b410d5f91d2965ce5030ee104f614f829264854df6f26ef05a605d876  neatvi-09.tar.gz
+1c67a6fb1cae78525a00ab5e78a6dfbbad1d5f79cd8daa09edd6cbc9b6c6a52729c6775b30b96c78e28f71d5e70ac10ad08cc0b3d5db54db6dc250ce0daea868  conf.patch
+"

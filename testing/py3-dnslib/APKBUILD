@@ -1,0 +1,33 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Fabian Affolter <fabian@affolter-engineering.ch>
+pkgname=py3-dnslib
+_pkgname=dnslib
+pkgver=0.9.16
+pkgrel=0
+pkgdesc="simple library to encode/decode DNS wire-format packets"
+url="https://github.com/paulc/dnslib"
+arch="noarch"
+license="BSD-2-Clause"
+depends="python3"
+makedepends="py3-setuptools"
+source="https://files.pythonhosted.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz"
+builddir="$srcdir"/$_pkgname-$pkgver
+
+replaces=py-dnslib # Backwards compatibility
+provides=py-dnslib=$pkgver-r$pkgrel # Backwards compatibility
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	PYTHONPATH="$PWD/build/lib" python3 dnslib/test_decode.py
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+debe8a68cd88224a42aec3800683e803f8928dfd67645b58e0fd7f74eff6b22bad09a84e7b322c3e19e7aecb7b70ea086a2ab4b3f8d91c11dc3efc6f8b288ff2  dnslib-0.9.16.tar.gz
+"

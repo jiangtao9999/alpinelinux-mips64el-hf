@@ -1,0 +1,30 @@
+# Contributor: Lonjil <alpine@lonjil.xyz>
+# Maintainer: Lonjil <alpine@lonjil.xyz>
+pkgname=qalculate-gtk
+pkgver=3.21.0
+pkgrel=0
+pkgdesc="Multi-purpose desktop calculator - GTK+ version"
+url="https://qalculate.github.io/"
+license="GPL-2.0-or-later"
+arch="all"
+makedepends="intltool pkgconf glib-dev libqalculate-dev gtk+3.0-dev"
+subpackages="$pkgname-doc $pkgname-lang"
+source="https://github.com/Qalculate/qalculate-gtk/releases/download/v$pkgver/qalculate-gtk-$pkgver.tar.gz"
+options="!check" # no test suite
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--mandir=/usr/share/man
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+c850e09ea6aebbe7bbd074e31f462a02dac64c1ef9fb3a26df8ae6355f79f3d8aec5b3f7af071801d05486511f1515abd67674561e30e68199adb7eac3c61444  qalculate-gtk-3.21.0.tar.gz
+"

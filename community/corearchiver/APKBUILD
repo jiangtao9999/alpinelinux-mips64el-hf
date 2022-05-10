@@ -1,0 +1,27 @@
+# Contributor: rahmanshaber <rahmanshaber@yahoo.com>
+# Maintainer: rahmanshaber <rahmanshaber@yahoo.com>
+pkgname=corearchiver
+pkgver=4.2.0
+pkgrel=0
+pkgdesc="Archiver from C-Suite to create and extract archives"
+arch="all"
+url="https://gitlab.com/cubocore"
+license="GPL-3.0-or-later"
+depends="qt5-qtsvg"
+makedepends="qt5-qtbase-dev libcprime-dev libarchive-qt-dev cmake ninja"
+source="$pkgname-$pkgver.tar.gz::https://gitlab.com/cubocore/corearchiver/-/archive/v$pkgver/corearchiver-v$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-v$pkgver"
+options="!check"
+
+build() {
+	cmake ../$pkgname-v$pkgver \
+		-GNinja \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	ninja
+}
+
+package() {
+	DESTDIR="$pkgdir" ninja install
+}
+sha512sums="f978aebd01f8a3a35c505df4d5be381d85df82461a30fb59f93ec1b560c3c3a70228f2f52b216f8426082c4736dc612f45f08ec4a5128a337b2599bff3189abb  corearchiver-4.2.0.tar.gz"

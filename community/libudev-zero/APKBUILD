@@ -1,0 +1,36 @@
+# Contributor: Milan P. Stanić <mps@arvanta.net>
+# Maintainer: Milan P. Stanić <mps@arvanta.net>
+pkgname=libudev-zero
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="libudev replacement to use whatever device manager"
+url="https://github.com/illiliti/libudev-zero/"
+arch="all"
+license="ISC"
+options="!check" # no tests
+makedepends="linux-headers"
+provides="udev"
+replaces="udev"
+provider_priority=20
+subpackages="$pkgname-dev $pkgname-helper"
+source="$pkgname-$pkgver.tar.gz::https://github.com/illiliti/libudev-zero/archive/$pkgver.tar.gz"
+
+build() {
+	make PREFIX=/usr
+	 cc -o libudev-zero-helper contrib/helper.c
+}
+
+package() {
+	make DESTDIR=$pkgdir PREFIX=/usr install
+	rm -f $pkgdir/usr/lib/libudev.a
+}
+helper() {
+	pkgname="libudev-zero hotplugging helper"
+	depends=""
+	install -Dm755 $builddir/libudev-zero-helper \
+		"$subpkgdir"/usr/libexec/libudev-zero-helper
+}
+
+sha512sums="
+1e1b56be0250b411ec094d233bd30447115e257e5acd21e3c808daab1b4395f9293d9461c7c89f7c012e5da657bba5e46f6e7eca541ffcc56eab32205dcd5a9f  libudev-zero-1.0.0.tar.gz
+"

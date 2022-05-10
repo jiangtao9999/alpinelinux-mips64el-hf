@@ -1,0 +1,38 @@
+# Contributor: Leonardo Arena <rnalrd@alpinelinux.org>
+# Maintainer: Leonardo Arena <rnalrd@alpinelinux.org>
+pkgname=qt5-qtkeychain
+pkgver=0.12.0
+pkgrel=0
+pkgdesc="Qt API to store passwords and other secret data"
+url="https://github.com/frankosterfeld/qtkeychain"
+arch="all"
+license="BSD-2-Clause"
+depends="dbus:org.freedesktop.Secrets"
+makedepends="cmake qt5-qttools-dev libsecret-dev"
+subpackages="$pkgname-dev"
+replaces="qtkeychain"
+source="$pkgname-$pkgver.tar.gz::https://github.com/frankosterfeld/qtkeychain/archive/v$pkgver.tar.gz"
+options="!check"
+builddir="$srcdir"/qtkeychain-$pkgver
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+
+	cmake \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		-DCMAKE_C_FLAGS="$CFLAGS" \
+		$CMAKE_CROSSOPTS
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="ad8f7b3e8f59894a09892aeb78118f5ed93aa4593eece782c1879a4f3c37d9d63e8d40ad4b2e6a2e286e0da39f45cd4ed46181a1a05c078a59134114b2456a03  qt5-qtkeychain-0.12.0.tar.gz"

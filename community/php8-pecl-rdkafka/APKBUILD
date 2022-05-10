@@ -1,0 +1,36 @@
+# Contributor: Gennady Feldman <gena01@gmail.com>
+# Maintainer: Andy Postnikov <apostnikov@gmail.com>
+pkgname=php8-pecl-rdkafka
+_extname=rdkafka
+pkgver=5.0.1
+pkgrel=0
+pkgdesc="A librdkafka bindings for PHP 8.0 providing a working client for Kafka - PECL"
+url="https://pecl.php.net/package/rdkafka"
+arch="all"
+license="MIT"
+depends="php8-common"
+makedepends="php8-dev file librdkafka-dev"
+source="php-pecl-$_extname-$pkgver.tgz::https://pecl.php.net/get/$_extname-$pkgver.tgz"
+builddir="$srcdir/$_extname-$pkgver"
+
+build() {
+	phpize8
+	./configure --prefix=/usr --with-php-config=/usr/bin/php-config8
+	make
+}
+
+check() {
+	php8 -dextension=modules/$_extname.so --ri $_extname
+	make NO_INTERACTION=1 REPORT_EXIT_STATUS=1 test TESTS=--show-diff
+}
+
+package() {
+	make INSTALL_ROOT="$pkgdir" install
+	local _confdir="$pkgdir"/etc/php8/conf.d
+	install -d $_confdir
+	echo "extension=$_extname" > $_confdir/$_extname.ini
+}
+
+sha512sums="
+77491caa7a992b703cd8e0cee65b03df90a036c2d8b42428c6d04e97104b56ffc60aad0808dbebceb3873972f1cd73242924ea39caeb32022b14122fdbf0cd76  php-pecl-rdkafka-5.0.1.tgz
+"

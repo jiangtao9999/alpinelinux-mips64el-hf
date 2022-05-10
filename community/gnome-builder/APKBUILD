@@ -1,0 +1,45 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-builder
+pkgver=41.2
+pkgrel=0
+pkgdesc="Develop software for GNOME"
+url="https://wiki.gnome.org/Apps/Builder"
+# mips64 and riscv64 blocked by rust -> webkit2gtk
+# s390x blocked by polkit -> flatpak
+arch="all !mips64 !riscv64 !s390x"
+license="GPL-3.0-or-later"
+depends="flatpak-builder py3-lxml py3-gobject3"
+makedepends="meson libdazzle-dev glib-dev gtk+3.0-dev gtksourceview4-dev
+	json-glib-dev jsonrpc-glib-dev pango-dev libpeas-dev webkit2gtk-dev
+	libxml2-dev libgit2-glib-dev template-glib-dev llvm-dev gspell-dev
+	enchant2-dev devhelp-dev glade-dev pcre2-dev gtkmm3-dev
+	vte3-dev vala gobject-introspection-dev ctags clang-dev flatpak-dev
+	libexecinfo-dev libportal-dev cmark-dev"
+checkdepends="appstream-glib desktop-file-utils xvfb-run"
+subpackages="$pkgname-dev $pkgname-lang"
+source="https://download.gnome.org/sources/gnome-builder/${pkgver%.*}/gnome-builder-$pkgver.tar.xz
+	fix-musl.patch
+	"
+
+build() {
+	export LIBS="$LIBS -lexecinfo"
+	abuild-meson \
+		-Dplugin_sysprof=false \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	# Increase the timeout, this can take pretty long, especially on armhf
+	xvfb-run meson test -C output -t 10
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+032d877865e72f8eb4124a1f89ab55fb60213cb64dc71c5e8d1967ba58e216eeb2cd6f7f26e2b29e5618a00e7d4fe0fac032630bb3c725fbef4a314f0e5709e5  gnome-builder-41.2.tar.xz
+ef7f75d316558e59ecb07b4fc8ef92abc51d78d6983021588546fadb57f90d971561be1f2491a2750e61e07c6d6200f3c199dab3db1060a2217ccbdb2505239e  fix-musl.patch
+"

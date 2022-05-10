@@ -1,0 +1,49 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kross
+pkgver=5.88.0
+pkgrel=0
+pkgdesc="Framework for scripting KDE applications"
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://community.kde.org/Frameworks"
+license="LGPL-2.1-or-later"
+depends_dev="
+	kcompletion-dev
+	kcoreaddons-dev
+	ki18n-dev
+	kiconthemes-dev
+	kio-dev
+	kparts-dev
+	kwidgetsaddons-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	qt5-qttools-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	kdoctools-dev
+	"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/portingAids/kross-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+4468a03cf0a298cad289b6f876024f143679f0602186716fbaa059210bc614c7327575c6c758b39003c5ac96ae80121fa44052fbf3436fd27a3de6c9e7e0285b  kross-5.88.0.tar.xz
+"

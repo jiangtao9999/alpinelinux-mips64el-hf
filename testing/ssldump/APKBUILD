@@ -1,0 +1,37 @@
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Maintainer:
+pkgname=ssldump
+pkgver=1.4
+pkgrel=0
+pkgdesc="SSLv3/TLS network protocol analyzer"
+url="https://github.com/adulau/ssldump"
+arch="all"
+license="BSD-4-Clause"
+subpackages="$pkgname-doc"
+options="!check"  # no tests provided
+makedepends="autoconf automake libnet-dev json-c-dev fts-dev libpcap-dev openssl-dev"
+source="https://github.com/adulau/ssldump/archive/v$pkgver/ssldump-$pkgver.tar.gz
+	"
+
+prepare() {
+	default_prepare
+	./autogen.sh
+}
+
+build() {
+	./configure \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--datarootdir=/usr/share \
+		--docdir=/usr/share/doc \
+		--localstatedir=/var
+	make
+}
+
+package() {
+	make install sbindir="$pkgdir/usr/sbin" mandir="$pkgdir/usr/share/man" docdir="$pkgdir/usr/share/doc"
+	install -D -m 644 COPYRIGHT "$pkgdir"/usr/share/licenses/$pkgname/COPYRIGHT
+}
+
+sha512sums="fb17c5610dcfce3e8020a5148d37be5b2fbc3083d78727281922ae32b5905c4aa882cd368c3581238f3492c6b5bab943dcff6a966d64160a3836d6a95bdc7682  ssldump-1.4.tar.gz"

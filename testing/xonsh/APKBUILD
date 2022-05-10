@@ -1,0 +1,31 @@
+# Contributor: vinnie <fz12345@gmail.com>
+# Maintainer: vinnie <fz12345@gmail.com>
+pkgname=xonsh
+pkgver=0.10.1
+pkgrel=0
+pkgdesc="Python-powered, cross-platform, Unix-gazing shell"
+url="https://xon.sh"
+arch="noarch"
+license="BSD-2-Clause"
+options="!check"  #flake8-docstrings missing, maybe later
+depends="
+	py3-pygments>=2.2
+	py3-prompt_toolkit>=3.0
+	py3-distro
+	py3-setproctitle
+	"
+makedepends="py3-setuptools"
+source="$pkgname-$pkgver.tar.gz::https://github.com/xonsh/xonsh/archive/$pkgver.tar.gz"
+
+build() {
+	python3 setup.py build
+}
+
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+6ccfa4fd30fac307b27db51f868e9516986c85831bc89fa72dcc28633fa429b928c09b8ff5bb55b86fc6e05f0a8e9ebe8810dcfac11fd97ae42bbd2e1aafc8a4  xonsh-0.10.1.tar.gz
+"

@@ -1,0 +1,49 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=katomic
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit -> kxmlgui
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://kde.org/applications/games/org.kde.katomic"
+pkgdesc="A fun and educational game built around molecular geometry"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	extra-cmake-modules
+	qt5-qtbase-dev
+	kcoreaddons-dev
+	kconfig-dev
+	kcrash-dev
+	kwidgetsaddons-dev
+	ki18n-dev
+	kxmlgui-dev
+	knewstuff-dev
+	kdoctools-dev
+	kdbusaddons-dev
+	libkdegames-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/katomic-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+9d7608ec2d0ebda4ade645ac0d35ec408b7b9cc71e7479e7131695f540ebc01a366e95c6e2d9ee9fbc56e497654b8db0533c4de6f91eb040420f2b84023cfd58  katomic-21.08.3.tar.xz
+"

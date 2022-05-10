@@ -1,0 +1,43 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=filelight
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by kio
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://kde.org/applications/utilities/filelight"
+pkgdesc="An application to visualize the disk usage on your computer"
+license="(GPL-2.0-only OR GPL-3.0-only) AND GFDL-1.2-only"
+makedepends="
+	extra-cmake-modules
+	kdoctools-dev
+	ki18n-dev
+	kio-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/filelight-$pkgver.tar.xz"
+subpackages="$pkgname-dbg $pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+0495ccf3230a77098386399ee9b08b4a581b637c267d94229fabe949e166e757872a548382b3b03f109cb95c7bc48b8359318a48f7a34f24e4fff61dfe9cf118  filelight-21.08.3.tar.xz
+"

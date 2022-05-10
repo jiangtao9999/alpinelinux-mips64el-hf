@@ -1,0 +1,35 @@
+# Contributor: Francesco Camuffo <dev@fmac.xyz>
+# Maintainer: Francesco Camuffo <dev@fmac.xyz>
+pkgname=ugrep
+pkgver=3.3.8
+pkgrel=0
+pkgdesc="Ultra fast grep with interactive query UI and fuzzy search"
+url="https://github.com/Genivia/ugrep/wiki"
+arch="all"
+license="BSD-3-Clause"
+checkdepends="bash"
+makedepends="bzip2-dev lz4-dev pcre2-dev xz-dev zlib-dev zstd-dev"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/Genivia/ugrep/archive/refs/tags/v$pkgver.tar.gz"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man
+	make
+}
+
+check() {
+	make test
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+d41d875d6c019030cc0ccf97417c385603d5a5560b1eacc16d961163e5723fe0982d5ad18be6ccd715676664d8b9a74dc65545ddf66a0bcf5c07596e928e5259  ugrep-3.3.8.tar.gz
+"

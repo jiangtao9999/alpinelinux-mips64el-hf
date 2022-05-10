@@ -1,0 +1,60 @@
+# Contributor: Olivier Mauras <olivier@mauras.ch>
+# Contributor: Michał Polański <michal@polanski.me>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=borgbackup
+_pkgname=borg
+pkgver=1.1.17
+pkgrel=1
+pkgdesc="Deduplicating backup program"
+url="https://www.borgbackup.org/"
+arch="all !s390x !mips !mips64" # limited by py3-pyzmq
+license="BSD-3-Clause"
+depends="python3 py3-pyzmq"
+makedepends="python3-dev lz4-dev acl-dev attr-dev openssl1.1-compat-dev linux-headers
+	py3-setuptools py3-setuptools_scm"
+checkdepends="py3-pytest py3-pytest-benchmark"
+subpackages="
+	$pkgname-doc
+	$pkgname-bash-completion
+	$pkgname-fish-completion
+	$pkgname-zsh-completion
+	"
+source="https://github.com/borgbackup/borg/releases/download/$pkgver/borgbackup-$pkgver.tar.gz"
+
+# https://gitlab.alpinelinux.org/alpine/aports/-/issues/11644
+case "$CARCH" in
+	armhf) ;;
+	*) makedepends="$makedepends zstd-dev" ;;
+esac
+
+build() {
+	# https://github.com/borgbackup/borg/issues/4891#issuecomment-615838317
+	CFLAGS="$CFLAGS -DXXH_FORCE_MEMORY_ACCESS=1" python3 setup.py build
+}
+
+check() {
+	PYTHONPATH="$(echo "$builddir"/build/lib.linux-*)" pytest -v --benchmark-skip --pyargs borg.testsuite
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+
+	install -Dm644 -t "$pkgdir"/usr/share/man/man1 docs/man/*.1
+
+	install -Dm644 scripts/shell_completions/bash/$_pkgname \
+		"$pkgdir"/usr/share/bash-completion/completions/$_pkgname
+
+	install -Dm644 scripts/shell_completions/fish/$_pkgname.fish \
+		"$pkgdir"/usr/share/fish/completions/$_pkgname.fish
+
+	install -Dm644 scripts/shell_completions/zsh/_$_pkgname \
+		"$pkgdir"/usr/share/zsh/site-functions/_$_pkgname
+
+	# clean some useless files
+	cd "$pkgdir"/usr/lib/python*/site-packages/borg
+	find . -name '*.h' -delete -o -name '*.c' -delete -o -name '*.pyx' -delete
+}
+
+sha512sums="
+6170680efcca35341031a8fcfd9434d2dca530bb6f7fcabbf452e6af6a8df5a825b4991d342f3c97bd7378d56b9ee86e6118f9281a31ba51235f49818852f4bb  borgbackup-1.1.17.tar.gz
+"

@@ -1,0 +1,33 @@
+# Contributor: Thomas Deutsch <thomas@tuxpeople.org>
+# Maintainer: Thomas Deutsch <thomas@tuxpeople.org>
+pkgname=lazygit
+pkgver=0.28.2
+pkgrel=1
+pkgdesc="Simple terminal UI for git commands"
+url="https://github.com/jesseduffield/lazygit"
+arch="all"
+license="MIT"
+makedepends="go"
+options="!check" # FIXME: https://github.com/jesseduffield/lazygit/issues/1009
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/jesseduffield/lazygit/archive/v$pkgver.tar.gz"
+
+export GOPATH="$srcdir"
+export GOFLAGS="$GOFLAGS -trimpath -mod=readonly -modcacherw"
+
+build() {
+	go build -ldflags="-s -w" -v
+}
+
+package() {
+	install -Dm0755 $pkgname -t "$pkgdir"/usr/bin
+
+	mkdir -p "$pkgdir"/usr/share/doc
+	mv docs "$pkgdir"/usr/share/doc/"$pkgname"
+	install -Dm0644 LICENSE -t "$pkgdir"/usr/share/licenses/"$pkgname"
+}
+
+
+sha512sums="
+e7002089194c572fffe8329bd245d4db64fb71cb73c63f07b950da845ecdc85c70c8bea682d2b4aa1c9b38f8cf5270cd24d3bb41eff8a26d31be58eddcdf41ce  lazygit-0.28.2.tar.gz
+"

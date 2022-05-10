@@ -1,0 +1,37 @@
+# Contributor: Andy Hawkins <andy@gently.org.uk>
+# Maintainer: Andy Hawkins <andy@gently.org.uk>
+pkgname=py3-quantiphy
+pkgver=2.15
+pkgrel=0
+pkgdesc="Physical Quantities"
+url="https://quantiphy.readthedocs.io/"
+arch="noarch"
+license="MIT"
+depends="
+	python3
+	"
+makedepends="
+	py3-setuptools
+	"
+checkdepends="
+	py3-pytest
+	py3-inform
+	"
+source="https://github.com/KenKundert/quantiphy/archive/v$pkgver/quantiphy-v$pkgver.tar.gz"
+builddir="$srcdir/quantiphy-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	# Exclude manual tests as they create a circular dependency with py3-quantiphy_eval
+	PYTHONPATH="$PWD/build/lib" pytest -k 'not test_manual'
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+sha512sums="
+922b3c40b527a2754b7c9425b90db7fe45bbb98f5ddfeaca3d7f9d113e527ed40b44605fe90c29f320fa4304ab8b60f8276130107d28dd5db482a1a086ebb034  quantiphy-v2.15.tar.gz
+"

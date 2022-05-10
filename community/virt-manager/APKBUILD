@@ -1,0 +1,66 @@
+# Maintainer: Leonardo Arena <rnalrd@alpinelinux.org>
+pkgname=virt-manager
+pkgver=3.2.0
+pkgrel=2
+pkgdesc="GUI for managing virtual machines"
+url="https://virt-manager.org/"
+arch="noarch !s390x !mips !mips64"
+license="GPL-2.0-or-later"
+depends="python3 $pkgname-common spice-gtk vte3 py3-cairo gtk-vnc>=0.5.2-r2
+	gtksourceview4 qemu-img"
+_common_deps="libvirt-glib py3-libxml2 py3-libvirt py3-gobject3 py3-requests
+	libosinfo"
+makedepends="intltool glib py3-docutils"
+subpackages="
+	$pkgname-doc
+	$pkgname-lang
+	$pkgname-common
+	virt-install:virt_install
+	$pkgname-bash-completion:bashcomp:noarch
+	"
+source="https://releases.pagure.org/virt-manager/virt-manager-$pkgver.tar.gz"
+
+# secfixes:
+#   2.2.1-r0:
+#     - CVE-2019-10183
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py check
+}
+
+package() {
+	python3 setup.py --no-update-icon-cache --no-compile-schemas install --root "$pkgdir"
+	python3 -m compileall "$pkgdir/usr/share/virt-manager"
+	python3 -O -m compileall "$pkgdir/usr/share/virt-manager"
+}
+
+common() {
+	pkgdesc="Common files used by virt-manager and virt-install"
+	depends="$_common_deps"
+	mkdir -p "$subpkgdir"/usr/share/virt-manager "$subpkgdir"/usr/bin
+	mv "$pkgdir"/usr/share/virt-manager/virtinst \
+		"$subpkgdir"/usr/share/virt-manager
+}
+
+virt_install() {
+	pkgdesc="Utilities for installing virtual machines"
+	depends="$pkgname-common=$pkgver-r$pkgrel"
+	mkdir -p "$subpkgdir"/usr/share/virt-manager "$subpkgdir"/usr/bin
+	mv "$pkgdir"/usr/bin/virt-install \
+		"$pkgdir"/usr/bin/virt-clone \
+		"$subpkgdir"/usr/bin/
+}
+
+bashcomp() {
+	depends=""
+	pkgdesc="Bash completions for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel bash-completion"
+
+	amove usr/share/bash-completion/completions
+}
+
+sha512sums="90cd98fe6b269007cd30f628490c65df440abe39b4925c65dc80667e7d80d059752695353ccf6ac3e2436206da311bc402eda50df31874d82ef8fe115966e1ec  virt-manager-3.2.0.tar.gz"

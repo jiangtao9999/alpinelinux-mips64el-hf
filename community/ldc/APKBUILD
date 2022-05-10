@@ -1,0 +1,170 @@
+# Contributor: Mathias LANG <pro.mathias.lang@gmail.com>
+# Maintainer: Mathias LANG <pro.mathias.lang@gmail.com>
+pkgname=ldc
+pkgver=1.28.0
+pkgrel=0
+pkgdesc="The LLVM-based D Compiler"
+url="https://github.com/ldc-developers/ldc"
+# LDC does not support host compiling on most of the architecture Alpine supports
+arch="x86_64 aarch64"
+license="BSD-3-Clause AND BSL-1.0 AND ( Artistic-1.0 OR GPL-2.0-or-later ) AND NCSA AND MIT"
+depends="llvm-libunwind-dev tzdata $pkgname-static=$pkgver-r$pkgrel"
+makedepends="chrpath cmake curl-dev diffutils gdmd llvm12-dev llvm12-static
+	libedit-dev zlib-dev"
+checkdepends="bash gdb grep llvm11-test-utils"
+# A user might want to install the '-runtime' subpackage when they have
+# a dynamically-linked D program.
+subpackages="
+	$pkgname-dbg
+	$pkgname-runtime
+	$pkgname-static
+	$pkgname-bash-completion:bashcomp:noarch"
+source="https://github.com/ldc-developers/ldc/releases/download/v$pkgver/ldc-$pkgver-src.tar.gz
+	0001-Add-OpenBSD-to-section_ldc.d-202.patch
+	0002-LDC-Fix-TLS-range-with-static-druntime-on-Linux-x86-.patch
+"
+builddir="$srcdir/ldc-$pkgver-src/"
+
+build() {
+	# Note: The CI was running into OOM while building this package
+	# See https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/14364#note_122336
+	case "$CARCH" in x86*)
+		export MAKEFLAGS="$MAKEFLAGS -j$((JOBS<4 ? JOBS : 4))"
+		export DFLAGS="$DFLAGS -lowmem"
+		;;
+	esac
+	# First, build LDC using GDC
+	mkdir -p "$builddir/stage1"
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	unset DFLAGS
+	cmake \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		-DCMAKE_C_FLAGS="$CFLAGS" \
+		-DD_COMPILER='gdmd' \
+		-DADDITIONAL_DEFAULT_LDC_SWITCHES=' "-linker=bfd", "-link-defaultlib-shared", "-L--export-dynamic"' \
+		$CMAKE_CROSSOPTS -S "$builddir" -B "$builddir/stage1"
+	make -C "$builddir/stage1"
+
+	# Then, self-build
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	# Don't use None buildtype for now, see
+	# https://github.com/ldc-developers/ldc/issues/3386#issuecomment-603370855
+	cmake \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		-DCMAKE_C_FLAGS="$CFLAGS" \
+		-DD_COMPILER="$builddir/stage1/bin/ldmd2" \
+		-DC_SYSTEM_LIBS="unwind;m;pthread;rt;dl" \
+		-DADDITIONAL_DEFAULT_LDC_SWITCHES=' "-linker=bfd", "-link-defaultlib-shared", "-L--export-dynamic"' \
+		$CMAKE_CROSSOPTS "$builddir"
+	make
+
+	# Build the test runners
+	# Use of `-L--export-dynamic` is needed so that exceptions work correctly
+	# (namely: function names should be available without debug infos).
+	make all-test-runners
+
+	# CMake added the rpaths to the shared libs (of stage1!) - strip them
+	chrpath -d "$builddir"/lib/*.so*
+	chrpath -d \
+		"$builddir"/bin/ldc2 \
+		"$builddir"/bin/ldmd2 \
+		"$builddir"/bin/ldc-build-runtime \
+		"$builddir"/bin/ldc-prune-cache
+}
+
+check() {
+	# Find the libraries we just built as final (not stage1!)
+	export LD_LIBRARY_PATH="$builddir"/lib
+
+	case "$CARCH" in
+		# Math & numeric related tests fail due to https://github.com/ldc-developers/ldc/issues/3270#issuecomment-613132406
+		# druntime-test-thread fails due to https://github.com/ldc-developers/ldc/issues/3403
+		aarch64)
+			_tests_ignore="|core\.thread\.fiber|std.*math.*|std\.numeric.*|std\.format|std\.algorithm\.sorting.*|druntime-test-thread|std\.complex.*"
+			;;
+		# https://github.com/ldc-developers/ldc/issues/3404
+		x86)
+			_tests_ignore="|druntime-test-thread"
+			;;
+	esac
+
+
+	# Note: The testsuite does not parallelize well, as the 'clean' target get run in parallel.
+	# Hence '-j${JOBS}' was left out on purpose
+	#
+	# - dmd-testsuite takes too long to run and has more to do with language checks
+	#	which are less relevant to us than platform integration tests
+	# - lit-test disabled because 'TEST 'LDC :: debuginfo/print_gdb.d' FAILED'
+	#	See https://gitlab.alpinelinux.org/alpine/aports/-/issues/11154
+	# - 'druntime-test-shared' fails, probably because it is using 'Object.factory'
+	# - 'druntime-test-stdcpp' fails for an unknown reason and is temporarily disabled
+	# - 'druntime-test-exceptions' fails for an unknown reason and is temporarily disabled
+    #
+    # The following two tests fail since v1.27.0, but seems to fail for unrelated reason.
+    # - 'druntime-test-cycles'
+    # - 'druntime-test-gc'
+    # Namely, the following assert is triggered:
+    # core.exception.AssertError@../../src/rt/lifetime.d(1250): Assertion failure
+    # ----------------
+    # ??:? _d_assert [0x7fc894efb1a0]
+    # ??:? void rt.lifetime.__unittest_L1236_C12() [0x5642121a5040]
+    #
+    # Link: https://github.com/ldc-developers/druntime/blob/8e135b4e978975b24536e2a938801a29b39dc9f6/src/rt/lifetime.d#L1250
+    # However this unittest is AFAICS unrelated to the two tests,
+    # and either succeed or isn't run on its own.
+	ctest --output-on-failure -E "dmd-testsuite|lit-tests|druntime-test-exceptions|druntime-test-shared|druntime-test-stdcpp|druntime-test-cycles|druntime-test-gc$_tests_ignore"
+}
+
+package() {
+	# Use -j1, the install is flaky with too many build jobs
+	make -j1 DESTDIR="$pkgdir" install
+
+	mkdir -p "$pkgdir"/usr/share/bash-completion
+	mv "$pkgdir"/etc/bash_completion.d "$pkgdir"/usr/share/bash-completion/completions
+}
+
+runtime() {
+	depends="libexecinfo-dev"
+	pkgdesc="Dynamic runtime library for D code compiled with $pkgname-$pkgver"
+
+	mkdir -p "$subpkgdir/usr/lib/"
+	for libn in "libdruntime" "libphobos2";
+	do
+		mv "$pkgdir"/usr/lib/$libn-ldc-shared.so* "$subpkgdir/usr/lib/"
+	done
+	# As of LDC v1.28.0, JIT is not supported for LLVM >= 12
+	# https://github.com/ldc-developers/ldc/blob/v1.28.0/CMakeLists.txt#L452
+	#mv "$pkgdir"/usr/lib/libldc-jit.so* "$subpkgdir/usr/lib"
+
+	mv "$pkgdir"/usr/lib/*.so* "$subpkgdir/usr/lib/"
+}
+
+static() {
+	depends="libexecinfo-static"
+	pkgdesc="$pkgdesc (static library)"
+
+	mkdir -p "$subpkgdir/usr/lib/"
+	mv "$pkgdir"/usr/lib/*.a "$subpkgdir/usr/lib/"
+}
+
+bashcomp() {
+	depends=""
+	pkgdesc="Bash completions for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel bash-completion"
+
+	amove usr/share/bash-completion/completions
+}
+
+sha512sums="
+3e566282175d65eb075c9c076bcf0475658c747238ed91efd350a7834d6d54760310ac5249fb74db3812c07058efbca8d726427ef39055d77b3f9a6940bf4188  ldc-1.28.0-src.tar.gz
+19a04c789b5f447dbc7dcf3536ef4f613ab4e637a4a707e3d5ba2445b4590881c030d7302a8ef3393ce5ca5bc9fb5695ba8b63b63fcd40b8d9c2fd147c079292  0001-Add-OpenBSD-to-section_ldc.d-202.patch
+a59dc0c05f9e6c74efe8f6c9ea35dff89fd2a34fc79c793925df997904da3b6032803a74715641c11944f7ef49ab96ddea70eabc25005f2e00ad1d9af2bd7bd8  0002-LDC-Fix-TLS-range-with-static-druntime-on-Linux-x86-.patch
+"

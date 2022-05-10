@@ -1,0 +1,39 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=nemo-qml-plugin-calendar
+pkgver=0.6.21
+pkgrel=0
+pkgdesc="Nemo QML calendar plugin"
+url="https://github.com/sailfishos/nemo-qml-plugin-calendar"
+# armhf blocked by extra-cmake-modules
+arch="all !armhf"
+license="LGPL-2.1-or-later"
+makedepends="
+	extra-cmake-modules
+	kcalendarcore-dev
+	libaccounts-qt-dev
+	mkcal-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	"
+source="https://github.com/sailfishos/nemo-qml-plugin-calendar/archive/$pkgver/nemo-qml-plugin-calendar-$pkgver.tar.gz
+	0001-Port-to-CMake.patch
+	"
+options="!check"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DINSTALL_QML_IMPORT_DIR=/usr/lib/qt5/qml
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+ec026bfe9df0262a1bb05084a93e38dff1c6661ad8e069d6dbf3a1173fd2d0f8b03e2bc7af4dd285cd2e692f1b83a7fa5fb8820e67bdbb36ec5398e73d721b64  nemo-qml-plugin-calendar-0.6.21.tar.gz
+80d80ef5b4fae6d15ff1447c4eb5c01c6d3b3eb992e46adc11d21353311f1cdd2a8cd4d08318f27f9934fb20549ae3e11bcb6cce60034a61ecbcf8279cf960c2  0001-Port-to-CMake.patch
+"

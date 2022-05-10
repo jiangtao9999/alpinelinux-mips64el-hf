@@ -1,0 +1,41 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=libxmlb
+pkgver=0.2.1
+pkgrel=1
+pkgdesc="Library to help create and query binary XML blobs"
+url="https://github.com/hughsie/libxmlb"
+arch="all"
+license="LGPL-2.1-or-later"
+makedepends="meson glib-dev gobject-introspection-dev py3-setuptools"
+checkdepends="shared-mime-info"
+subpackages="$pkgname-dev:_dev $pkgname-dbg"
+source="$pkgname-$pkgver.tar.gz::https://github.com/hughsie/libxmlb/archive/$pkgver.tar.gz"
+
+build() {
+	abuild-meson \
+		-Dgtkdoc=false \
+		-Dtests=true \
+		-Dstemmer=false \
+		-Dintrospection=true \
+		output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+	rm -rf "$pkgdir"/usr/share/installed-tests
+	rm -rf "$pkgdir"/usr/libexec/installed-tests
+}
+
+_dev() {
+	default_dev
+	mkdir -p "$subpkgdir"/usr
+	mv "$pkgdir"/usr/libexec "$subpkgdir"/usr
+}
+
+sha512sums="4e082f036eb62626d1724ac5093ad625f9259e9e81aa40d5ca0589a3a72dadd669c0718ff64dcae094973b6c282b6c8f8ce7212b7e47211f320035bb639ec59d  libxmlb-0.2.1.tar.gz"

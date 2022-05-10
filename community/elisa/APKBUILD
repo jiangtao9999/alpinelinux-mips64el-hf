@@ -1,0 +1,68 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=elisa
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://kde.org/applications/multimedia/org.kde.elisa"
+pkgdesc="A simple music player aiming to provide a nice experience for its users"
+license="LGPL-3.0-or-later"
+depends="
+	kirigami2
+	vlc
+	"
+makedepends="
+	baloo-dev
+	extra-cmake-modules
+	kcmutils-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kdbusaddons-dev
+	kdeclarative-dev
+	kdoctools-dev
+	kfilemetadata-dev
+	ki18n-dev
+	kio-dev
+	kirigami2-dev
+	kpackage-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	qt5-qtmultimedia-dev
+	qt5-qtquickcontrols2-dev
+	qt5-qtsvg-dev
+	vlc-dev
+	"
+checkdepends="
+	cmd:dbus-run-session
+	xvfb-run
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/elisa-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+
+	# mediaplaylistproxymodelTest is broken
+	CTEST_OUTPUT_ON_FAILURE=TRUE dbus-run-session xvfb-run ctest -E "mediaplaylistproxymodelTest"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+839a35d3bd69b6c57eff85b583d78d8a630536f7911283e407776ada8c69625d2c3e06a0ac1591cf91420eb05ff1cd9bfbfe6eb8dccbbb26a31845a3ab9f2018  elisa-21.08.3.tar.xz
+"

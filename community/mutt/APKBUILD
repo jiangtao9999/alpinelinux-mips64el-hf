@@ -1,0 +1,68 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Contributor: Andrew Manison <amanison@anselsystems.com>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=mutt
+pkgver=2.1.3
+pkgrel=1
+pkgdesc="Small and very powerful text-mode email client"
+url="http://www.mutt.org"
+arch="all"
+license="GPL-2.0-or-later"
+makedepends="cyrus-sasl-dev gdbm-dev gettext-dev gpgme-dev
+	libidn2-dev ncurses-dev openssl1.1-compat-dev perl"
+options="!check"
+install="$pkgname.post-upgrade"
+subpackages="$pkgname-doc $pkgname-lang"
+source="https://bitbucket.org/mutt/mutt/downloads/mutt-$pkgver.tar.gz
+	"
+
+# secfixes:
+#   2.0.4-r1:
+#     - CVE-2021-3181
+#   2.0.2-r0:
+#     - CVE-2020-28896
+#   1.14.4-r0:
+#     - CVE-2020-14093
+
+build() {
+	ISPELL=/usr/bin/hunspell \
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info \
+		--enable-imap \
+		--enable-pop \
+		--enable-smtp \
+		--enable-hcache \
+		--enable-gpgme \
+		--enable-sidebar \
+		--with-curses \
+		--with-mailpath=/var/mail \
+		--with-docdir=/usr/share/doc/$pkgname \
+		--without-included-gettext \
+		--with-ssl \
+		--with-sasl \
+		--with-idn2
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+
+	rm -f "$pkgdir"/etc/*.dist \
+		"$pkgdir"/etc/mime.types
+
+	# Don't tamper with the global configuration file.
+	# Many options set in the global config cannot be
+	# overwritten in the users configuration file.
+	# Example: Resetting colors isn't possible.
+	install -Dm644 contrib/gpg.rc \
+		"$pkgdir"/etc/Muttrc.gpg.dist
+}
+
+sha512sums="
+43b1ce3c9c62ccf7845fa3ae99936562890877626b8f8e8997c63a5f28347b1e69cb891fdb6f7e4d1c10962e0d40a186cb4cb41a7aa3a8c3966bbde10165394b  mutt-2.1.3.tar.gz
+"

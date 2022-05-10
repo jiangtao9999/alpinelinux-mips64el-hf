@@ -1,0 +1,30 @@
+# Contributor: Stacy Harper <contact@stacyharper.net>
+# Maintainer: Stacy Harper <contact@stacyharper.net>
+pkgname=kiln
+pkgver=0.2.1
+pkgrel=1
+pkgdesc="Simple static site generator for Gemini sites"
+url="https://git.sr.ht/~adnano/kiln"
+arch="all"
+license="GPL-3.0-only"
+makedepends="go scdoc"
+subpackages="$pkgname-doc"
+options="!check"
+source="
+	$pkgname-$pkgver.tar.gz::https://git.sr.ht/~adnano/kiln/archive/$pkgver.tar.gz
+	"
+
+build() {
+	go build -v -o bin/$pkgname --tags extended
+	make docs
+}
+
+package() {
+	install -Dm755 "$builddir"/bin/$pkgname "$pkgdir"/usr/bin/$pkgname
+	install -Dm644 "$builddir"/docs/*.1 -t "$pkgdir"/usr/share/man/man1
+
+	cp -a "$builddir"/templates "$pkgdir"/usr/share/$pkgname
+}
+sha512sums="
+8cb297260045c40271758217032752887c8c64410728b89299d3db88fefd1cffa211b3a84f756bd114b1f8d119bc23c431459799f19c5f2e4354c0739c495d39  kiln-0.2.1.tar.gz
+"

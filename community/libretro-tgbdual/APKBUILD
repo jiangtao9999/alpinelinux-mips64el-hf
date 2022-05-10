@@ -1,0 +1,23 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-tgbdual
+pkgver=0_git20210312
+pkgrel=0
+_commit="fb6d2f6fca1956b389b3e9a8282df5b0cd465a6f"
+pkgdesc="libretro port of TGB Dual"
+url="https://github.com/libretro/tgbdual-libretro"
+arch="all"
+license="GPL-2.0-only"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/tgbdual-libretro/archive/$_commit.tar.gz"
+builddir="$srcdir/tgbdual-libretro-$_commit"
+options="!check" # No tests
+
+build() {
+	make
+}
+
+package() {
+	install -Dm644 tgbdual_libretro.so "$pkgdir"/usr/lib/libretro/tgbdual_libretro.so
+}
+
+sha512sums="f08a0c3679f38010dc5af889d6aa847344e54c2d58666639a5e72596db8a0882db8b36cf232165df434c02f31794890e57eaccbcc7d6655c12ea054a24744aba  libretro-tgbdual-fb6d2f6fca1956b389b3e9a8282df5b0cd465a6f.tar.gz"

@@ -1,0 +1,58 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=konversation
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://konversation.kde.org/"
+pkgdesc="A user-friendly and fully-featured IRC client"
+license="GPL-2.0-or-later"
+makedepends="
+	extra-cmake-modules
+	karchive-dev
+	kbookmarks-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kdbusaddons-dev
+	kdoctools-dev
+	kglobalaccel-dev
+	ki18n-dev
+	kiconthemes-dev
+	kidletime-dev
+	kio-dev
+	kitemviews-dev
+	knewstuff-dev
+	knotifications-dev
+	knotifyconfig-dev
+	kparts-dev
+	kwallet-dev
+	kwidgetsaddons-dev
+	kwindowsystem-dev
+	phonon-dev
+	qca-dev
+	qt5-qtbase-dev
+	solid-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/konversation-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+7cf3e8c0fb455c708f37b1112cd1cc6649770dfa0dc6106ebfe52bf152817f27a31ee1bfeb561a55a728bc270a384eade595b676a900763eeaa724b1bca086c0  konversation-21.08.3.tar.xz
+"

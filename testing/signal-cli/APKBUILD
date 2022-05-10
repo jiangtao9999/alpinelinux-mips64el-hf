@@ -1,0 +1,36 @@
+# Contributor: Siva Mahadevan <me@svmhdvn.name>
+# Maintainer: Siva Mahadevan <me@svmhdvn.name>
+pkgname=signal-cli
+pkgver=0.8.0
+pkgrel=1
+pkgdesc="commandline interface for libsignal-service-java"
+url="https://github.com/AsamK/signal-cli"
+# aarch64 fails on builder, https://gitlab.alpinelinux.org/alpine/aports/-/issues/12440
+# armv7, armhf, x86 and mips64 are jdk-less
+#arch="noarch !armv7 !armhf !x86 !mips !mips64 !aarch64"
+license="GPL-3.0-or-later"
+depends="java-jre-headless"
+makedepends="gradle"
+source="$pkgname-$pkgver.tar.gz::https://github.com/AsamK/signal-cli/archive/v$pkgver.tar.gz"
+
+build() {
+	gradle installDist
+}
+
+check() {
+	gradle check
+}
+
+package() {
+	local buildhome="build/install/$pkgname"
+	local installhome="/usr/share/java/$pkgname"
+
+	install -dm755 "$pkgdir/$installhome/lib"
+	install -m644 "$buildhome"/lib/* "$pkgdir/$installhome/lib"
+
+	install -Dm755 "$buildhome/bin/$pkgname" "$pkgdir/$installhome/bin/$pkgname"
+	install -dm755 "$pkgdir/usr/bin"
+	ln -s "$installhome/bin/$pkgname" "$pkgdir/usr/bin/$pkgname"
+}
+
+sha512sums="30fe9d04feeb96a668f40fca21e150e7d68665182bd11180a19e02195ade4df94b8b14271cecfe9c216ab21de315d3ad6aac82115ad6745e270ffe5a8c60d438  signal-cli-0.8.0.tar.gz"

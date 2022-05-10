@@ -1,0 +1,28 @@
+# Contributor: guddaff <guddaff@protonmail.com>
+# Maintainer: guddaff <guddaff@protonmail.com>
+pkgname=wtfutil
+pkgver=0.40.0
+pkgrel=0
+pkgdesc="personal information dashboard"
+url="https://wtfutil.com/"
+arch="all"
+license="MPL-2.0"
+makedepends="go"
+source="$pkgname-$pkgver.tar.gz::https://github.com/wtfutil/wtf/archive/refs/tags/v$pkgver.tar.gz"
+builddir="$srcdir/wtf-$pkgver"
+
+build() {
+	make PREFIX=/usr
+}
+
+check() {
+	make test
+}
+
+package() {
+	install -Dm755 bin/wtfutil $pkgdir/usr/bin/wtfutil
+}
+
+sha512sums="
+30b334908d936ea5b04d6b311360a9a85c9a9a3f0862a2257d83e88c74a09e6ab561420580e8d1b2efa900aa08c6554a0ee0cb7510b9d97d569adcd39f0b68c3  wtfutil-0.40.0.tar.gz
+"

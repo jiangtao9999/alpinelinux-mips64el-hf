@@ -1,0 +1,38 @@
+# Contributor: Duncan Bellamy <dunk@denkimushi.com>
+# Maintainer: Duncan Bellamy <dunk@denkimushi.com>
+pkgname=dovecot-fts-xapian
+pkgver=1.5.1
+pkgrel=0
+pkgdesc="Dovecot xapian fts plugin"
+url="https://github.com/grosjo/fts-xapian"
+arch="all"
+license="LGPL-2.1-or-later"
+depends="dovecot xapian-core"
+makedepends="automake autoconf libtool dovecot-dev xapian-core-dev icu-dev chrpath"
+source="$pkgname-$pkgver.tar.gz::https://github.com/grosjo/fts-xapian/archive/$pkgver.tar.gz"
+builddir="$srcdir/"fts-xapian-$pkgver
+
+prepare() {
+	default_prepare
+	autoreconf -vif
+}
+
+build() {
+	PANDOC=false ./configure \
+		--enable-static=no \
+		--with-dovecot=/usr/lib/dovecot
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	chrpath -d "$pkgdir"/usr/lib/dovecot/lib21_fts_xapian_plugin.so
+}
+
+sha512sums="
+ad5512ea703a49d0dffe3a18ff890570650019831c9742a3db2d5c58bb9d4254e0709e7abe5cd9d80c991a3ce621eb9e8fcc89a27b4af7f569238821a684d7cd  dovecot-fts-xapian-1.5.1.tar.gz
+"

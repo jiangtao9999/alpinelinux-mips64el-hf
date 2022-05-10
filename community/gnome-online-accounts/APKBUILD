@@ -1,0 +1,49 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-online-accounts
+pkgver=3.40.0
+pkgrel=0
+pkgdesc="Single sign-on framework for GNOME"
+url="https://wiki.gnome.org/Projects/GnomeOnlineAccounts"
+# mips64 and riscv64 blocked by webkit2gtk
+arch="all !mips64 !riscv64"
+license="GPL-2.0-or-later"
+depends="dbus:org.freedesktop.Secrets"
+makedepends="gnome-desktop-dev libxslt itstool libxml2-utils
+	webkit2gtk-dev json-glib-dev rest-dev libsecret-dev
+	docbook-xsl docbook-xml gobject-introspection-dev vala gtk-doc"
+subpackages="$pkgname-dbg $pkgname-dev $pkgname-lang $pkgname-doc"
+source="https://download.gnome.org/sources/gnome-online-accounts/${pkgver%.*}/gnome-online-accounts-$pkgver.tar.xz"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var \
+		--enable-media-server \
+		--enable-lastfm \
+		--enable-documentation \
+		--enable-vala
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+dev() {
+	provides="$pkgname-static=$pkgver-r$pkgrel"
+	replaces="$pkgname-static"
+	default_dev
+}
+
+sha512sums="
+ac90226023e2a69ad9cd12faf637844a029814282f164cc905810bf54af6693069b9019ca58211deb8487f6a32886eb072a1223fca32bc4e3fe0bc91ce8f2d6c  gnome-online-accounts-3.40.0.tar.xz
+"

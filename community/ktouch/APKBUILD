@@ -1,0 +1,35 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=ktouch
+pkgver=21.08.3
+pkgrel=0
+# riscv64 disabled due to missing rust in recursive dependency
+arch="all !armhf !mips !mips64 !s390x !riscv64" # armhf blocked by qt5-qtdeclarative, everything else by rust
+url="https://edu.kde.org/ktouch/"
+pkgdesc="Touch Typing Tutor"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="extra-cmake-modules qt5-qtbase-dev qt5-qtdeclarative-dev qt5-qtquickcontrols2-dev qt5-qtxmlpatterns-dev qt5-qtx11extras-dev kcompletion-dev kconfig-dev kconfigwidgets-dev kcoreaddons-dev kdeclarative-dev kdoctools-dev ki18n-dev kitemviews-dev kcmutils-dev ktextwidgets-dev kwidgetsaddons-dev kwindowsystem-dev kxmlgui-dev kiconthemes-dev"
+source="https://download.kde.org/stable/release-service/$pkgver/src/ktouch-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="
+97e86e5fab6a1f6fca2ac4b1edb82ea3a182a4f3d8e45d3467dd09f02ae1190345803450332b70352eced1c687f775dbeacae8335e123c02aa3006ffb8077073  ktouch-21.08.3.tar.xz
+"

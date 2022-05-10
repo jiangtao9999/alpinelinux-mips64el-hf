@@ -1,0 +1,67 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gpaste
+pkgver=3.42.1
+pkgrel=0
+pkgdesc="Clipboard managment system"
+url="https://github.com/Keruspe/GPaste"
+arch="all !armhf !s390x !ppc64le !mips !mips64 !riscv64" # limited by gnome-control-center
+license="BSD-2-Clause"
+makedepends="meson gtk+3.0-dev gnome-control-center-dev dbus-dev mutter-dev
+	gjs-dev appstream-glib-dev vala"
+subpackages="
+	$pkgname-dev
+	$pkgname-lang
+	$pkgname-doc
+	$pkgname-gnome:_gnome
+	$pkgname-bash-completion:bashcomp:noarch
+	$pkgname-zsh-completion:zshcomp:noarch
+	"
+source="gpaste-$pkgver.tar.gz::https://github.com/Keruspe/GPaste/archive/v$pkgver.tar.gz"
+builddir="$srcdir/GPaste-$pkgver"
+
+build() {
+	abuild-meson \
+		-Dsystemd=false \
+		-Dintrospection=true \
+		-Dvapi=true \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+_gnome() {
+	install_if="$pkgname=$pkgver-r$pkgrel gnome-shell gnome-control-center"
+	depends="gnome-control-center"
+	mkdir -p "$subpkgdir"/usr/share
+	mv "$pkgdir"/usr/share/gnome-shell \
+		"$pkgdir"/usr/share/gnome-control-center \
+		"$subpkgdir"/usr/share
+}
+
+bashcomp() {
+	depends=""
+	pkgdesc="Bash completions for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel bash-completion"
+
+	amove usr/share/bash-completion/completions
+}
+
+zshcomp() {
+	depends=""
+	pkgdesc="Zsh completions for $pkgname"
+	install_if="$pkgname=$pkgver-r$pkgrel zsh"
+
+	amove usr/share/zsh/site-functions
+}
+
+sha512sums="
+f603912ecd1805b0b757706eb5add23ca8d96fa404a981b100027bcaeef43f0b5d2e70b9f7f2c35873160f156c269fb17c991bc0c1104ab0bc5353a6c115db48  gpaste-3.42.1.tar.gz
+"

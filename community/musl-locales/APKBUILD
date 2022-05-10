@@ -1,0 +1,41 @@
+# Contributor: TBK <alpine@jjtc.eu>
+# Maintainer: TBK <alpine@jjtc.eu>
+pkgname=musl-locales
+pkgver=0_git20201005
+pkgrel=0
+_commit="1101fb2bcdd189cd9415b8bd1c775eb43527d25c"
+arch="all"
+url="https://gitlab.com/rilian-la-te/musl-locales"
+pkgdesc="Locales support for musl"
+license="LGPL-3.0-only"
+options="!check" # No test suite
+makedepends="cmake gettext-tiny-dev"
+subpackages="$pkgname-lang"
+source="$pkgname-$pkgver.tar.gz::https://gitlab.com/api/v4/projects/rilian-la-te%2Fmusl-locales/repository/archive?sha=$_commit
+	add-all-available-locales.patch
+	"
+builddir="$srcdir/$pkgname-$_commit-$_commit"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_C_FLAGS="$CFLAGS" \
+		"$CMAKE_CROSSOPTS"
+	make -C build
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+lang() {
+	default_lang
+	license="MIT"
+}
+
+sha512sums="48aa00ffab7dd275a3ac5c5f5a7aec8172d4c6748e5f081fc9869638bce981630fd136a03c6a5c6cf3b29300a0b2c5ef89aa41f7368c9eda494664c7eb727c85  musl-locales-0_git20201005.tar.gz
+dac294f9e6207686b8dcbedfc71db4e7e8c648ca6e11992dd6b606e0fcefc44d15db192753f8a6c902941a5aa9540e54fac2747bfa59058b087c46c49ac314de  add-all-available-locales.patch"

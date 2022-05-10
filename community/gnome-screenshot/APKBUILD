@@ -1,0 +1,30 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-screenshot
+pkgver=40.0
+pkgrel=0
+pkgdesc="Screenshot capture utility for GNOME"
+url="https://gitlab.gnome.org/GNOME/gnome-screenshot"
+# s390x, mips64 and riscv64 blocked by rust -> libhandy1
+arch="all !s390x !mips64 !riscv64"
+license="GPL-2.0-or-later"
+depends="desktop-file-utils"
+makedepends="meson libcanberra-dev glib-dev itstool appstream-glib-dev
+	libhandy1-dev"
+subpackages="$pkgname-doc $pkgname-lang"
+source="https://download.gnome.org/sources/gnome-screenshot/${pkgver%.*}/gnome-screenshot-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="0889d7701711f17de68f8a55f512b7764fed087b1b2f86b372d1a38ee956f05ca8c833ca16a1de2396b07c01de79204d988192036780f521b82733436d019cb0  gnome-screenshot-40.0.tar.xz"

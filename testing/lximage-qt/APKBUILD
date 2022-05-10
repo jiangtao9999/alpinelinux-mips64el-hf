@@ -1,0 +1,34 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=lximage-qt
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="The image viewer and screenshot tool for LXQt"
+url="https://github.com/lxqt/lximage-qt"
+arch="all !armhf !mips64 !s390x" # armhf, mips64 blocked by liblxqt, s390x blocked by libfm-qt
+license="LGPL-2.0-or-later"
+makedepends="
+	cmake lxqt-build-tools liblxqt-dev qt5-qttools-dev
+	libfm-qt-dev libexif-dev menu-cache-dev
+	"
+options="!check" # No testsuite
+source="https://github.com/lxqt/lximage-qt/releases/download/$pkgver/lximage-qt-$pkgver.tar.xz"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+b78ef64316978a91ab350ab4588b0e5a7d1cfd2cda90ceac739ed8e1668cd6e34a164bb1cd818ca8175a5677d8bff8a50cd7c6aa2cd99ad87116a6da969534cb  lximage-qt-1.0.0.tar.xz
+"

@@ -1,0 +1,26 @@
+# Maintainer: Michał Adamski <michal@ert.pl>
+pkgname=electrs
+pkgver=0.9.3
+pkgrel=0
+pkgdesc="Efficient re-implementation of Electrum Server in Rust"
+url="https://github.com/romanz/electrs"
+license="MIT"
+arch="x86 x86_64 aarch64" # limited by rust/cargo and rocksdb
+makedepends="cargo rocksdb-dev<6.24 clang-libs"
+source="https://github.com/romanz/electrs/archive/v$pkgver/electrs-$pkgver.tar.gz"
+
+build() {
+	ROCKSDB_INCLUDE_DIR=/usr/include ROCKSDB_LIB_DIR=/usr/lib cargo build --all --features "metrics_process" --release --locked
+}
+
+check() {
+	cargo test --all --release --locked
+}
+
+package() {
+	install -Dm755 target/release/$pkgname -t "$pkgdir"/usr/bin
+}
+
+sha512sums="
+2c52e28274fabca9d95d607253de6d077bd9e695e4f36e0132e2b20e5e1bbc42f0e52205f2be7c8157d79246c84c59edc674b5884d3b30fce71051b792f52ee9  electrs-0.9.3.tar.gz
+"

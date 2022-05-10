@@ -1,0 +1,27 @@
+# Contributor: Kevin Daudt <kdaudt@alpinelinux.org>
+# Maintainer: Kevin Daudt <kdaudt@alpinelinux.org>
+pkgname=py3-whois
+pkgver=0.9.8
+pkgrel=1
+pkgdesc="Python module/library for retrieving WHOIS information of domains"
+url="https://github.com/DannyCork/python-whois"
+arch="noarch"
+license="WTFPL"
+depends="python3 whois"
+makedepends="py3-setuptools"
+source="$pkgname-$pkgver.tar.gz::https://files.pythonhosted.org/packages/source/w/whois/whois-$pkgver.tar.gz"
+builddir="$srcdir/whois-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	:
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="554836ce0908c9bf5a5c21976bd7494c51df2915cfbe1c3b26ecf673c47fc82e9eaa9b230868ff729b4c9cef8e17477d9e7331db1a8631cf431c792cf3c3772c  py3-whois-0.9.8.tar.gz"

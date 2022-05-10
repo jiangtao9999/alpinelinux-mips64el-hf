@@ -1,0 +1,32 @@
+# Contributor: Florian Heigl <florian.heigl@gmail.com>
+# Maintainer: Florian Heigl <florian.heigl@gmail.com>
+pkgname=nvme-cli
+pkgver=1.16
+pkgrel=0
+pkgdesc="NVM-Express user space tooling for Linux"
+options="!check" # Requires nose2
+arch="all"
+url="https://github.com/linux-nvme/nvme-cli"
+license="GPL-2.0-only"
+makedepends="linux-headers coreutils util-linux-dev util-linux uuidgen"
+subpackages="
+	$pkgname-doc
+	$pkgname-bash-completion
+	$pkgname-zsh-completion
+	"
+source="$pkgname-$pkgver.tar.gz::https://github.com/linux-nvme/nvme-cli/archive/v$pkgver.tar.gz
+	add-limits.patch"
+
+build() {
+	make PREFIX=/usr
+}
+
+package() {
+	make PREFIX=/usr DESTDIR="$pkgdir" UDEVDIR=/usr/lib/udev install
+	rm -rf "$pkgdir"/usr/lib/systemd
+}
+
+sha512sums="
+c713eb15b979ad17791cf95717b42d5f638cb4803d646bca1f4825e6bb50f086226b44b108b61571709b2cb615ae6ba86dbad309f675b240ebd3968d1cf536ff  nvme-cli-1.16.tar.gz
+cee0623c3b17c74edc365eed80b3a03086ccb68f4fe00a0cd13ee65f0602a1edb0eed64a352403dd71a25f2779dc410fd2497a17be1e565958a7616dd375da70  add-limits.patch
+"

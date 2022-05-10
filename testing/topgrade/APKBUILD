@@ -1,0 +1,31 @@
+# Contributor: Sean McAvoy <seanmcavoy@gmail.com>
+# Maintainer: Sean McAvoy <seanmcavoy@gmail.com>
+pkgname=topgrade
+pkgver=8.0.3
+pkgrel=0
+pkgdesc="run upgrades of packages in OS and other package managers"
+url="https://github.com/r-darwish/topgrade"
+arch="all !s390x !mips !mips64 !riscv64"
+license="GPL-3.0-or-later"
+makedepends="rust cargo"
+subpackages="$pkgname-doc"
+source="topgrade-$pkgver.tar.gz::https://github.com/r-darwish/topgrade/archive/refs/tags/v$pkgver.tar.gz"
+
+build() {
+	cargo build --release
+}
+
+check() {
+	cargo test
+}
+
+package() {
+	install -Dm755 target/release/topgrade "$pkgdir"/usr/bin/topgrade
+	install -Dm644 topgrade.8 "$pkgdir"/usr/share/man/man8/topgrade.8
+	install -Dm644 config.example.toml "$pkgdir"/usr/share/doc/topgrade/config.example.toml
+	install -Dm644 LICENSE "$pkgdir"/usr/share/license/topgrade/LICENSE
+}
+
+sha512sums="
+bf3df1de2780117c8aa2dec16c40612cb97aa81103b68960c866660c2457c04831d2ba25374323a099465ea68df3df7d74ee69d81a1a52a5becb4e0fe584f838  topgrade-8.0.3.tar.gz
+"

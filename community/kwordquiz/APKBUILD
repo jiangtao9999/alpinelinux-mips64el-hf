@@ -1,0 +1,54 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kwordquiz
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kxmlgui
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://edu.kde.org/kwordquiz"
+pkgdesc="Flash Card Trainer"
+license="GPL-2.0-or-later AND LGPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	extra-cmake-modules
+	kconfig-dev
+	kconfigwidgets-dev
+	kcrash-dev
+	kdoctools-dev
+	kguiaddons-dev
+	ki18n-dev
+	kiconthemes-dev
+	kitemviews-dev
+	knewstuff-dev
+	knotifications-dev
+	knotifyconfig-dev
+	kwindowsystem-dev
+	kxmlgui-dev
+	libkeduvocdocument-dev
+	phonon-dev
+	qt5-qtbase-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kwordquiz-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+82642d7c1af661dae52e1753d6543e4d6b9ea7211179ef4fe9cd439f84076053fa73edce47407d5dfd9e30beab2c392cc65c42b9ff883a1eef7b0557cd08f791  kwordquiz-21.08.3.tar.xz
+"

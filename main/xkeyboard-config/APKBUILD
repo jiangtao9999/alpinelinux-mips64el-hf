@@ -1,0 +1,28 @@
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=xkeyboard-config
+pkgver=2.34
+pkgrel=0
+pkgdesc="X keyboard configuration files"
+url="http://www.freedesktop.org/wiki/Software/XKeyboardConfig"
+arch="noarch"
+license="MIT"
+subpackages="$pkgname-doc"
+makedepends="meson perl libxslt"
+source="https://www.x.org/archive/individual/data/xkeyboard-config/xkeyboard-config-$pkgver.tar.bz2
+	"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+sha512sums="
+cf3bdb658349b2db9db44ea1a0f7060b890b95520319101d83ba5aefeb0b1e2fd578b6f72a90758438f04bffbe7536cf112b76297fd47c95e02029fd203c51fb  xkeyboard-config-2.34.tar.bz2
+"

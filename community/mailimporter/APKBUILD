@@ -1,0 +1,48 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=mailimporter
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="KDE PIM library providing support for mail applications"
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit -> pimcommon
+# ppc64le blocked by qt5-qtwebengine -> akonadi
+arch="all !armhf !mips64 !s390x !riscv64 !ppc64le"
+url="https://kontact.kde.org/"
+license="GPL-2.0-or-later"
+depends_dev="
+	akonadi-dev
+	akonadi-mime-dev
+	karchive-dev
+	kconfig-dev
+	kcoreaddons-dev
+	ki18n-dev
+	kmime-dev
+	libkdepim-dev
+	pimcommon-dev
+	qt5-qtbase-dev
+	"
+makedepends="$depends_dev extra-cmake-modules"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/mailimporter-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+5ae7bcc12a84a5ded19f2b280cca486cdeaf715491a122236ae300813d4760e3f50efdc5ffe00327408383ab55fa459097a9607461f1d064356cf74c75e02905  mailimporter-21.08.3.tar.xz
+"

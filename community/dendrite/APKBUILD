@@ -1,0 +1,45 @@
+# Contributor: Michał Polański <michal@polanski.me>
+# Maintainer: Michał Polański <michal@polanski.me>
+pkgname=dendrite
+pkgver=0.5.1
+pkgrel=0
+pkgdesc="Second-generation Matrix homeserver written in Go"
+url="https://github.com/matrix-org/dendrite"
+license="Apache-2.0"
+arch="all"
+makedepends="go"
+subpackages="$pkgname-openrc"
+pkgusers="$pkgname"
+pkggroups="$pkgname"
+install="$pkgname.pre-install"
+source="https://github.com/matrix-org/dendrite/archive/v$pkgver/dendrite-v$pkgver.tar.gz
+	dendrite.initd
+	dendrite.confd
+	"
+options="net" # required to download go modules
+
+build() {
+	for cmd in dendrite-monolith-server generate-keys create-account; do
+		go build -trimpath -ldflags="-s -w" -v -o bin/$cmd ./cmd/$cmd
+	done
+}
+
+check() {
+	go test ./...
+}
+
+package() {
+	install -Dm755 bin/dendrite-monolith-server "$pkgdir"/usr/bin/dendrite
+	install -Dm755 bin/generate-keys "$pkgdir"/usr/bin/dendrite-generate-keys
+	install -Dm755 bin/create-account "$pkgdir"/usr/bin/dendrite-create-account
+
+	install -Dm644 dendrite-config.yaml "$pkgdir"/etc/$pkgname/dendrite.yaml
+	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
+	install -Dm644 "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="
+4ac06c0e9a714e64c7dfb57752d758f8ab84e0c71a030b1c610add7d4b598eebc19340e428e5f44f898915df13809427b3b940b8f42d248a13f3c7209cfd2835  dendrite-v0.5.1.tar.gz
+a275a4a24bdbec2131fc5f6cb150faf0cd326a6a6a775974f8360fdef5657065a27e4d04c199e9420b91d1de7b159f47c3b1b645671b471b35131c61bda9edd2  dendrite.initd
+a6a088683a6aebc431d3eb289bd0d4dbaede698d1a5da25d6af2aad79e9cd36db02ce9173ab6904249f23b88bca5d1630258736feef7e8266e6c22220d74fa1f  dendrite.confd
+"

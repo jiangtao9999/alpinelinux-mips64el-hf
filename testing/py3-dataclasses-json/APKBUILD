@@ -1,0 +1,31 @@
+# Contributor: Alex McGrath <amk@amk.ie>
+# Maintainer: Alex McGrath <amk@amk.ie>
+pkgname=py3-dataclasses-json
+_pkgname=dataclasses-json
+pkgver=0.5.6
+pkgrel=0
+pkgdesc="Provides a simple API for encoding and decoding dataclasses to and from JSON."
+url="https://github.com/lidatong/dataclasses-json"
+arch="all"
+license="MIT"
+depends="python3 py3-marshmallow py3-marshmallow-enum py3-typing_inspect py3-stringcase"
+makedepends="py3-setuptools"
+checkdepends="py3-pytest py3-hypothesis py3-mypy"
+source="dataclasses-json-$pkgver.tar.gz::https://github.com/lidatong/dataclasses-json/archive/v$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+e6883ae8ca68e4f4c6446948e106334ea2357489a6234a7e9f50004f450246e7028367571f8aa69e64c2886bcce74a1258b836ad45b210ce14685bac8e0b5a4f  dataclasses-json-0.5.6.tar.gz
+"

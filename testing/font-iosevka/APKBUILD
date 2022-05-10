@@ -1,0 +1,81 @@
+# Contributor: psykose <alice@ayaya.dev>
+# Maintainer: psykose <alice@ayaya.dev>
+
+pkgname=font-iosevka
+pkgver=11.0.0
+pkgrel=0
+pkgdesc="Versatile typeface for code, from code."
+url="https://typeof.net/Iosevka/"
+arch="noarch"
+options="!check" # no testsuite
+license="OFL-1.1"
+depends="fontconfig"
+subpackages="
+	$pkgname-base
+	$pkgname-slab
+	$pkgname-curly
+	$pkgname-curly-slab
+	$pkgname-aile
+	$pkgname-etoile
+	"
+source="
+	https://github.com/be5invis/Iosevka/releases/download/v$pkgver/super-ttc-iosevka-$pkgver.zip
+	https://github.com/be5invis/Iosevka/releases/download/v$pkgver/super-ttc-iosevka-slab-$pkgver.zip
+	https://github.com/be5invis/Iosevka/releases/download/v$pkgver/super-ttc-iosevka-curly-$pkgver.zip
+	https://github.com/be5invis/Iosevka/releases/download/v$pkgver/super-ttc-iosevka-curly-slab-$pkgver.zip
+	https://github.com/be5invis/Iosevka/releases/download/v$pkgver/super-ttc-iosevka-aile-$pkgver.zip
+	https://github.com/be5invis/Iosevka/releases/download/v$pkgver/super-ttc-iosevka-etoile-$pkgver.zip
+	"
+
+builddir="$srcdir"
+
+_install_font_ttc() {
+	font="$srcdir/$1.ttc"
+	install -Dm644 "$font" -t "$subpkgdir"/usr/share/fonts/TTC
+}
+
+package() {
+	for pkg in $subpackages; do
+		depends="$depends $pkg"
+	done
+	mkdir -p "$pkgdir"
+}
+
+base() {
+	pkgdesc="$pkgdesc (Iosevka)"
+	_install_font_ttc "iosevka"
+}
+
+slab() {
+	pkgdesc="$pkgdesc (Iosevka Slab)"
+	_install_font_ttc "iosevka-slab"
+}
+
+curly() {
+	pkgdesc="$pkgdesc (Iosevka Curly)"
+	_install_font_ttc "iosevka-curly"
+}
+
+curly_slab() {
+	pkgdesc="$pkgdesc (Iosevka Curly Slab)"
+	_install_font_ttc "iosevka-curly-slab"
+}
+
+aile() {
+	pkgdesc="$pkgdesc (Iosevka Aile)"
+	_install_font_ttc "iosevka-aile"
+}
+
+etoile() {
+	pkgdesc="$pkgdesc (Iosevka Etoile)"
+	_install_font_ttc "iosevka-etoile"
+}
+
+sha512sums="
+b8357a407b5286e613a2508cfd81bc7dc45b6ac98d9c873050087e5887ecf7ea55960763bf5deaabcb442418684355289e02f502f25454944a5607673fdd6b79  super-ttc-iosevka-11.0.0.zip
+ba96179b6400f53209f74d0c9a8a35e79d060f7ec18cb11f265b0ddbdb17cb709e70f0e78be0999f2a7022e3c78e875c8b4fbd781aaea387315521e4e93d324b  super-ttc-iosevka-slab-11.0.0.zip
+ae4b10201c4373185d8c9af4b2e01c4a055a9989994a0f4de63aa8ee553a7a4ec2b010fc9c03066a1693353769d290504e8d78b0e9d264e70393cd3d58ef51bf  super-ttc-iosevka-curly-11.0.0.zip
+d696ff46bc4a484ba1ab5ef7f4ade4cb0ddd7c1afba3be6cebd29ef175bf4cf16b44100ba3ebf6fe781476dac8679b28d2d719bae61eddaeea756bf8e43f587e  super-ttc-iosevka-curly-slab-11.0.0.zip
+32685048a8a8c3f1d29402c23c9036e879b313f3ec7b32201815bd682d7160690a346da3f53c1dfcdf52891e47e5f68c428fccb9324c8eaf860a9f6f842ed584  super-ttc-iosevka-aile-11.0.0.zip
+2cc918640a0c08eea0458ef8673dbcd4b70005fd8c8edd642c1acf658462f02eba1df7218abf0197cc2eb78a96f58f023363af76c8a960be5449d8b32693e7d9  super-ttc-iosevka-etoile-11.0.0.zip
+"

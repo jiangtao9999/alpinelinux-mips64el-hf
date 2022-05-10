@@ -1,0 +1,97 @@
+# Maintainer: Olliver Schinagl <oliver@schinagl.nl>
+pkgname=shellcheck
+pkgver=0.7.2
+pkgrel=2
+pkgdesc="a static analysis tool for shell scripts"
+url="https://github.com/koalaman/shellcheck"
+arch="x86_64" # Limited by GHC / Cabal
+license="GPL-3.0"
+makedepends="cabal bash ghc libffi-dev"
+subpackages="$pkgname-doc"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/koalaman/shellcheck/archive/v$pkgver.tar.gz
+	cabal.config
+"
+_cabal_home="$srcdir/dist"
+
+cabal_update() {
+	msg "Freezing $pkgname dependencies"
+
+	# Resolve deps and generate fresh cabal.config with version constraints.
+	HOME="$_cabal_home" cabal update
+	(
+		cd "$builddir"
+		HOME="$_cabal_home" cabal v1-freeze --shadow-installed-packages
+
+		# Add version tag at the first line.
+		sed -i "1i--$pkgver" "cabal.config"
+
+		mv "cabal.config" "$startdir/"
+	)
+
+	if ! abuild checksum; then
+		die "Failed to update checksum, run 'abuild checksum' manually"
+	fi
+}
+
+prepare() {
+	default_prepare
+	./striptests
+
+	if [ "$(head -n 1 "$srcdir/cabal.config")" != "--$pkgver" ]; then
+		die "Requirements file is outdated, run 'abuild cabal_update'"
+	fi
+
+	ln -sf "$srcdir/cabal.config" "$builddir/cabal.config"
+}
+
+build() {
+	HOME="$_cabal_home" cabal update
+	HOME="$_cabal_home" cabal v1-install \
+		--disable-documentation \
+		--only-dependencies
+	HOME="$_cabal_home" cabal v1-configure \
+		--prefix='/usr' \
+		--bindir='$prefix/bin' \
+		--docdir='$prefix/share/doc' \
+		--datadir='$prefix/share' \
+		--htmldir='$docdir/html' \
+		--libdir='$prefix/lib' \
+		--libsubdir="$pkgname" \
+		--datasubdir="$pkgname" \
+		--dynlibdir="$pkgname" \
+		--sysconfdir='/etc' \
+		--disable-library-profiling \
+		--disable-profiling \
+		--disable-shared \
+		--enable-executable-stripping \
+		--flags='GMP FFI standalone'
+	HOME="$_cabal_home" cabal v1-build -j
+}
+
+check() {
+	_test_script="$(mktemp)"
+	{
+		echo "#!/bin/sh"
+		echo
+		echo "exit 0"
+	} > "$_test_script"
+	trap 'rm "$_test_script"' EXIT
+	"$builddir/dist/build/$pkgname/$pkgname" "$_test_script"
+	trap - EXIT
+	rm "$_test_script"
+}
+
+package() {
+	HOME="$_cabal_home" cabal v1-copy --destdir="$pkgdir"
+
+	rm -r "$pkgdir/usr/lib/$pkgname"
+
+	mkdir -p "$pkgdir/usr/share/doc/$pkgname"
+	mv "$pkgdir/usr/share/doc/LICENSE" "$pkgdir/usr/share/doc/$pkgname"
+}
+
+sha512sums="
+87b7377add4ce37766f9fd812cd9bf03097c9ba452b646e7ae1dc65946a7210c9d24d8c83b4be4146a0f100aff5bc9a3a562b3990c74f1c29ee191e249f97714  shellcheck-0.7.2.tar.gz
+c91b5a4b94df6feb3ef08a50f80594ad4ef9c2270d24a4275bd40075834af7259c1d70ecc2faaeab3eb789b787971ca52ccd1df842ce64a43f920ae1a447d8b3  cabal.config
+"

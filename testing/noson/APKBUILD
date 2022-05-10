@@ -1,0 +1,38 @@
+# Maintainer: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+# Contributor: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+pkgname=noson
+pkgver=2.4.1
+pkgrel=0
+pkgdesc="An easy client interface to drive SONOS player"
+url="https://github.com/janbar/noson"
+arch="all"
+license="GPL-3.0-only"
+subpackages="$pkgname-dev"
+makedepends="
+	cmake
+	flac-dev
+	openssl-dev
+	pulseaudio-dev
+	zlib-dev
+	"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/janbar/noson/archive/$pkgver.tar.gz
+	"
+options="!check" # No unit tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=1
+	make -C build
+}
+
+package() {
+	make DESTDIR="$pkgdir" install -C build
+}
+
+sha512sums="
+3758c6f9f16b6b899a281d83fa7f3550c88a30187e1a8847a1e19301b0920378f37c3c0b64170ed736e0dfc859fa62aeb63e44d8e994f6547b7aa7aebc4d4e4e  noson-2.4.1.tar.gz
+"

@@ -1,0 +1,38 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Fabian Affolter <fabian@affolter-engineering.ch>
+pkgname=py3-voluptuous
+_pkgname=voluptuous
+pkgver=0.12.1
+pkgrel=1
+pkgdesc="Python data validation library"
+url="https://github.com/alecthomas/voluptuous"
+arch="noarch"
+license="BSD-3-Clause"
+depends="python3"
+makedepends="py3-setuptools"
+checkdepends="py3-nose"
+source="https://files.pythonhosted.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz"
+builddir="$srcdir"/$_pkgname-$pkgver
+
+replaces="py-voluptuous" # Backwards compatibility
+provides="py-voluptuous=$pkgver-r$pkgrel" # Backwards compatibility
+
+prepare() {
+	default_prepare
+	# https://github.com/alecthomas/voluptuous/issues/333
+	rm -rf ./*.egg-info
+}
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	nosetests -v
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="14ead6bd99c9238318e7ed39fa543cb3363cbb0716a251061e6f533b8fae3fd5e754bd6b2756b6d76745da0e02236e04bfe0ae4e25dd87d291bb2a716660eebc  voluptuous-0.12.1.tar.gz"

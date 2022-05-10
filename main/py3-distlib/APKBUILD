@@ -1,0 +1,35 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=py3-distlib
+pkgver=0.3.3
+pkgrel=0
+pkgdesc="Distribution utilities"
+options="!check" # 1 test in tests/test_locator.py fails
+url="https://bitbucket.org/pypa/distlib"
+arch="noarch"
+license="PSF-2.0"
+depends="python3"
+makedepends="py3-setuptools"
+source="https://files.pythonhosted.org/packages/source/d/distlib/distlib-$pkgver.zip"
+builddir="$srcdir/distlib-$pkgver"
+
+prepare() {
+	default_prepare
+	rm distlib/*.exe
+}
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	PYTHONHASHSEED=0 python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+834ed7314b2c3aecaaa833a275aac9ae72feb27e62c4e712b30bb5ac526bd38d18756d51ca8c95015953dac7f0cfd7e60382c0a7bdf330d8a01602ccb7344f0d  distlib-0.3.3.zip
+"

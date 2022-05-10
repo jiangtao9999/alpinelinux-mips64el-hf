@@ -1,0 +1,31 @@
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Carlo Landmeter <clandmeter@alpinelinux.org>
+pkgname=py3-mysqlclient
+pkgver=2.0.3
+pkgrel=0
+pkgdesc="MySQL database connector for Python (with py3 support)"
+url="https://mysqlclient.readthedocs.io/"
+arch="all"
+license="GPL-2.0-or-later"
+makedepends="python3-dev py3-setuptools mariadb-dev"
+source="mysqlclient-python-$pkgver.tar.gz::https://github.com/PyMySQL/mysqlclient-python/archive/v$pkgver.tar.gz"
+builddir="$srcdir/mysqlclient-$pkgver"
+
+replaces="py-mysqlclient" # Backwards compatibility
+provides="py-mysqlclient=$pkgver-r$pkgrel" # Backwards compatibility
+
+build() {
+	CFLAGS="$CFLAGS -I/usr/include/mysql" python3 setup.py build
+}
+
+check() {
+	python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+1c517c5691ac64f14d13631dc3c178f0372d355d81860ef00f90e5654a7df84cb47a88de34bed8a5d5887c7193fa11f65e1ff84f59f76d2bdcfff0275b447c1b  mysqlclient-python-2.0.3.tar.gz
+"

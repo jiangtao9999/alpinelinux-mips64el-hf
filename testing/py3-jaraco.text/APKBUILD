@@ -1,0 +1,33 @@
+# Contributor: Duncan Bellamy <dunk@denkimushi.com>
+# Maintainer: Duncan Bellamy <dunk@denkimushi.com>
+pkgname=py3-jaraco.text
+pkgver=3.6.0
+pkgrel=1
+pkgdesc="Module for text manipulation"
+url="https://github.com/jaraco/jaraco.text"
+arch="noarch"
+license="MIT"
+depends="py3-jaraco.functools"
+makedepends="
+	py3-setuptools
+	py3-setuptools_scm
+	"
+checkdepends="py3-pytest"
+source="https://files.pythonhosted.org/packages/source/j/jaraco.text/jaraco.text-$pkgver.tar.gz"
+builddir="$srcdir/jaraco.text-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	pytest
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+74e6f199372b62ee767fd5f5829ab636d6d87c38998d93cb4ed7dddbe53db27e5c3caf45f36f7b5690b3c12367df0c93702fac59ee99ffcb03f53e70b8b18f96  jaraco.text-3.6.0.tar.gz
+"

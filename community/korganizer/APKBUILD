@@ -1,0 +1,84 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=korganizer
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# ppc64le, s390x, mips64 and riscv64 blocked by qt5-qtwebengine -> kmailtransport
+arch="all !armhf !ppc64le !s390x !mips64 !riscv64"
+url="https://kontact.kde.org/components/korganizer.html"
+pkgdesc="The calendar and scheduling component of Kontact"
+license="GPL-2.0-or-later"
+depends="kdepim-runtime"
+makedepends="
+	akonadi-calendar-dev
+	akonadi-contacts-dev
+	akonadi-dev
+	akonadi-mime-dev
+	akonadi-notes-dev
+	akonadi-search-dev
+	calendarsupport-dev
+	eventviews-dev
+	extra-cmake-modules
+	incidenceeditor-dev
+	kcalendarcore-dev
+	kcalutils-dev
+	kcmutils-dev
+	kcodecs-dev
+	kcompletion-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcontacts-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kdbusaddons-dev
+	kdoctools-dev
+	kholidays-dev
+	kiconthemes-dev
+	kidentitymanagement-dev
+	kitemviews-dev
+	kjobwidgets-dev
+	kldap-dev
+	kmailtransport-dev
+	kmime-dev
+	knewstuff-dev
+	knotifications-dev
+	kontactinterface-dev
+	kparts-dev
+	kpimtextedit-dev
+	kservice-dev
+	kuserfeedback-dev
+	kwidgetsaddons-dev
+	kwindowsystem-dev
+	kxmlgui-dev
+	libkdepim-dev
+	phonon-dev
+	pimcommon-dev
+	qt5-qtbase-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/korganizer-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	# akonadi-sqlite-koeventpopupmenutest and akonadi-mysql-koeventpopupmenutest
+	# require running dbus server
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest -E "akonadi(-sqlite-koeventpopupmenu|-mysql-koeventpopupmenu)test"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+8453ed342b8d5e950a27d46cee7d9e1096834db55814b6e2607ce2fe435c6f49bf5d75d0cf8dc6ac872a81c64aa158bf6c0337bf7d63eb2b7ef5b6ad9f4da5b5  korganizer-21.08.3.tar.xz
+"

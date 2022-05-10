@@ -1,0 +1,30 @@
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=sshfs
+pkgver=3.7.2
+pkgrel=0
+pkgdesc="FUSE client based on the SSH File Transfer Protocol"
+url="https://github.com/libfuse/sshfs"
+arch="all"
+license="GPL-2.0-or-later"
+depends="openssh-client fuse3"
+makedepends="fuse3-dev glib-dev meson coreutils py3-docutils"
+subpackages="$pkgname-doc"
+source="https://github.com/libfuse/sshfs/releases/download/sshfs-$pkgver/sshfs-$pkgver.tar.xz"
+options="!check" # requires FUSE kernel module to run tests
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+
+	mkdir -p "$pkgdir"/usr/share/doc/$pkgname/
+	install -Dm644 README.rst ChangeLog.rst AUTHORS COPYING \
+		"$pkgdir"/usr/share/doc/$pkgname/
+}
+
+sha512sums="
+1612d515869a8b38c0bc3d79eaf80e8b4da1a9710c9668e6ec23e6b77313063ae0bee66ab9e9e0f70d98eaa1334425b2087dd93cc4618af3ac6ac191acf7f838  sshfs-3.7.2.tar.xz
+"

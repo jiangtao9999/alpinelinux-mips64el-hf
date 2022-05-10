@@ -1,0 +1,27 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=libwpebackend-fdo
+pkgver=1.10.0
+pkgrel=0
+pkgdesc="freedesktop.org backend for WPE WebKit"
+url="https://wpewebkit.org/"
+arch="all"
+license="BSD-2-Clause"
+makedepends="mesa-dev meson glib-dev wayland-dev libwpe-dev libepoxy-dev"
+options="!check" # no tests
+subpackages="$pkgname-dbg $pkgname-dev"
+source="https://github.com/Igalia/WPEBackend-fdo/releases/download/$pkgver/wpebackend-fdo-$pkgver.tar.xz"
+builddir="$srcdir/wpebackend-fdo-$pkgver"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+50e65d1560b943ec85b80449c838b61d7ab3baf96844542cce06028bd934b1145319f3fa07a3dc629d2a7896b95ab388edbe853b7e377cf0ff02fb66291e1ce0  wpebackend-fdo-1.10.0.tar.xz
+"

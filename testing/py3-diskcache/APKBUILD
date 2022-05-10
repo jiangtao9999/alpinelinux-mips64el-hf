@@ -1,0 +1,32 @@
+# Contributor:
+# Maintainer:
+pkgname=py3-diskcache
+pkgver=5.2.1
+pkgrel=1
+pkgdesc="disk caching implementation"
+options="!check" # test_incr_update_keyerror fails
+url="http://www.grantjenks.com/docs/diskcache/"
+arch="noarch"
+license="MIT"
+depends="python3"
+makedepends="py3-setuptools"
+checkdepends="py3-pytest py3-pytest-xdist py3-mock py3-django"
+source="$pkgname-$pkgver.tar.gz::https://github.com/grantjenks/python-diskcache/archive/v$pkgver.tar.gz"
+builddir="$srcdir"/python-diskcache-$pkgver
+
+replaces="py-diskcache" # Backwards compatibility
+provides="py-diskcache=$pkgver-r$pkgrel" # Backwards compatibility
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 -m pytest
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="6e55bada12145d931f4a465092decc3f2cfed2e618d1ea271ad6daa6caf7c3abfd6ae5de11072efdf898ebf272acd39136136b58d7b5e735092963bdd46af52e  py3-diskcache-5.2.1.tar.gz"

@@ -1,0 +1,47 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=mauikit-accounts
+pkgver=2.1.0
+pkgrel=0
+pkgdesc="MauiKit Utilities to handle User Accounts"
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by mauikit
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://mauikit.org/"
+license="GPL-2.0-or-later"
+depends="
+	kirigami2
+	"
+depends_dev="
+	kconfig-dev
+	kcoreaddons-dev
+	ki18n-dev
+	mauikit-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	"
+source="https://download.kde.org/stable/maui/mauikit-accounts/$pkgver/mauikit-accounts-$pkgver.tar.xz"
+subpackages="$pkgname-dev"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+3f033e4c79e63dca60d94619524383301a6eb3989d99e9c86284866d63f5f6d62a9f8922290fe9cac2519bd4b56859153c46fae6f1e91de83dbfa7ebee966073  mauikit-accounts-2.1.0.tar.xz
+"

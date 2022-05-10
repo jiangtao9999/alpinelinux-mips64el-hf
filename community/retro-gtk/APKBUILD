@@ -1,0 +1,30 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=retro-gtk
+pkgver=1.0.2
+pkgrel=1
+pkgdesc="The GTK+ Libretro frontend framework"
+url="https://gitlab.gnome.org/GNOME/retro-gtk"
+arch="all"
+license="GPL-3.0-or-later"
+makedepends="meson libepoxy-dev glib-dev gtk+3.0-dev pulseaudio-dev
+	gobject-introspection-dev vala libsamplerate-dev"
+checkdepends="xvfb-run"
+options="!check" # https://gitlab.gnome.org/GNOME/retro-gtk/-/issues/56
+subpackages="$pkgname-dev"
+source="https://download.gnome.org/sources/retro-gtk/${pkgver%.*}/retro-gtk-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	xvfb-run meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="e72de7dbb88a5e6241fd4b325deb1b47cbeec5b4aed3e5a03b2b5e994653296aa77b68562fe21f53429133578a2fa78bcaccfe7495b4e4549aafd43e81a70aba  retro-gtk-1.0.2.tar.xz"

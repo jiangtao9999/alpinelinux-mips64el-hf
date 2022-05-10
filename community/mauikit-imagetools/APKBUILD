@@ -1,0 +1,49 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=mauikit-imagetools
+pkgver=2.1.0
+pkgrel=0
+pkgdesc="MauiKit Image Tools Components"
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by mauikit
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://mauikit.org/"
+license="GPL-2.0-or-later"
+depends="
+	kirigami2
+	"
+depends_dev="
+	exiv2-dev
+	kcoreaddons-dev
+	ki18n-dev
+	kquickimageeditor-dev
+	mauikit-dev
+	qt5-qtbase-dev
+	qt5-qtdeclarative-dev
+	qt5-qtlocation-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	"
+source="https://download.kde.org/stable/maui/mauikit-imagetools/$pkgver/mauikit-imagetools-$pkgver.tar.xz"
+subpackages="$pkgname-dev"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+d057b37f3320a8c1895eab79f0a96ed85595bc781bcbef2f5b98738390e09ecd7b6f840ac6387bfcb58b6d8589cf0068947a34c606e64f422062f51003966e4f  mauikit-imagetools-2.1.0.tar.xz
+"

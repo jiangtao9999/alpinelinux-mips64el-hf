@@ -1,0 +1,29 @@
+# Contributor: Andrew Panteleyev <insonifi@gmail.com>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=gst-rtsp-server
+pkgver=1.18.5
+pkgrel=0
+pkgdesc="GStreamer RTSP server"
+url="https://gstreamer.freedesktop.org"
+arch="all !mips64 !riscv64" # blocked by gst-plugins-bad
+license="LGPL-2.0-or-later"
+depends_dev="gst-plugins-base-dev"
+makedepends="$depends_dev gobject-introspection-dev gstreamer-dev meson gst-plugins-bad-dev"
+subpackages="$pkgname-dev"
+source="https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-$pkgver.tar.xz"
+
+build() {
+	abuild-meson \
+		-Dpackage-origin="https://alpinelinux.org" \
+		-Dpackage-name="GStreamer RTSP server (Alpine Linux)" \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+da06aaaac8fa9039a5ae287b3a383ffcd4c2aecd70b12aaabba64aa67ea1586a9ed3d7f4f792b8e167d6f72574e214aaed6733e3ed3d4017b519af5985779d82  gst-rtsp-server-1.18.5.tar.xz
+"

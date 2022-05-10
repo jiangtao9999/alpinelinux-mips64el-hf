@@ -1,0 +1,33 @@
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=ortp
+pkgver=5.0.51
+pkgrel=0
+pkgdesc="oRTP is a library implemeting Real-time Transport Protocol (RFC3550), licensed under LGPL"
+url="http://www.linphone.org/technical-corner/ortp"
+arch="all"
+options="!check" #no test avail
+license="LGPL-2.0-or-later VSL"
+makedepends="cmake bctoolbox-dev"
+subpackages="$pkgname-doc $pkgname-dev"
+source="https://gitlab.linphone.org/BC/public/ortp/-/archive/$pkgver/ortp-$pkgver.tar.gz"
+
+build() {
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_MODULE_PATH=/usr/lib/cmake \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_SKIP_INSTALL_RPATH=ON \
+		-DENABLE_STATIC=NO \
+		-DENABLE_SHARED=YES .
+	make -C build
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+b703e9f2bfbad2ca5afcdccc1256c48825b2f1ede76682a21a95cdac465cc2740acde338b284e9e49fed11e21d228a3e67f7db3f941d6f0004c4a1ab1e0e8c4d  ortp-5.0.51.tar.gz
+"

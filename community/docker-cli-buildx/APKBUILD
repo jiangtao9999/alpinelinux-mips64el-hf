@@ -1,0 +1,44 @@
+# Contributor: Jake Buchholz Göktürk <tomalok@gmail.com>
+# Maintainer: Jake Buchholz Göktürk <tomalok@gmail.com>
+pkgname=docker-cli-buildx
+_commit=f0026081a7496ca28b597a9006616201d838fea8
+pkgver=0.7.0
+pkgrel=0
+pkgdesc="A Docker CLI plugin for extended build capabilities"
+url="https://docs.docker.com/engine/reference/commandline/buildx_build"
+arch="all"
+license="Apache-2.0"
+depends="docker-cli"
+makedepends="go"
+options="net"
+source="buildx-$pkgver.tar.gz::https://github.com/docker/buildx/archive/v$pkgver.tar.gz"
+
+_buildx_installdir="/usr/libexec/docker/cli-plugins"
+
+builddir="$srcdir"/buildx-"$pkgver"
+
+export GOPATH=$srcdir/go
+export GOCACHE=$srcdir/go-build
+export GOTMPDIR=$srcdir
+
+build() {
+	PKG=github.com/docker/buildx
+	local ldflags="-X $PKG/version.Version=v$pkgver -X $PKG/version.Revision=$_commit -X $PKG/version.Package=$PKG"
+	go build -modcacherw -ldflags "$ldflags" -o docker-buildx ./cmd/buildx
+}
+
+check() {
+	# filecount tests are excluded because they depend on exact file sizes
+	# which depend on filesystem used.
+	local pkgs="$(go list -modcacherw ./... | grep -Ev '(plugins/inputs/filecount)')"
+	go test -modcacherw -short $pkgs
+	./docker-buildx version
+}
+
+package() {
+	install -Dm755 docker-buildx "$pkgdir$_buildx_installdir"/docker-buildx
+}
+
+sha512sums="
+3d8db5fd881d2fc7bb207c0bb372e278bfaca0a19645cfefd581225da4bcffb4f7ee60a3e8901b1c6c49474b2c89517635e2f585b8fadf75e9aeffabc498c1b4  buildx-0.7.0.tar.gz
+"

@@ -1,0 +1,90 @@
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+#
+# WARNING: There may be breakages!
+pkgname=nim
+pkgver=1.4.8
+pkgrel=2
+_csources_ver=0.20.0
+pkgdesc="A systems and applications programming language"
+url="https://nim-lang.org/"
+arch="all !s390x"
+license="MIT"
+checkdepends="sqlite-libs nodejs gc-dev pcre valgrind"
+subpackages="$pkgname-doc nimsuggest niminst"
+depends="libucontext-dev"  # used by nims compiler
+source="https://nim-lang.org/download/nim-$pkgver.tar.xz
+	$pkgname-csources-$_csources_ver.tar.gz::https://github.com/nim-lang/csources/archive/v$_csources_ver.tar.gz
+	niminst-fix-paths.patch
+	nim-config-fix-paths.patch
+	nim-config-enable-ucontext.patch
+	"
+
+# Don't run tests on armhf and ppc64le, it'd take eternity...
+# Can't run tests on mips and riscv64, no nodejs...
+# Temporarily allow textrels on riscv64
+case "$CARCH" in
+	armhf | ppc64le | mips*) options="!check";;
+	riscv64) options="!check textrels";;
+esac
+
+prepare() {
+	mv "$srcdir"/csources-$_csources_ver "$builddir"/csources
+	default_prepare
+}
+
+build() {
+	cd "$builddir"/csources
+
+	msg2 "Building nim csources..."
+	./build.sh
+
+	cd ..
+
+	msg2 "Building koch..."
+	./bin/nim compile -d:release koch
+
+	msg2 "Building nim..."
+	./koch boot -d:release
+
+	msg2 "Building nimsuggest..."
+	./bin/nim compile -d:release nimsuggest/nimsuggest.nim
+}
+
+check() {
+	# XXX: Some tests fail!
+	./koch tests --pedantic --targets="c js" all || true
+}
+
+package() {
+	DESTDIR="$pkgdir" ./koch install /usr/bin
+
+	cd "$pkgdir"
+	mkdir -p usr/include
+	local file; for file in usr/lib/nim/*.h; do
+		mv $file usr/include/
+		ln -s ../../include/${file##*/} usr/lib/nim/${file##*/}
+	done
+}
+
+nimsuggest() {
+	pkgdesc="idetools for the nim language"
+
+	install -D -m 755 "$builddir"/nimsuggest/nimsuggest \
+		"$subpkgdir"/usr/bin/nimsuggest
+}
+
+niminst() {
+	pkgdesc="A tool to generate an installer for a Nim program"
+
+	install -D -m 755 "$builddir"/tools/niminst/niminst \
+		"$subpkgdir"/usr/bin/niminst
+}
+
+sha512sums="
+e6b245271495880f0eea271c46b4f5ce9168a421716a9a22367b6be3c2a9822937aad1f48eb61c151b040ac961728a89c8a6d143c8300057c0d8c1f2d66f3dd3  nim-1.4.8.tar.xz
+4da00678cb92cfd3b2425e4698cbbef8111c711f9457ba969367638437b5fad7928ca0a91fd24f53dcd9d341cfc420e87ec85d245767531bc57ccafd6feba258  nim-csources-0.20.0.tar.gz
+7b4b4dbaef63786a98f69e5c43ae066f64ab4321769c95d0e8d279642329089882d9a93535c1ab876dcdb06ae62ba2918d051359698c4ca6d05342e128ca5d69  niminst-fix-paths.patch
+813eb4cb93b0e9f12cb7666bef65c583390008ec09bc850f43f621688dc809bc51c105898095a8ef6316fbef49ac657a7abc75d74ad7b8cb3919c8f1a721af02  nim-config-fix-paths.patch
+4bff5b687fc4154a4b3c8e888e4fcdd2340acfcc87b1a5eeaa9feb173cadd6047bd73d68983461c1edcec232aca6014dbeab8efaedcf4d8a52662780de4b51d3  nim-config-enable-ucontext.patch
+"

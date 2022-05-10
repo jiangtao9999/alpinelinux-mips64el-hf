@@ -1,0 +1,48 @@
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=qt5-qtimageformats
+pkgver=5.15.3_git20201031
+pkgrel=0
+_commit="cb82c74310837fe4e832c8ab72176a5d63e4355f"
+pkgdesc="Qt5 - QtImageFormats component"
+url="https://www.qt.io/developers/"
+arch="all"
+license="(LGPL-2.0-or-later OR GPL-3.0-only OR GPL-2.0-or-later) AND Qt-GPL-exception-1.0"
+makedepends="qt5-qtbase-dev libmng-dev tiff-dev libwebp-dev"
+builddir="$srcdir/qtimageformats-$_commit"
+
+case $pkgver in
+	*_beta*|*_rc*) _rel=development_releases;;
+	*) _rel=official_releases;;
+esac
+
+source="https://invent.kde.org/qt/qt/qtimageformats/-/archive/$_commit/qtimageformats-$_commit.tar.gz"
+
+prepare() {
+	default_prepare
+
+	# We need to make the build system think we're running in a git repository
+	# so it correctly symlinks during the build
+	mkdir .git
+}
+
+build() {
+	qmake-qt5
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make install INSTALL_ROOT="$pkgdir"
+
+	# Drop QMAKE_PRL_BUILD_DIR because reference the build dir
+	find "$pkgdir/usr/lib" -type f -name '*.prl' \
+		-exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
+
+	install -d "$pkgdir"/usr/share/licenses
+	ln -s /usr/share/licenses/qt5-base "$pkgdir"/usr/share/licenses/$pkgname
+}
+
+sha512sums="f202f3abcdea0b49ae4f286fd50c1855c8b84d502b89f8350666828c6e29c4fa0bafd72b891513330e2541dc407d298076ffb519a030b4bb50517b5196ff9a3f  qtimageformats-cb82c74310837fe4e832c8ab72176a5d63e4355f.tar.gz"

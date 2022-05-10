@@ -1,0 +1,29 @@
+# Contributor: Gavin D. Howard <yzena.tech@gmail.com>
+# Maintainer: Gavin D. Howard <yzena.tech@gmail.com>
+pkgname=howard-bc
+pkgver=5.1.1
+pkgrel=0
+pkgdesc="POSIX bc with GNU extensions"
+url="https://github.com/gavinhoward/bc"
+arch="all"
+license="BSD-2-Clause"
+subpackages="$pkgname-doc"
+source="https://github.com/gavinhoward/bc/releases/download/$pkgver/bc-$pkgver.tar.xz"
+builddir="$srcdir/bc-$pkgver"
+
+build() {
+	PREFIX=/usr DESTDIR="$pkgdir" EXECSUFFIX=-howard ./configure.sh -GN
+	make
+}
+
+check() {
+	make test
+}
+
+package() {
+	make install
+}
+
+sha512sums="
+d8774fb1e654520abdf7d790783d4a3c04fa8f4982fc1cd0d92331e7e4b5889efa022cafb5e1286b6c82a74c9388f47657c7b9d78888b5d8056fa40d3d5e5c69  bc-5.1.1.tar.xz
+"

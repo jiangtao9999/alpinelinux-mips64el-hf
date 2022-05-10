@@ -1,0 +1,25 @@
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=esh
+pkgver=0.3.1
+pkgrel=0
+pkgdesc="Simple template system based on shell"
+url="https://github.com/jirutka/esh"
+arch="noarch"
+license="MIT"
+makedepends="asciidoctor"
+subpackages="$pkgname-doc"
+source="https://github.com/jirutka/$pkgname/archive/v$pkgver/$pkgname-$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-$pkgver"
+
+check() {
+	cd "$builddir"
+	make test
+}
+
+package() {
+	cd "$builddir"
+	make DESTDIR="$pkgdir" prefix=/usr install
+}
+
+sha512sums="a29f8b028ceba305c8a37f2df20be95701fa3bdaeefd9853e05cc6423a6c685b33954deabda9af25c31baeae2321084e2a2badee216010c8efd75e58888effa3  esh-0.3.1.tar.gz"

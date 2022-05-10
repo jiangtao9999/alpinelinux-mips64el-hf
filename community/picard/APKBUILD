@@ -1,0 +1,46 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=picard
+pkgver=2.6.4
+pkgrel=0
+# armhf blocked by qt5-qtdeclarative
+arch="all !armhf"
+url="https://picard.musicbrainz.org/"
+pkgdesc="Official MusicBrainz tagger"
+license="GPL-2.0-or-later"
+depends="
+	chromaprint
+	py3-fasteners
+	py3-mutagen
+	py3-qt5
+	"
+makedepends="
+	gettext
+	py3-setuptools
+	python3-dev
+	"
+checkdepends="
+	py3-dateutil
+	py3-pytest
+	"
+subpackages="$pkgname-lang"
+source="$pkgname-$pkgver.tar.gz::https://github.com/metabrainz/picard/archive/release-$pkgver.tar.gz"
+builddir="$srcdir/picard-release-$pkgver"
+
+build() {
+	python3 setup.py config
+}
+
+check() {
+	pytest
+}
+
+package() {
+	python3 setup.py install \
+		--root="$pkgdir" \
+		--disable-autoupdate
+}
+
+sha512sums="
+5f44f91f9f44cb17ecd27e204b75c83b776a2c55e2a6e42f96018c83f4073d92f028ef74006d6acbe42b1ed374543a65e177f34c561bfdf13ded1085515bf353  picard-2.6.4.tar.gz
+"

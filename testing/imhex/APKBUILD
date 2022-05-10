@@ -1,0 +1,30 @@
+# Contributor: George Hopkins <george-hopkins@null.net>
+# Maintainer: George Hopkins <george-hopkins@null.net>
+pkgname=imhex
+pkgver=1.6.1
+pkgrel=1
+pkgdesc="Hex editor for reverse engineers and programmers"
+url="https://github.com/WerWolv/ImHex"
+arch="all !x86 !armhf !armv7 !mips" # See #11
+license="GPL-2.0-or-later"
+options="!check" # No testsuite
+makedepends="cmake capstone-dev file-dev freetype-dev glfw-dev glm-dev
+	openssl-dev nlohmann-json python3-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/WerWolv/ImHex/archive/v$pkgver.tar.gz
+	force-release-flags.patch
+	"
+builddir="$srcdir"/ImHex-$pkgver
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="9f068887fb0668e29aef986e399d845ac891a51552e3229d61307743fa40b15712898fd590145f0609367926d7a87205a1aca6df02b5e63d309f643006a043bc  imhex-1.6.1.tar.gz
+46f2e8bfb1a7827dc2339ae5da97af5e26dfc09b38a935a82cfb590a93b3f980fadabf186cb236f5a972fd7ff56b865d9c0a3c7f1f350193deecbe1a04aabd71  force-release-flags.patch"

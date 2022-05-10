@@ -1,0 +1,56 @@
+# Contributor: Danct12 <danct12@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=qt5-qtwebview
+pkgver=5.15.3_git20201028
+pkgrel=0
+_commit="920de5f1cd9f9001cfef1bfd2c19e6720793362f"
+# ppc64le, s390x, mips64 and riscv64 blocked by qt5-qtwebengine
+# armhf blocked by qt5-qtdeclarative
+arch="all !armhf !ppc64le !s390x !mips64 !riscv64"
+url="https://www.qt.io/developers/"
+license="LGPL-3.0-only AND GPL-2.0-only AND GPL-3.0-only AND Qt-GPL-exception-1.0"
+pkgdesc="Provides a way to display web content in a QML application"
+depends="qt5-qtwebengine"
+depends_dev="qt5-qtdeclarative-dev"
+makedepends="$depends_dev
+	qt5-qtbase-dev
+	"
+subpackages="$pkgname-dev"
+builddir="$srcdir/qtwebview-$_commit"
+
+case $pkgver in
+	*_beta*|*_rc*) _rel=development_releases;;
+	*) _rel=official_releases;;
+esac
+
+source="https://invent.kde.org/qt/qt/qtwebview/-/archive/$_commit/qtwebview-$_commit.tar.gz"
+
+prepare() {
+	default_prepare
+
+	# We need to make the build system think we're running in a git repository
+	# so it correctly symlinks during the build
+	mkdir .git
+}
+
+build() {
+	qmake-qt5 CONFIG+="lang-all handwriting"
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make INSTALL_ROOT="$pkgdir" install
+
+	# Drop QMAKE_PRL_BUILD_DIR because reference the build dir
+	find "$pkgdir/usr/lib" -type f -name '*.prl' \
+		-exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
+
+	install -d "$pkgdir"/usr/share/licenses
+	ln -s /usr/share/licenses/qt5-base "$pkgdir"/usr/share/licenses/$pkgname
+}
+
+sha512sums="ebfdf785f64649c26576a7871553cd5550cbc86a84a86b6c5b3f2e206b70007125192027d5899f95c27479d7880ee57b5d2d39d2e46779c5376ea6ebcd9751a7  qtwebview-920de5f1cd9f9001cfef1bfd2c19e6720793362f.tar.gz"

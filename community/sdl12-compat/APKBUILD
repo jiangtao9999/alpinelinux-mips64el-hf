@@ -1,0 +1,54 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=sdl12-compat
+# Have the same version as the last upstream release
+pkgver=0.0.1_git20211015
+_commit=36a09e450a007c86ed0f91812fbbba0d783be120
+pkgrel=0
+pkgdesc="SDL-1.2 compat layer that uses SDL-2.0"
+options="!check" # no testsuite
+url="https://github.com/libsdl-org/sdl12-compat"
+arch="all"
+license="BSD-3-Clause"
+depends="sdl2"
+makedepends="cmake sdl2-dev"
+subpackages="$pkgname-dev"
+source="$pkgname-$_commit.tar.gz::https://github.com/libsdl-org/sdl12-compat/archive/$_commit.tar.gz"
+builddir="$srcdir/$pkgname-$_commit"
+
+# Otherwise the package will fail installation if sdl is already present
+# NOTE(Leo): remove this before the release of 3.15
+replaces="sdl"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DSDL12TESTS=OFF \
+		-DCMAKE_C_FLAGS="$CFLAGS -I/usr/include/directfb" \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+
+	# Claim the provider 'pc:sdl=$pkgver' by creating a symlink
+	# so packages can find it
+	ln -s sdl12_compat.pc "$pkgdir"/usr/lib/pkgconfig/sdl.pc
+}
+
+dev() {
+	# Otherwise the package will fail installation if sdl is already present
+	# NOTE(Leo): remove this before the release of 3.15
+	replaces="sdl-dev"
+
+	default_dev
+}
+
+sha512sums="
+d270b3855aeba3ac38a8c9c6f2c881edb54630fd2d2916dc94099c73021946358aed62a36427867f846aba4579c505d6c9fcd75e4e2d180c0113fe8d2b23dcf2  sdl12-compat-36a09e450a007c86ed0f91812fbbba0d783be120.tar.gz
+"

@@ -1,0 +1,53 @@
+# Contributor: Chloe Kudryavtsev <toast@toast.cafe>
+# Maintainer: Chloe Kudryavtsev <toast@toast.cafe>
+pkgname=procs
+pkgver=0.11.10
+pkgrel=0
+pkgdesc="Modern replacement for ps written in Rust"
+url="https://github.com/dalance/procs"
+arch="all !mips64 !s390x !riscv64" # limited by rust/cargo
+license="MIT"
+makedepends="cargo"
+subpackages="
+	$pkgname-bash-completion
+	$pkgname-fish-completion
+	$pkgname-zsh-completion
+	"
+source="procs-$pkgver.tar.gz::https://github.com/dalance/procs/archive/v$pkgver.tar.gz
+	minimize-size.patch
+	"
+
+prepare() {
+	default_prepare
+
+	cargo fetch --locked
+}
+
+build() {
+	# Default features enables "docker" feature that doubles the size of
+	# the resulting binary with unnecessary bloat!
+	cargo build --release --frozen --no-default-features
+
+	# generate shell completions
+	target/release/procs --completion bash
+	target/release/procs --completion fish
+	target/release/procs --completion zsh
+}
+
+check() {
+	cargo test --frozen --no-default-features
+}
+
+package() {
+	install -Dm755 target/release/procs "$pkgdir"/usr/bin/procs
+
+	# install completions
+	install -Dm644 procs.bash "$pkgdir"/usr/share/bash-completion/completions/procs
+	install -Dm644 procs.fish "$pkgdir"/usr/share/fish/completions/procs.fish
+	install -Dm644 _procs "$pkgdir"/usr/share/zsh/site-functions/_procs
+}
+
+sha512sums="
+af2cedde717e3e7b5cb7b272366f0f9fe6a77ce41f820bf125bb5bc8863bc732807d6b43bf78f4e1a3e4235a1174e9492ccb37d5a0eb6815ef13433f1c78f0b5  procs-0.11.10.tar.gz
+8ea573db74ceb90e07945043735bf162062c4ab758531e2f8116933f50282b762748f420eb3f1b7263aeb591c94c0f95200bb4098c340efd69f8da3b0bc31b69  minimize-size.patch
+"

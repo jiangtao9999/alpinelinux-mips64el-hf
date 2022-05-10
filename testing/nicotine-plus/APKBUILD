@@ -1,0 +1,21 @@
+# Contributor: dai9ah <dai9ah@protonmail.com>
+# Maintainer: dai9ah <dai9ah@protonmail.com>
+pkgname=nicotine-plus
+pkgver=3.1.1
+pkgrel=0
+pkgdesc="Graphical client for the SoulSeek peer-to-peer system"
+url="https://nicotine-plus.github.io/nicotine-plus"
+arch="noarch"
+license="GPL-3.0-or-later"
+depends="gtk+3.0 py3-gobject3 python3"
+makedepends="gettext"
+subpackages="$pkgname-doc $pkgname-lang"
+source="nicotine-plus-$pkgver.tar.gz::https://github.com/Nicotine-Plus/nicotine-plus/archive/$pkgver.tar.gz"
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+28eaca5f270176ff5562f693906b4dfef180b91f0113332e3fc1659acaa6bb49e8f956b03612effab14f6833e9e7c00ebca75ca3c49906cd990d1e82e1bb5be3  nicotine-plus-3.1.1.tar.gz
+"

@@ -1,0 +1,24 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=lilv
+pkgver=0.24.12
+pkgrel=2
+pkgdesc="C library for simpler use of LV2 plugins"
+url="https://drobilla.net/software/lilv"
+arch="all"
+license="ISC"
+makedepends="lv2-dev python3 serd-dev libsndfile-dev sord-dev sratom-dev"
+subpackages="$pkgname-dev $pkgname-doc"
+source="http://download.drobilla.net/lilv-$pkgver.tar.bz2"
+options="!check" # No tests
+
+build() {
+	python3 waf configure --prefix=/usr
+	python3 waf build
+}
+
+package() {
+	python3 waf install --destdir="$pkgdir"
+}
+
+sha512sums="ea22db4e995792b62d60d793169c792549b8fb0255c2cf7a85780dd149811921e2fae5eaea0fb83465f01b14dfa66361af3be40bf7cb3733e98655b943f4faee  lilv-0.24.12.tar.bz2"

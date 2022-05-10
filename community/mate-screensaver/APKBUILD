@@ -1,0 +1,44 @@
+# Contributor: Alan Lacerda <alacerda@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=mate-screensaver
+pkgver=1.26.0
+pkgrel=0
+pkgdesc="A screen saver and locker for MATE"
+url="https://github.com/mate-desktop/mate-screensaver"
+# riscv64 disabled due to missing rust in recursive dependency
+arch="all !s390x !mips !mips64 !riscv64" # mate-desktop
+license="GPL-2.0-or-later"
+makedepends="intltool glib-dev libxscrnsaver-dev gtk+3.0-dev
+	mate-desktop-dev dbus-glib-dev mate-menus-dev dconf-dev
+	libnotify-dev libmatekbd-dev mate-session-manager libsm-dev"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+source="https://pub.mate-desktop.org/releases/${pkgver%.*}/mate-screensaver-$pkgver.tar.xz"
+builddir="$srcdir/$pkgname-$pkgver/"
+options="suid"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--sysconfdir=/etc \
+		--enable-static=no \
+		--enable-locking=yes \
+		--prefix=/usr \
+		--without-console-kit
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+
+	# https://gitweb.gentoo.org/repo/gentoo.git/tree/mate-extra/mate-screensaver
+	chmod u+s "$pkgdir"/usr/libexec/mate-screensaver-dialog
+}
+
+sha512sums="
+7efc1ef49c8c25db83cec3d6c3971fa31ac0722eeba256257de2191b1176170b88f9f2c7cf2a4361cd955dd12d94ab8b2017beead3776a59f6ae557d85f11663  mate-screensaver-1.26.0.tar.xz
+"

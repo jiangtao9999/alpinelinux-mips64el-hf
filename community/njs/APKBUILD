@@ -1,0 +1,45 @@
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=njs
+pkgver=0.7.0
+pkgrel=0
+pkgdesc="njs scripting language CLI utility"
+url="https://nginx.org/en/docs/njs/"
+# x86 - one test failed
+# s390x - segfaults in test
+arch="all !x86 !s390x"
+license="BSD-2-Clause"
+makedepends="libedit-dev openssl1.1-compat-dev pcre-dev"
+checkdepends="expect"
+subpackages="$pkgname-debug $pkgname-libs-static"
+source="$pkgname-$pkgver.tar.gz::https://hg.nginx.org/njs/archive/$pkgver.tar.gz"
+
+build() {
+	NJS_BUILD_DIR='build-debug' ./configure --debug=YES
+	make njs
+
+	./configure --cc-opt='-Os' --ld-opt='-Os'
+	make njs
+}
+
+check() {
+	make test
+}
+
+package() {
+	install -m 755 -D build/njs "$pkgdir"/usr/bin/njs
+
+	install -m 644 -D build/libnjs.a "$pkgdir"/usr/lib/libnjs.a
+	install -m 644 -D build-debug/libnjs.a "$pkgdir"/usr/lib/libnjs-debug.a
+}
+
+debug() {
+	pkgdesc="njs built with additional runtime checks and debug symbols"
+	options="!strip"
+
+	install -m 755 -D "$builddir"/build-debug/njs "$subpkgdir"/usr/bin/njs-debug
+}
+
+sha512sums="
+e8894b010b51c282bcfa1c167727ef337d1e4db1189af0e748cb07e6c6132d443b1c32157d4985e9fd7ab776864fb6025e6ffc3018aef56f9ea0c8bfa17c7742  njs-0.7.0.tar.gz
+"

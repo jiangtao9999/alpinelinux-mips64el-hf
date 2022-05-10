@@ -1,0 +1,28 @@
+# Contributor: Stefan Reiff <kroko87@hotmail.com>
+# Maintainer: Stefan Reiff <kroko87@hotmail.com>
+pkgname=wireguard-go
+pkgver=0.0.20210424
+pkgrel=1
+pkgdesc="Next generation secure network tunnel: userspace implementation in go"
+url="https://www.wireguard.com"
+license="GPL-2.0-only"
+arch="all"
+makedepends="go"
+depends="wireguard-tools-wg wireguard-tools-wg-quick"
+subpackages="$pkgname-doc"
+options="!check"
+source="https://git.zx2c4.com/wireguard-go/snapshot/wireguard-go-$pkgver.tar.xz"
+
+build() {
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	install -Dm644 README.md "$pkgdir"/usr/share/doc/$pkgname/README.md
+	install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+}
+
+sha512sums="
+0c7c91f2a3002b7bc85028c7838ee84af47daf287c508160adfcca248afe3590135d3e7dc76811dfec39576bf6d499bc78eb59a49235d2e54431caee6d402ddc  wireguard-go-0.0.20210424.tar.xz
+"

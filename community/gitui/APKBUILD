@@ -1,0 +1,50 @@
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=gitui
+# NOTE: If update-lockfile.patch is not applicable after bumping, apply only
+# the previous patches, copy Cargo.lock to Cargo.lock.orig, run
+# `cargo build --release`, interrupt it (^C) right after it starts building
+# and generate a new diff (`diff -u Cargo.lock.orig Cargo.lock`).
+pkgver=0.18.0
+pkgrel=1
+pkgdesc="Blazing fast terminal client for git"
+url="https://github.com/extrawurst/gitui"
+arch="x86_64 armv7 armhf aarch64 x86 ppc64le"  # limited by rust/cargo
+license="MIT"
+makedepends="cargo libgit2-dev oniguruma-dev openssl1.1-compat-dev zlib-dev"
+source="https://github.com/extrawurst/gitui/archive/v$pkgver/$pkgname-$pkgver.tar.gz
+	use-system-openssl.patch
+	use-oniguruma.patch
+	update-lockfile.patch
+	make-gh-emoji-optional.patch
+	"
+
+export LIBSSH2_SYS_USE_PKG_CONFIG=1  # use system libssh2
+export RUSTONIG_DYNAMIC_LIBONIG=1  # use system libonig
+
+_cargo_opts="--frozen --no-default-features"
+
+prepare() {
+	default_prepare
+	cargo fetch --locked
+}
+
+build() {
+	cargo build $_cargo_opts --release
+}
+
+check() {
+	cargo test $_cargo_opts
+}
+
+package() {
+	install -D -m755 target/release/gitui "$pkgdir"/usr/bin/gitui
+}
+
+sha512sums="
+c77f4957d051c86ebbe882b9db33480da711acad3d915248939edd4fc914e66e9a2a01a53f8aab5f9242b7fa0245d3bad8d0fffaf7770469e3df562877c396c9  gitui-0.18.0.tar.gz
+33e74dc1810d71bea734e85435f5ab2f1a47e2e36ef28b612c789db7ab1b084521b924688ee10977fabfc6c9b1f72f278878e2d9efdddd9a65b512b27c3aa24a  use-system-openssl.patch
+66e9bd29a29d7252fa563348d99b8cf232295ae539b3c221b232efb9795baab2d34c9c96b7e74ff4b77bc52ae28353156ca66b365c8262eaaa5da791cccd9b23  use-oniguruma.patch
+73d7a26b38414dae571c4075d9adf4d080ed0d6106db5da9cc3ca69606ffc73057cf79a99b8bf1d685c8ba61068a077ecf200e292b6ef919a4a27cbe92763307  update-lockfile.patch
+3b2ee1178cc94c108b764383147c07fe854a8fba0531ba32e0b2b7eba5486bcaf8ed415a9cc071225ec31f6d65bbe4794ce8357c89035cff0b820eff41c90d21  make-gh-emoji-optional.patch
+"

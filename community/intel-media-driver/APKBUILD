@@ -1,0 +1,43 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=intel-media-driver
+pkgver=21.4.1
+pkgrel=0
+pkgdesc="Intel Media Driver for VAAPI - Broadwell+ iGPUs"
+url="https://github.com/intel/media-driver"
+arch="x86_64"
+license="BSD-3-Clause AND MIT"
+makedepends="
+	cmake
+	intel-gmmlib-dev
+	libva-dev
+	libpciaccess-dev
+	"
+subpackages="$pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/intel/media-driver/archive/intel-media-$pkgver.tar.gz"
+builddir="$srcdir/media-driver-intel-media-$pkgver"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		-DCMAKE_C_FLAGS="$CFLAGS" \
+		-DINSTALL_DRIVER_SYSCONF=OFF \
+		-Wno-dev \
+		$CMAKE_CROSSOPTS .
+	make -C build
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+620f42ed5edb4f2ce780a23c2f745a724a6df902b344b05070462b19a1a0273be07820d8edeb6bfd3ab58a7fe480bdd02a6b06b72b7d69a71cf1104ff0af2d10  intel-media-driver-21.4.1.tar.gz
+"

@@ -1,0 +1,39 @@
+# Maintainer: Eivind Uggedal <eu@eju.no>
+pkgname=py3-redis
+_pkgname=redis
+pkgver=4.0.2
+pkgrel=0
+pkgdesc="Python3 client for Redis key-value store"
+url="https://github.com/andymccurdy/redis-py"
+arch="noarch"
+license="MIT"
+depends="python3 py3-deprecated py3-hiredis"
+makedepends="py3-setuptools"
+checkdepends="py3-pytest py3-mock redis"
+source="
+	https://files.pythonhosted.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz
+	0001-all-remove-support-for-nonfree-Redis-modules.patch
+"
+builddir="$srcdir"/$_pkgname-$pkgver
+
+replaces="py-redis" # Backwards compatibility
+provides="py-redis=$pkgver-r$pkgrel" # Backwards compatibility
+
+build() {
+	python3 setup.py build
+}
+
+check() (
+	redis-server --dir "$builddir" &
+	trap "kill $!" EXIT
+	pytest
+)
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+3f73ddd2ceb551fa447cfb4ecdc1d393957bbfd8c184ae3d357f9f47fff860f1c4684ec0fc3cb85fea530454456c17a98a2a56e592bef4cd9ad17bb405c1a0f7  redis-4.0.2.tar.gz
+f2f890e147bd76311b6aa9d0bbdab64f44c46a52e450c7c6ca2c9eddcf30e0a6ed8e962950dc98d0160a45eb68580399707ff6a12a17c56a768382814deab626  0001-all-remove-support-for-nonfree-Redis-modules.patch
+"

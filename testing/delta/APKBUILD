@@ -1,0 +1,27 @@
+# Contributor: Aleks Bunin <alpinelinux@compuix.com>
+# Maintainer: Aleks Bunin <alpinelinux@compuix.com>
+pkgname=delta
+pkgver=0.9.2
+pkgrel=0
+pkgdesc="Viewer for git and diff output"
+url="https://github.com/dandavison/delta"
+license="MIT"
+arch="all !s390x !mips64 !riscv64" # limited by rust/cargo
+makedepends="cargo"
+source="https://github.com/dandavison/delta/archive/$pkgver/delta-$pkgver.tar.gz"
+
+build() {
+	cargo build --release --locked
+}
+
+check() {
+	cargo test --release --locked
+}
+
+package() {
+	install -Dm755 target/release/delta "$pkgdir"/usr/bin/delta
+}
+
+sha512sums="
+14557103e0a5edf1c307c5036dc092fbab119952d2eef95709e3a363d913ae11e3d8fb7bf16e7dd26bd36e8a7d51c49e70edb002fce8f00b428c7ee330d49d01  delta-0.9.2.tar.gz
+"

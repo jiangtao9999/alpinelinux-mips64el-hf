@@ -1,0 +1,29 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=grcov
+pkgver=0.8.2
+pkgrel=0
+pkgdesc="Rust tool to collect and aggregate code coverage data"
+url="https://github.com/eqrion/cbindgen"
+arch="x86_64 armv7 armhf aarch64 x86 ppc64le" # Limited by cargo
+license="MPL-2.0"
+depends="gcc" # gcov
+makedepends="cargo"
+options="net !check" # Failing due to utf-8 (locale?)
+source="$pkgname-$pkgver.tar.gz::https://github.com/mozilla/grcov/archive/v$pkgver.tar.gz"
+
+build() {
+	cargo build --release --locked --verbose
+}
+
+check() {
+	cargo test --release --locked --verbose
+}
+
+package() {
+	install -Dm0755 target/release/grcov -t "$pkgdir"/usr/bin
+}
+
+sha512sums="
+ab3e338559850d1b9a9d66263cf3a317f601a01a7d03888b9625f022190afff1b92c26d417fef6dc7f99f5a91b9bce876c299d6361ddcee2dfc45a11bd893418  grcov-0.8.2.tar.gz
+"

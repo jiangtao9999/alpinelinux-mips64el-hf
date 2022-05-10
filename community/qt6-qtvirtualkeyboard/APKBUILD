@@ -1,0 +1,45 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=qt6-qtvirtualkeyboard
+pkgver=6.2.1
+pkgrel=0
+pkgdesc="Virtual keyboard framework"
+url="https://qt.io/"
+# s390x blocked by qt6-qtdeclarative
+arch="all !s390x"
+license="LGPL-2.1-only AND LGPL-3.0-only AND GPL-3.0-only AND Qt-GPL-exception-1.0"
+depends_dev="
+	hunspell-dev
+	qt6-qtbase-dev
+	qt6-qtdeclarative-dev
+	qt6-qtsvg-dev
+	"
+makedepends="$depends_dev
+	cmake
+	perl
+	"
+subpackages="$pkgname-dev"
+options="!check" # No tests
+builddir="$srcdir/qtvirtualkeyboard-everywhere-src-${pkgver/_/-}"
+
+case $pkgver in
+	*_alpha*|*_beta*|*_rc*) _rel=development_releases;;
+	*) _rel=official_releases;;
+esac
+
+source="https://download.qt.io/$_rel/qt/${pkgver%.*}/${pkgver/_/-}/submodules/qtvirtualkeyboard-everywhere-src-${pkgver/_/-}.tar.xz"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+f3c81dae6848d71c15d78123f0a00e6c8aa84370475f3b6e1cc649e2caa05048a9db2adcdd5e14dcbdccdb94c2090410d18ed7e2cb02d0c4765528f04005f7e9  qtvirtualkeyboard-everywhere-src-6.2.1.tar.xz
+"

@@ -1,0 +1,42 @@
+# Maintainer: Luca Weiss <luca@z3ntu.xyz>
+pkgname=net-cpp
+pkgver=3.0.0
+pkgrel=0
+pkgdesc="A simple yet beautiful networking API for C++11"
+url="https://gitlab.com/ubports/core/lib-cpp/net-cpp"
+arch="all"
+license="LGPL-3.0-only"
+makedepends="cmake cmake-extras boost-dev curl-dev process-cpp-dev
+	properties-cpp-dev jsoncpp-dev gtest-dev"
+checkdepends="py3-httpbin"
+subpackages="$pkgname-dev"
+source="https://gitlab.com/ubports/core/lib-cpp/net-cpp/-/archive/$pkgver/net-cpp-$pkgver.tar.gz
+	python-init.patch
+	"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		-DCMAKE_BUILD_TYPE=None \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+c8728f0bdc6ccb14edf4f6b6c7ec4381796aa4f40ced0b5ea58494db31a52e5e785816704e932aa34a993e6e7edc4826739755abcbfcea69990ba5505fc465e6  net-cpp-3.0.0.tar.gz
+28518bb713a4a93fde1e32d1ca57b028f0e71114799bbf62b104ebf263152ec4351f8c16d23cbf05b9b0b2fd568c5103500d0f58f9522abcb928cf1a30028593  python-init.patch
+"

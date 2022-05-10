@@ -1,0 +1,34 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Fabian Affolter <fabian@affolter-engineering.ch>
+pkgname=py3-dpath
+_pkgname=dpath
+pkgver=2.0.2
+pkgrel=0
+pkgdesc="Filesystem-like pathing and searching for dictionaries"
+url="https://www.github.com/akesterson/dpath-python"
+arch="noarch"
+license="MIT"
+replaces="py-dpath" # for backwards compatibility
+provides="py-dpath=$pkgver-r$pkgrel" # for backwards compatibility
+depends="python3"
+makedepends="py3-setuptools"
+checkdepends="py3-hypothesis py3-mock py3-nose py3-pytest"
+source="https://files.pythonhosted.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz"
+
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	PYTHONPATH="$builddir"/build/lib pytest-3
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+d6afd123e1fcc72cb553f45f664727e8d52429b02ae47cb6399935957c51cd2c1c9db9914b079a1b79db4ab9709ffa104e5e740f45278d807f040e3617738077  dpath-2.0.2.tar.gz
+"

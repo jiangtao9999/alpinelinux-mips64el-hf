@@ -1,0 +1,65 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=spectacle
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="Application for capturing desktop screenshots"
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kdeclarative
+# ppc64le blocked by qt5-qtwebengine -> purpose
+arch="all !armhf !s390x !mips64 !riscv64 !ppc64le"
+url="https://kde.org/applications/utilities/org.kde.spectacle"
+license="GPL-2.0-only"
+makedepends="
+	extra-cmake-modules
+	kconfig-dev
+	kcoreaddons-dev
+	kdbusaddons-dev
+	kdeclarative-dev
+	kdoctools-dev
+	ki18n-dev
+	kio-dev
+	knewstuff-dev
+	knotifications-dev
+	kwayland-dev
+	kwidgetsaddons-dev
+	kwindowsystem-dev
+	libkipi-dev
+	libxcb-dev
+	purpose-dev
+	qt5-qtbase-dev
+	qt5-qtx11extras-dev
+	xcb-util-cursor-dev
+	xcb-util-image-dev
+	xcb-util-renderutil-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/spectacle-$pkgver.tar.xz
+	spectacle.desktop
+	"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+
+	install -Dm644 "$srcdir"/spectacle.desktop -t "$pkgdir"/etc/xdg/autostart/
+
+	# We don't ship systemd
+	rm -r "$pkgdir"/usr/lib/systemd
+}
+sha512sums="
+03568bc1865bbed143bd0177835cc0bcd49444d9c336ea06ba5a43bbdbb4da141a29c2b58d6e95de340126029066499a988546957e79f161e05401931d75a078  spectacle-21.08.3.tar.xz
+7c563d811f30d26f83e01a465e803b95167c5b2b842315257216ab282e07c69e7582a14d7f429cd19678199179ad8f3f2854265092f5a4c9ce9b65c87ed3849d  spectacle.desktop
+"

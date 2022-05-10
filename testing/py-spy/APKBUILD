@@ -1,0 +1,51 @@
+# Contributor: messense <messense@icloud.com>
+# Maintainer: messense <messense@icloud.com>
+pkgname=py-spy
+pkgver=0.3.9
+pkgrel=0
+pkgdesc="Sampling profiler for Python programs"
+url="https://github.com/benfred/py-spy"
+arch="aarch64 armv7 armhf x86_64 ppc64le" # limited by rust
+license="MIT"
+makedepends="cargo zlib-dev libunwind-dev xz-dev"
+checkdepends="python3 bash"
+subpackages="
+	$pkgname-doc
+	$pkgname-bash-completion
+	$pkgname-fish-completion
+	$pkgname-zsh-completion
+	"
+source="$pkgname-$pkgver.tar.gz::https://github.com/benfred/py-spy/archive/v$pkgver.tar.gz"
+
+build() {
+	cargo build --release --locked
+
+	./target/release/py-spy completions bash > $pkgname.bash
+	./target/release/py-spy completions fish > $pkgname.fish
+	./target/release/py-spy completions zsh > $pkgname.zsh
+}
+
+check() {
+	# enable interpreter "python" hack
+	mkdir "$builddir"/pythonbindir
+	ln -s /usr/bin/python3 "$builddir"/pythonbindir/python
+	export PATH="$PATH:$builddir/pythonbindir"
+
+	case "$CARCH" in
+		# py-spy requires additional permissions when running in docker
+		# see https://github.com/benfred/py-spy#how-do-i-run-py-spy-in-docker
+		aarch64 | armv7 | armhf) cargo test --release --locked --no-run ;;
+		*) cargo test --release --locked ;;
+	esac
+}
+
+package() {
+	install -Dm0755 target/release/$pkgname -t "$pkgdir"/usr/bin
+	install -Dm0644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+
+	install -Dm644 $pkgname.bash "$pkgdir"/usr/share/bash-completion/completions/$pkgname
+	install -Dm644 $pkgname.fish "$pkgdir"/usr/share/fish/completions/$pkgname.fish
+	install -Dm644 $pkgname.zsh "$pkgdir"/usr/share/zsh/site-functions/_$pkgname
+}
+
+sha512sums="0b743885b76c4d7d7f49db5359c8487bb127eca360b792ca407aa967512ef9857ae7b533e6fa27a1ad247f503c6048abbc17da986348d470b58126690af470cf  py-spy-0.3.9.tar.gz"

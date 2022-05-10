@@ -1,0 +1,24 @@
+# Contributor: Lucas Ramage <ramage.lucas@protonmail.com>
+# Maintainer: Lucas Ramage <ramage.lucas@protonmail.com>
+pkgname=cdist
+pkgver=6.9.8
+pkgrel=0
+pkgdesc="A Usable Configuration Management System"
+arch="noarch"
+url="https://www.cdi.st/"
+options="!check"
+license="GPL-3.0-or-later"
+depends="python3"
+source="$pkgname-$pkgver.tar.gz::https://code.ungleich.ch/ungleich-public/cdist/uploads/d342a7e52f1dab308e9ae155c7204a61/cdist-$pkgver.tar.gz"
+
+package() {
+	./bin/$pkgname 2> /dev/null
+	python3 setup.py build install --root="$pkgdir"
+	find "$pkgdir" -type d -exec chmod 0755 {} \;
+	find "$pkgdir" -type f -exec chmod a+r {} \;
+}
+
+sha512sums="
+d3039751533f000ee3530f2ddca08aa3317d323ee223f87835ca58bd5d9dc552b6fdf5e3a98d6bd2e43380dfb1296ccfe3c47eb9bc135b14a71bd5aaed19c11d  cdist-6.9.8.tar.gz
+"
+

@@ -1,0 +1,29 @@
+# Contributor: Taner Tas <taner76@gmail.com>
+# Maintainer: Taner Tas <taner76@gmail.com>
+pkgname=gstreamer-vaapi
+pkgver=1.18.5
+pkgrel=0
+pkgdesc="GStreamer streaming media framework VA API plug-ins"
+url="https://gstreamer.freedesktop.org/"
+arch="all !mips64 !riscv64" # blocked by gst-plugins-bad
+license="LGPL-2.1-or-later"
+makedepends="glib-dev gst-plugins-bad-dev libva-dev libxrandr-dev meson eudev-dev"
+options="!check" # Need actual display with HW accel
+source="https://gstreamer.freedesktop.org/src/gstreamer-vaapi/gstreamer-vaapi-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test -C output --print-errorlogs
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+5ab6fc2c6f6bdad41fa76464d3dd47f5812e104190f82b84dfd161911584c1c1c968d5691dc421037093991b3e75b7bf937e76b1d55f40ffb08161ae4c3971ee  gstreamer-vaapi-1.18.5.tar.xz
+"

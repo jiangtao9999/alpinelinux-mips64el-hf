@@ -1,0 +1,26 @@
+# Contributor: Galen Abell <galen@galenabell.com>
+# Maintainer: Galen Abell <galen@galenabell.com>
+pkgname=py3-sphobjinv
+_pyname=sphobjinv
+pkgver=2.1
+pkgrel=0
+pkgdesc="Sphinx objects.inv Inspection/Manipulation Tool"
+url="https://github.com/bskinn/sphobjinv"
+arch="noarch"
+license="MIT"
+options="!check"  # no tests
+depends="python3 py3-attrs py3-certifi py3-jsonschema py3-fuzzywuzzy"
+makedepends="py3-setuptools"
+checkdepends="py3-pytest"
+source="$_pyname-$pkgver.tar.gz::https://github.com/bskinn/sphobjinv/archive/refs/tags/v$pkgver.tar.gz"
+builddir="$srcdir/$_pyname-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="cde77d73b09b72358b0ac5b0d8f1a748e78dce6664d1b849ba68f5ff70dc43cbcff4581374d0151be29c4d97efe2920c5c00ff68918371243be158031e9554fa  sphobjinv-2.1.tar.gz"

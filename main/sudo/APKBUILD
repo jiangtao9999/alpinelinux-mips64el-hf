@@ -1,0 +1,74 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Contributor: Łukasz Jendrysik <scadu@yandex.com>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=sudo
+pkgver=1.9.8_p2
+if [ "${pkgver%_*}" != "$pkgver" ]; then
+	_realver=${pkgver%_*}${pkgver#*_}
+else
+	_realver=$pkgver
+fi
+pkgrel=1
+pkgdesc="Give certain users the ability to run some commands as root"
+url="https://www.sudo.ws/sudo/"
+arch="all"
+license="custom ISC"
+makedepends="zlib-dev bash mandoc"
+subpackages="$pkgname-doc $pkgname-dev"
+source="https://www.sudo.ws/dist/sudo-$_realver.tar.gz
+	0001-Use-our-own-getentropy-by-default-on-Linux.patch
+	"
+options="suid"
+builddir="$srcdir/sudo-$_realver"
+
+# secfixes:
+#   1.9.5p2-r0:
+#     - CVE-2021-3156
+#   1.9.5-r0:
+#     - CVE-2021-23239
+#     - CVE-2021-23240
+#   1.8.31-r0:
+#     - CVE-2019-18634
+#   1.8.28-r0:
+#     - CVE-2019-14287
+#   1.8.20_p2-r0:
+#     - CVE-2017-1000368
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--libexecdir=/usr/lib \
+		--mandir=/usr/share/man \
+		--disable-nls \
+		--enable-pie \
+		--with-env-editor \
+		--with-mdoc \
+		--without-pam \
+		--without-skey \
+		--with-sendmail=/usr/sbin/sendmail \
+		--with-passprompt="[sudo] password for %p: "
+
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	# the sudo's mkinstalldir script miscreates the leading
+	# path components with bad permissions. fix this.
+	install -d -m0755 "$pkgdir"/var "$pkgdir"/var/db
+	make -j1 DESTDIR="$pkgdir" install
+	rm -rf "$pkgdir"/var/run
+
+	# Exactly the same as /etc/sudoers
+	rm "$pkgdir"/etc/sudoers.dist
+}
+
+sha512sums="
+899b252e8c219226f658dff3dd34c97b07d42004998b45175b4c0c4de42a6bf9f909598e99b4056fa1171e63378e203854b0f8608b0f5c1b00e9d3677818f6d3  sudo-1.9.8p2.tar.gz
+720eb364f5721b75c937573c480a8ef27af97dd99af5ace254666275116e7a3c7a82af783d64360a4404a97a1825b9762a127788242343d57a6c518077d56f90  0001-Use-our-own-getentropy-by-default-on-Linux.patch
+"

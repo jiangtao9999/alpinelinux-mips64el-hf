@@ -1,0 +1,67 @@
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=xterm
+pkgver=370
+pkgrel=0
+pkgdesc="X Terminal Emulator"
+options="!check" # Requires vttest
+url="http://invisible-island.net/xterm"
+arch="all"
+license="MIT"
+depends="ncurses-terminfo-base"
+makedepends="libxaw-dev libxft-dev ncurses-dev"
+subpackages="$pkgname-doc"
+source="ftp://ftp.invisible-island.net/xterm/xterm-$pkgver.tgz
+	posix-ptys.patch"
+
+# secfixes:
+#   366-r0:
+#     - CVE-2021-27135
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info \
+		--localstatedir=/var \
+		--with-x \
+		--disable-full-tgetent \
+		--disable-imake \
+		--enable-ansi-color \
+		--enable-88-color \
+		--enable-256-color \
+		--enable-broken-osc \
+		--enable-broken-st \
+		--enable-load-vt-fonts \
+		--enable-i18n \
+		--enable-wide-chars \
+		--enable-doublechars \
+		--enable-warnings \
+		--enable-tcap-query \
+		--enable-logging \
+		--enable-dabbrev \
+		--enable-freetype \
+		--enable-luit \
+		--enable-mini-luit \
+		--enable-narrowproto \
+		--enable-exec-xterm \
+		--enable-sixel-graphics \
+		--with-tty-group=tty \
+		--with-utempter
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	install -m755 -d "$pkgdir"/usr/share/applications
+	install -m644 "$builddir"/xterm.desktop "$pkgdir"/usr/share/applications/
+	install -m644 "$builddir"/uxterm.desktop "$pkgdir"/usr/share/applications/
+}
+
+sha512sums="
+24f1836c4f5aec175c45db77e9bc829b45ee2c93cf12c20252b22bee470392ef0637cfbbb6e90074b1c038ac023f74a4fb713bbd4abf2b5b86d064667caf38dd  xterm-370.tgz
+03722dc3ebe8067a1edf4673ce2e5132832e52818f4e122bfbd3846a4ebf0ca25bea999d98455b87ec572931becbbb0432e22c75b0fb5371a81c8acf0c4e9f98  posix-ptys.patch
+"

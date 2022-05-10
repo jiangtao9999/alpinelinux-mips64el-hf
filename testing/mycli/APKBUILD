@@ -1,0 +1,39 @@
+# Contributor: Thomas Boerger <thomas@webhippie.de>
+# Maintainer: Thomas Boerger <thomas@webhippie.de>
+pkgname=mycli
+pkgver=1.24.1
+pkgrel=1
+pkgdesc="MySQL CLI with autocompletion and syntax highlighting"
+url="https://www.mycli.net/"
+arch="noarch"
+license="BSD-3-Clause"
+depends="
+	python3
+	py3-pyaes
+	py3-click
+	py3-pygments
+	py3-prompt_toolkit
+	py3-pymysql
+	py3-sqlparse
+	py3-configobj
+	py3-cryptography
+	py3-cli_helpers
+	py3-pyperclip
+	"
+makedepends="python3-dev py3-setuptools py3-paramiko"
+checkdepends="py3-pytest py3-mock"
+source="https://files.pythonhosted.org/packages/source/m/mycli/mycli-$pkgver.tar.gz"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 -m pytest -v test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="01deb08fffe3dd862b46a6c3ac5a61ed218d338616c7b908a50df0457072882e2e9c0259e0985c8e5b0f87b6fd89708af67d44ee8f708a1186acceca0272d7b8  mycli-1.24.1.tar.gz"

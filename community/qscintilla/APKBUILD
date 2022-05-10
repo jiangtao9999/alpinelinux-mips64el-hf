@@ -1,0 +1,27 @@
+# Maintainer: Marian Buschsiewke <marian.buschsieweke@ovgu.de>
+pkgname=qscintilla
+pkgver=2.11.6
+pkgrel=0
+pkgdesc="QScintilla is a port to Qt of Neil Hodgson's Scintilla C++ editor control"
+url="https://www.riverbankcomputing.com/software/qscintilla"
+arch="all"
+license=" GPL-3.0-only"
+subpackages="$pkgname-dev"
+makedepends="qt5-qtbase-dev"
+source="https://www.riverbankcomputing.com/static/Downloads/QScintilla/$pkgver/QScintilla-$pkgver.tar.gz"
+builddir="$srcdir/QScintilla-$pkgver/Qt4Qt5"
+
+build() {
+	qmake-qt5
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" INSTALL_ROOT="$pkgdir" install -j1
+}
+
+sha512sums="8055d72a40f9f5a7d45c6592055c1b8eb5e5c50ce9e51673babd5e567c769d60c64d244ba5a7def5731a3120099e9528d01ed94327a06bb56ae2fa2e5e37b198  QScintilla-2.11.6.tar.gz"

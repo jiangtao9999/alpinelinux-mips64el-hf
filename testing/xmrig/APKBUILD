@@ -1,0 +1,38 @@
+# Contributor: Oleg Titov <oleg.titov@gmail.com>
+# Maintainer: Oleg Titov <oleg.titov@gmail.com>
+pkgname=xmrig
+pkgver=6.15.3
+pkgrel=0
+pkgdesc="XMRig is a high performance Monero (XMR) miner"
+url="https://xmrig.com/"
+arch="aarch64 x86 x86_64" # officially supported by upstream
+license="GPL-3.0-or-later"
+options="!check" # No test suite from upstream
+makedepends="cmake libmicrohttpd-dev libuv-dev openssl-dev hwloc-dev"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/xmrig/xmrig/archive/v$pkgver.tar.gz
+	enable-donateless-mode.patch
+	"
+
+case "$CARCH" in
+	aarch64*) CMAKE_CROSSOPTS="-DARM_TARGET=8"; makedepends="$makedepends linux-headers" ;;
+esac
+
+build() {
+	cmake -B build $CMAKE_CROSSOPTS -DCMAKE_BUILD_TYPE=None \
+		-DWITH_CUDA=OFF \
+		-DWITH_OPENCL=OFF
+
+	make -C build
+}
+
+package() {
+	install -Dm 755 build/xmrig $pkgdir/usr/bin/xmrig
+
+	install -Dm 644 -t "$pkgdir"/usr/share/doc/$pkgname/ README.md
+}
+
+sha512sums="
+8c20e2a89405cb7fb3763b6184f6db9dbbdb6628e6d5d3cb62c35d87aa4c54daab5efe8682ed0f0ec3bb6577af0d0e5f41f2f864d52eee41081449e372649a2a  xmrig-6.15.3.tar.gz
+40cd7e3a884920951ec48efebbea5d7181deaeef6a226444a46ad8dc83b54eceae954c8d28952c21d63a15a4947eac72d1024b83684b5cb15437d3c8d32b006a  enable-donateless-mode.patch
+"

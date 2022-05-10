@@ -1,0 +1,66 @@
+# Contributor: Michael Pirogov <vbnet.ru@gmail.com>
+# Maintainer: Michael Pirogov <vbnet.ru@gmail.com>
+pkgname=janus-gateway
+pkgver=0.11.5
+pkgrel=0
+pkgdesc="Janus WebRTC Server"
+url="https://janus.conf.meetecho.com/"
+license="GPL-3.0-only"
+arch="all !mips64 !riscv64" # blocked by nodejs/npm
+install="$pkgname.pre-install"
+makedepends="autoconf automake libtool gengetopt lua5.3-dev cmake libsrtp-dev
+	libnice-dev jansson-dev libconfig-dev libusrsctp-dev libmicrohttpd-dev
+	libwebsockets-dev rabbitmq-c-dev curl-dev libogg-dev libopusenc-dev
+	lua duktape-dev npm doxygen graphviz ffmpeg-dev zlib-dev libogg-dev
+	libuv-dev sofia-sip-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/meetecho/janus-gateway/archive/refs/tags/v$pkgver.tar.gz
+	$pkgname.initd
+	$pkgname.confd
+	"
+subpackages="$pkgname-doc $pkgname-openrc"
+options="!check" # missing aiortc
+
+# nanomsg not available on armv7
+case "$CARCH" in
+	arm*)
+		;;
+	*)
+		makedepends="$makedepends nanomsg-dev"
+		;;
+esac
+
+prepare() {
+	default_prepare
+	autoreconf -fi
+}
+
+build() {
+	./configure \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--runstatedir=/run \
+		--enable-sample-event-handler \
+		--enable-rest \
+		--enable-javascript-es-module \
+		--enable-all-js-modules \
+		--enable-post-processing \
+		--enable-json-logger \
+		--enable-plugin-lua \
+		--enable-plugin-sip \
+		--enable-plugin-duktape \
+		--enable-docs \
+		--disable-aes-gcm
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
+	install -Dm644 "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="
+38e49539d23604ec9003d4b02c4fdf84211d074389675948df939e8b8c289da64f52b83683e08d1e5797f770c20f444c69fe6e46aaa130d3da685796e007e37e  janus-gateway-0.11.5.tar.gz
+942d8566219a426671d78b962f1584a910137995a2dbfc9af2a5c2901f30dc8992bbc749543d149d9f3d24bd751090abc226fca405276450ef84acff1cd74cc1  janus-gateway.initd
+f442a419a435f5d1adab673011b7689a5680064f32f712e5e4668c486ce10f1442822c60cb302ee850ddc576a9e9f610a0863f02204e56f1fc68aa3ee312ebe0  janus-gateway.confd
+"

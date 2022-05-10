@@ -1,0 +1,41 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=libkipi
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="KDE Image Plugin Interface library"
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by kxmlgui
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://www.digikam.org/"
+license="GPL-2.0-or-later AND LGPL-2.0-or-later"
+depends_dev="
+	kconfig-dev
+	kservice-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	libjpeg-turbo-dev
+	libkexiv2-dev
+	tiff-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/libkipi-$pkgver.tar.xz"
+subpackages="$pkgname-dev"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+07a717cc5a28d79f3e3aea7a2d3d86a46b6c83efaa00e2fd3f723a619305848091e944fd937b595b5ec65e9b46177839ce9b9fc46f5d1125d51d6ceb8c904040  libkipi-21.08.3.tar.xz
+"

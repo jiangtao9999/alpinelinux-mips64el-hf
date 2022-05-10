@@ -1,0 +1,28 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-characters
+pkgver=41.0
+pkgrel=0
+pkgdesc="A simple utility application to find and insert unusual characters"
+url="https://wiki.gnome.org/Design/Apps/CharacterMap"
+# s390x, mips64 and riscv64 blocked by gjs
+arch="all !s390x !mips64 !riscv64"
+license="BSD-3-Clause AND GPL-2.0-or-later"
+makedepends="meson gjs-dev glib-dev pango-dev gtk+3.0-dev libunistring-dev
+	libhandy1-dev"
+options="!check" # no tests
+subpackages="$pkgname-lang"
+source="https://download.gnome.org/sources/gnome-characters/${pkgver%.*}/gnome-characters-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+faa76b8ced642d5a1c4641fc4670800f851dd0aae98cd227fd0847c5b930d572f6838e677e11858d62f672a6cabfb1c5aa582a534cd8e37541e9fc1bb16fcc04  gnome-characters-41.0.tar.xz
+"

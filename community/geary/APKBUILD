@@ -1,0 +1,68 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=geary
+pkgver=40.0
+pkgrel=5
+pkgdesc="Geary is an email application built around conversations"
+url="https://wiki.gnome.org/Apps/Geary"
+# s390x and mips blocked by libhandy1
+# mips64 and riscv64 blocked by webkit2gtk
+arch="all !s390x !mips !mips64 !riscv64"
+license="LGPL-2.1-or-later AND CC-BY-3.0 AND BSD-2-Clause"
+depends="iso-codes dbus:org.freedesktop.Secrets"
+makedepends="
+	appstream-glib-dev
+	enchant2-dev
+	folks-dev
+	gcr-dev
+	glib-dev
+	gmime-dev
+	gnome-online-accounts-dev
+	gsound-dev
+	gspell-dev
+	gtk+3.0-dev
+	iso-codes-dev
+	itstool
+	json-glib-dev
+	libcanberra-dev
+	libucontext-dev
+	libgee-dev
+	libhandy1-dev
+	libnotify-dev
+	libpeas-dev
+	libsecret-dev
+	libstemmer-dev
+	libunwind-dev
+	libxml2-dev
+	meson
+	sqlite-dev
+	vala
+	webkit2gtk-dev
+	ytnef-dev
+	"
+checkdepends="xvfb-run desktop-file-utils ibus"
+options="!check" # https://gitlab.gnome.org/GNOME/geary/-/issues/776
+subpackages="$pkgname-lang $pkgname-doc"
+source="https://download.gnome.org/sources/geary/${pkgver%.*}/geary-$pkgver.tar.xz"
+
+# secfixes:
+#   3.37.91-r0:
+#     - CVE-2020-24661
+
+build() {
+	LDFLAGS="$LDFLAGS -lucontext" abuild-meson \
+		-Dlibunwind=auto \
+		-Dprofile=release \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	xvfb-run meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="d31716121be63a9d39caf4bffacce0109cebcc8048127c37fac6969b4103ab2cf12aac9bed73623b0f3baf7f39996b8f0b0fe9b57968054d51ae3e209f6b1522  geary-40.0.tar.xz"

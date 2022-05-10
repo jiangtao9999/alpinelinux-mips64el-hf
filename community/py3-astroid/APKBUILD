@@ -1,0 +1,32 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Fabian Affolter <fabian@affolter-engineering.ch>
+pkgname=py3-astroid
+pkgver=2.7.2
+pkgrel=0
+pkgdesc="A new abstract syntax tree from Python's ast"
+url="https://www.astroid.org"
+arch="noarch"
+license="LGPL-2.1-or-later"
+depends="py3-lazy-object-proxy py3-typed-ast py3-wrapt"
+replaces="py-logilab-astng"
+makedepends="py3-setuptools py3-setuptools_scm"
+checkdepends="py3-pytest py3-pytest-runner"
+source="https://files.pythonhosted.org/packages/source/a/astroid/astroid-$pkgver.tar.gz"
+builddir="$srcdir/astroid-$pkgver"
+options="!check" # PyPI archive doesn't contain tests anymore
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	pytest
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+2c86d96bee1a47b2022f2e02d0c5bf470561f90bf19fe4ba34b6f12f93da05aa30e75436ac8715f90d4ed9dd14349d68fe3e4b1b6064201d50537cc6e0649896  astroid-2.7.2.tar.gz
+"

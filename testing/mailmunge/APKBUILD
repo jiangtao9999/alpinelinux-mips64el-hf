@@ -1,0 +1,63 @@
+# Contributor: Duncan Bellamy <dunk@denkimushi.com>
+# Maintainer: Duncan Bellamy <dunk@denkimushi.com>
+pkgname=mailmunge
+pkgver=3.05
+pkgrel=0
+pkgdesc="email filtering framework that uses libmilter to interface with Postfix or Sendmail"
+url="https://mailmunge.org"
+arch="all"
+license="GPL-2.0-only"
+pkgusers="mailmunge"
+pkggroups="mailmunge"
+depends="
+	perl-io-socket-ssl
+	perl-mime-tools
+	perl-socket
+	perl-time-local
+	perl-unix-syslog
+	tzdata
+	"
+makedepends="libmilter-dev"
+checkdepends="
+	perl-dbi
+	perl-file-find-rule
+	perl-html-parser
+	perl-json-any
+	perl-json-xs
+	perl-mail-spamassassin
+	perl-net-dns
+	perl-dbd-sqlite
+	perl-test-deep
+	perl-utils
+	"
+subpackages="$pkgname-openrc $pkgname-doc"
+install="$pkgname.pre-install"
+source="$pkgname-$pkgver.tar.gz::https://git.skoll.ca/Skollsoft-Public/mailmunge/archive/v$pkgver.tar.gz"
+builddir="$srcdir/$pkgname"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var \
+		--with-perlinstalldirs=vendor \
+	make
+}
+
+check() {
+	make test
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	# delete systemd and tests
+	rm -rf "$pkgdir"/etc/systemd
+	rm -rf "$pkgdir"/usr/share/perl*/vendor_perl/Test
+}
+
+sha512sums="
+b96557e8ced3769e2525f3626e63dab88833a6ab30fe7c2db205d8f20d287a26a057facbe977d20f9501d436c8c1a4985ce58dded51c6cb881e814ea7ec3c0af  mailmunge-3.05.tar.gz
+"

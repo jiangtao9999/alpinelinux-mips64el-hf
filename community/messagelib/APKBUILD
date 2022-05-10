@@ -1,0 +1,80 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=messagelib
+pkgver=21.08.3
+pkgrel=0
+pkgdesc="KDE PIM messaging library"
+# armhf blocked by extra-cmake-modules
+# ppc64le, s390x, mips64 and riscv64 blocked by qt5-qtwebengine
+arch="all !armhf !ppc64le !s390x !mips64 !riscv64"
+url="https://kontact.kde.org/"
+license="LGPL-2.0-only OR LGPL-3.0-only AND GPL-2.0-or-later"
+depends_dev="
+	akonadi-contacts-dev
+	akonadi-dev
+	akonadi-mime-dev
+	akonadi-search-dev
+	gpgme-dev
+	grantlee-dev
+	grantleetheme-dev
+	karchive-dev
+	kcodecs-dev
+	kcompletion-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcontacts-dev
+	kdbusaddons-dev
+	ki18n-dev
+	kiconthemes-dev
+	kidentitymanagement-dev
+	kio-dev
+	kitemviews-dev
+	kjobwidgets-dev
+	kldap-dev
+	kmailtransport-dev
+	kmbox-dev
+	kmime-dev
+	knewstuff-dev
+	kpimtextedit-dev
+	kservice-dev
+	ktextwidgets-dev
+	kwidgetsaddons-dev
+	kwindowsystem-dev
+	kxmlgui-dev
+	libgravatar-dev
+	libkdepim-dev
+	libkleo-dev
+	pimcommon-dev
+	qca-dev
+	qt5-qtbase-dev
+	qt5-qtwebengine-dev
+	sonnet-dev
+	syntax-highlighting-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/messagelib-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+options="!check" # Requires OpenGL and running dbus server
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+bb4371b8cebfda476ac950158df5ee7c6ae5cefe6022a51cb23fccdd9b2469a5ec79001187cf61bca5fb7e44af0f0bd434e695044f4f54fb4256f9d1f5b37cf2  messagelib-21.08.3.tar.xz
+"

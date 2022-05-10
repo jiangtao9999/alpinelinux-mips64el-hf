@@ -1,0 +1,32 @@
+# Maintainer: Milan P. Stanić <mps@arvanta.net>
+pkgname=dosbox-staging
+pkgver=0.77.1
+pkgrel=0
+pkgdesc="revitalized dosbox DOS-emulator"
+url="https://dosbox-staging.github.io/"
+arch="all !x86" # TEXTREL on x86
+license="GPL-2.0-or-later"
+options="!check" # no
+depends="!dosbox" # dosbox provides same binary in /usr/bin/dosbox
+makedepends="alsa-lib-dev sdl2-dev libpng-dev
+	 opus-dev opusfile-dev fluidsynth-dev sdl2_net-dev samurai meson"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/dosbox-staging/dosbox-staging/archive/v$pkgver.tar.gz"
+
+build() {
+	abuild-meson \
+	--prefix /usr \
+	--buildtype=release \
+	-Duse_mt32emu=false \
+	-Ddefault_library=static \
+	. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+fe5d6150a88f5c276aee5672f98c15b5ffee702fe9934919d3e78068efd1a85f08a8f04352bc6a8fe850324e33f3227340c59242db6cbae0475b12a58b749cac  dosbox-staging-0.77.1.tar.gz
+"

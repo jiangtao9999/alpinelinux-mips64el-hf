@@ -1,0 +1,40 @@
+# Contributor: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+# Maintainer: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+pkgname=xdg-desktop-portal-wlr
+pkgver=0.5.0
+pkgrel=0
+pkgdesc="wlroots implementation of xdg-desktop-portal"
+url="https://github.com/emersion/xdg-desktop-portal-wlr"
+# ppc64le: blocked by wlroots
+# riscv64: blocked by xdg-desktop-portal
+# s390x: blocked by pipewire, xdg-desktop-portal
+arch="all !mips* !ppc64le !riscv64 !s390x"
+license="MIT"
+depends="xdg-desktop-portal"
+makedepends="
+	basu-dev
+	inih-dev
+	meson
+	pipewire-dev
+	scdoc
+	wayland-protocols-dev
+	wlroots-dev
+	"
+options="!check"  # no tests provided
+subpackages="$pkgname-doc $pkgname-dbg"
+source="https://github.com/emersion/xdg-desktop-portal-wlr/releases/download/v$pkgver/xdg-desktop-portal-wlr-$pkgver.tar.gz"
+
+build() {
+	abuild-meson build \
+		-Dsd-bus-provider=basu
+	meson compile ${JOBS:+-j ${JOBS}} -C build
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C build
+	rm -rf "$pkgdir"/usr/lib/systemd
+}
+
+sha512sums="
+9ece46f2381e83cac8002a8175a13b0c29c0a2dab49cf11ed5ffa3448f176802b9d324b7e4fe9c15d3fb65087be42299f21a0ef505088e6281787f4067d256ac  xdg-desktop-portal-wlr-0.5.0.tar.gz
+"

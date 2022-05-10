@@ -1,0 +1,66 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kwallet
+pkgver=5.88.0
+pkgrel=0
+pkgdesc="Secure and unified container for user passwords"
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://community.kde.org/Frameworks"
+license="LGPL-2.1-or-later"
+depends_dev="
+	gpgme-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	kdbusaddons-dev
+	ki18n-dev
+	kiconthemes-dev
+	knotifications-dev
+	kservice-dev
+	kwindowsystem-dev
+	libgcrypt-dev
+	"
+makedepends="$depends_dev
+	doxygen
+	extra-cmake-modules
+	graphviz
+	kdoctools-dev
+	qt5-qttools-dev
+	"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/kwallet-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+provides="dbus:org.freedesktop.Secrets"
+# 2nd highst priority after gnome-keyring, mainly for KDE
+provider_priority=10
+
+case "$CARCH" in
+	mips*)	options="!check";;
+esac
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_QCH=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+
+	local excluded_checks=
+	case "$CARCH" in
+		s390x) excluded_checks="(blowfishtest)";;
+	esac
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest -E "$excluded_checks"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+ad12f9d9162181962006b6f51fde52344de15e384bb69e9c48fc376625175a3a3aafd9093f3cdaa5d99735c9fc88954c16353b14c0d4499e488008307918b847  kwallet-5.88.0.tar.xz
+"

@@ -1,0 +1,48 @@
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=qt5-qtwebsockets
+pkgver=5.15.3_git20201221
+pkgrel=0
+_commit="e7883bc64440b1ff4666272ac6eb710ee4bc221b"
+pkgdesc="Provides WebSocket communication compliant with RFC 6455"
+url="https://www.qt.io/developers/"
+arch="all"
+license="(LGPL-3.0-or-later OR GPL-3.0-only OR GPL-2.0-or-later) AND Qt-GPL-exception-1.0"
+makedepends="qt5-qtbase-dev qt5-qtdeclarative-dev"
+subpackages="$pkgname-dev"
+replaces="qt5-websockets"
+options="!check" # No tests
+builddir="$srcdir/qtwebsockets-$_commit"
+
+case $pkgver in
+	*_beta*|*_rc*) _rel=development_releases;;
+	*) _rel=official_releases;;
+esac
+
+source="https://invent.kde.org/qt/qt/qtwebsockets/-/archive/$_commit/qtwebsockets-$_commit.tar.gz"
+
+prepare() {
+	default_prepare
+
+	# We need to make the build system think we're running in a git repository
+	# so it correctly symlinks during the build
+	mkdir .git
+}
+
+build() {
+	qmake-qt5
+	make
+}
+
+package() {
+	make INSTALL_ROOT="$pkgdir" install
+
+	# Drop QMAKE_PRL_BUILD_DIR because reference the build dir
+	find "$pkgdir/usr/lib" -type f -name '*.prl' \
+		-exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
+
+	install -d "$pkgdir"/usr/share/licenses
+	ln -s /usr/share/licenses/qt5-base "$pkgdir"/usr/share/licenses/$pkgname
+}
+
+sha512sums="35b1caed6462083014bbb83c6aa81b441f67da7f0e3813fc47997ca4fecfe5423eaef5dd4ed3c37f42dd311eded0e6b36cce6725c7028047ca21b454ded9257f  qtwebsockets-e7883bc64440b1ff4666272ac6eb710ee4bc221b.tar.gz"

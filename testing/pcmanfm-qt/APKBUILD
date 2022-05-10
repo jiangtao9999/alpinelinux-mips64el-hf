@@ -1,0 +1,35 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=pcmanfm-qt
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Qt port of pcmanfm"
+url="https://github.com/lxqt/pcmanfm-qt"
+arch="all !s390x !mips64 !armhf" # s390x blocked by libfm-qt
+license="LGPL-2.0-or-later"
+depends="desktop-file-utils paper-icon-theme lxmenu-data"
+makedepends="
+	cmake lxqt-build-tools menu-cache-dev
+	qt5-qttools-dev libfm-qt-dev libexif-dev
+	"
+subpackages="$pkgname-doc"
+source="https://github.com/lxqt/pcmanfm-qt/releases/download/$pkgver/pcmanfm-qt-$pkgver.tar.xz"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+66f8badf47f32482f880009e24b506ad409ac4a939d4cbc0b6b9adf29874a6d76e5c154e5611329007485fe9c34985be7f67a1ec769ea0e0a107d16d48f2fd7f  pcmanfm-qt-1.0.0.tar.xz
+"

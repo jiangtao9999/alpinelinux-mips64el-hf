@@ -1,0 +1,69 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=rocs
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# mips, mips64 and s390x blocked by kxmlgui
+# riscv64 disabled due to missing rust in recursive dependency
+arch="all !armhf !mips !mips64 !s390x !riscv64"
+url="https://kde.org/applications/education/org.kde.rocs"
+pkgdesc="Graph Theory IDE"
+license="GPL-2.0-or-later AND (LGPL-2.1-only OR LGPL-3.0-only) AND GFDL-1.2-only"
+makedepends="
+	boost-dev
+	extra-cmake-modules
+	grantlee-dev
+	karchive-dev
+	kconfig-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kdeclarative-dev
+	kdoctools-dev
+	ki18n-dev
+	kitemviews-dev
+	ktexteditor-dev
+	kxmlgui-dev
+	qt5-qtbase-dev
+	qt5-qtsvg-dev
+	qt5-qtxmlpatterns-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/rocs-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang $pkgname-dev"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+
+	# TestTgfFileFormat, TestRocs1FileFormat, TestRocs2FileFormat, and
+	# graphtheory-test_graphoperations are broken
+	# TestProject requires OpenGL
+	local skipped_tests="("
+	local tests="
+		TestTgfFileFormat
+		TestRocs1FileFormat
+		TestRocs2FileFormat
+		graphtheory-test_graphoperations
+		TestProject"
+	for test in $tests; do
+		skipped_tests="$skipped_tests|$test"
+	done
+	skipped_tests="$skipped_tests)"
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest -E "$skipped_tests"
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="
+0e66198bb5796eb2737d2d38748aff331c9e951e2863f329ae8126c0a79e26944b0b51b53b4ba4e3e74c86e893e0c2fe66aa0468015fe1dde2b904ab7d0f5343  rocs-21.08.3.tar.xz
+"

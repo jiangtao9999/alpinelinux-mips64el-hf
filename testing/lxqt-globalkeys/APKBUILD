@@ -1,0 +1,35 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=lxqt-globalkeys
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Daemon used to register global keyboard shortcuts"
+url="https://github.com/lxqt/lxqt-globalkeys"
+arch="all !armhf !mips64" # armhf blocked by liblxqt and kwindowsystem
+license="LGPL-2.0-or-later"
+makedepends="
+	cmake lxqt-build-tools liblxqt-dev
+	qt5-qttools-dev kwindowsystem-dev
+	"
+subpackages="$pkgname-dev"
+options="!check" # No testsuite
+source="https://github.com/lxqt/lxqt-globalkeys/releases/download/$pkgver/lxqt-globalkeys-$pkgver.tar.xz"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+f58921ebe9be0d7488f0ddc8031c4cf6256db6d52c04af66399379e0af32b47c360dd4cb6e3e478252677a59b27994efebe2a4cac6c37da726046933e0687387  lxqt-globalkeys-1.0.0.tar.xz
+"

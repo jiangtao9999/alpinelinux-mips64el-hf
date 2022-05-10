@@ -1,0 +1,31 @@
+# Contributor: Fabian Affolter <fabian@affolter-engineering.ch>
+# Maintainer: Fabian Affolter <fabian@affolter-engineering.ch>
+pkgname=perl-string-random
+_realname=String-Random
+pkgver=0.31
+pkgrel=0
+pkgdesc="Perl extension to generate random strings"
+url="https://metacpan.org/release/String-Random"
+arch="noarch"
+license="GPL-1.0-or-later OR Artistic-1.0-Perl"
+depends="perl"
+makedepends="perl-module-build"
+subpackages="$pkgname-doc"
+source="https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/String-Random-$pkgver.tar.gz"
+builddir="$srcdir"/$_realname-$pkgver
+
+build() {
+	perl Build.PL installdirs=vendor
+	./Build
+}
+
+check() {
+	./Build test
+}
+
+package() {
+	./Build install destdir="$pkgdir"
+	find "$pkgdir" \( -name perllocal.pod -o -name .packlist \) -delete
+}
+
+sha512sums="6430fee321ff92142bd24df02145984979cdae2f6cd21c4570fc2ea498b1f308080b25b576cc62dff5d07a7dcb6c61e2108badbe93d41989d6ea92a13ceae6a2  String-Random-0.31.tar.gz"

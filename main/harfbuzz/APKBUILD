@@ -1,0 +1,62 @@
+# Contributor: Sören Tempel <soeren+alpinelinux@soeren-tempel.net>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=harfbuzz
+pkgver=3.0.0
+pkgrel=2
+pkgdesc="Text shaping library"
+url="https://freedesktop.org/wiki/Software/HarfBuzz"
+arch="all"
+license="MIT"
+# tests depend on certain freetype behaviours
+options="!check"
+makedepends="freetype-dev glib-dev gobject-introspection-dev cairo-dev icu-dev
+	graphite2-dev meson gtk-doc"
+checkdepends="python3"
+subpackages="$pkgname-static $pkgname-dev $pkgname-icu $pkgname-utils $pkgname-doc"
+source="harfbuzz-$pkgver.tar.gz::https://github.com/harfbuzz/harfbuzz/archive/$pkgver.tar.gz"
+
+build() {
+	abuild-meson \
+		--default-library=both \
+		-Dglib=enabled \
+		-Dgobject=enabled \
+		-Dgraphite=enabled \
+		-Dicu=enabled \
+		-Dfreetype=enabled \
+		-Dcairo=enabled \
+		-Ddocs=enabled \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+static() {
+	pkgdesc="$pkgdesc (static libraries)"
+
+	mkdir -p "$subpkgdir"/usr/lib
+	mv "$pkgdir"/usr/lib/*.a "$subpkgdir"/usr/lib/
+}
+
+icu() {
+	pkgdesc="Harfbuzz ICU support library"
+	replaces="harfbuzz"
+	mkdir -p "$subpkgdir"/usr/lib
+	mv "$pkgdir"/usr/lib/lib*icu.so.* "$subpkgdir"/usr/lib/
+}
+
+utils() {
+	pkgdesc="$pkgdesc (utilities)"
+	mkdir -p "$subpkgdir"/usr
+	mv "$pkgdir"/usr/bin "$subpkgdir"/usr/
+}
+
+sha512sums="
+69999ad86bde56ef689392a521143b6ad14b6719860772c3d4c343358997049a48c79e8f302fe0a7f3b0d930b476ddf440def874a1269b50ae79d020bcd073b5  harfbuzz-3.0.0.tar.gz
+"

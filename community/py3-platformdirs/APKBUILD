@@ -1,0 +1,32 @@
+# Contributor: Duncan Bellamy <dunk@denkimushi.com>
+# Maintainer: Duncan Bellamy <dunk@denkimushi.com>
+pkgname=py3-platformdirs
+pkgver=2.4.0
+pkgrel=0
+pkgdesc="Module for determining appropriate platform-specific dirs"
+url="https://github.com/platformdirs/platformdirs"
+arch="noarch"
+license="MIT"
+depends="python3"
+makedepends="py3-setuptools"
+checkdepends="py3-pytest py3-pytest-mock"
+source="https://files.pythonhosted.org/packages/source/p/platformdirs/platformdirs-$pkgver.tar.gz
+	fix-version.patch"
+builddir="$srcdir/platformdirs-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	PYTHONPATH=build/lib pytest
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+476f69a1bf91468f2d0285178adabf2f9fccc9abdb084008a7cce46535b1cc2e903511f8d02e03494ad9d26ccba81a0cce8e87e491ce3264582b01f6c93a2c7b  platformdirs-2.4.0.tar.gz
+dff46866fafb3b8739a84cd95dcb96cd633c82fcd55a4ce4df6f18424e7ff29a2a4c7d47e72c3bc9d93912dc4f36bfe07a1f2a0f397e375ffb7ae6159b357d47  fix-version.patch
+"

@@ -1,0 +1,43 @@
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=ruby-rouge
+_gemname=rouge
+pkgver=3.26.1
+pkgrel=1
+pkgdesc="A pure Ruby code highlighter that is compatible with Pygments"
+url="https://github.com/rouge-ruby/rouge"
+arch="noarch"
+license="MIT AND BSD-2-Clause"
+depends="ruby"
+checkdepends="ruby-minitest ruby-rake"
+source="https://github.com/rouge-ruby/rouge/archive/v$pkgver/$pkgname-$pkgver.tar.gz"
+builddir="$srcdir/$_gemname-$pkgver"
+options="!check"  # FIXME: run tests
+
+build() {
+	gem build $_gemname.gemspec
+}
+
+package() {
+	local gemdir="$pkgdir/$(ruby -e 'puts Gem.default_dir')"
+	local geminstdir="$gemdir/gems/$_gemname-$pkgver"
+
+	gem install \
+		--local \
+		--install-dir "$gemdir" \
+		--bindir "$pkgdir/usr/bin" \
+		--ignore-dependencies \
+		--no-document \
+		--verbose \
+		$_gemname
+
+	# Remove unnecessary files and rubbish...
+	cd "$gemdir"
+	rm -r cache build_info doc extensions
+
+	rm "$geminstdir"/Gemfile
+}
+
+sha512sums="
+4b5d5a840dab75579e2fb10b4d86fde647ccf183b2fe496463a6ab14dfc9022fa44be9ac75e5f792bf3f2102477a40aafb5fe4694e59bfe9786d3a2d70ddb9f6  ruby-rouge-3.26.1.tar.gz
+"

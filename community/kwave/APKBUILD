@@ -1,0 +1,73 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kwave
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit -> kio
+arch="all !armhf !mips64 !s390x !riscv64"
+url="http://kwave.sourceforge.net/"
+pkgdesc="A sound editor for KDE"
+license="GPL-2.0-or-later"
+makedepends="
+	alsa-lib-dev
+	audiofile-dev
+	extra-cmake-modules
+	fftw-dev
+	flac-dev
+	imagemagick
+	karchive-dev
+	kcompletion-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	kcrash-dev
+	kdbusaddons-dev
+	kdoctools-dev
+	ki18n-dev
+	kiconthemes-dev
+	kio-dev
+	kservice-dev
+	ktextwidgets-dev
+	kwidgetsaddons-dev
+	kxmlgui-dev
+	libsamplerate-dev
+	libvorbis-dev
+	opus-dev
+	pulseaudio-dev
+	qt5-qtbase-dev
+	qt5-qtmultimedia-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kwave-$pkgver.tar.xz"
+subpackages="$pkgname-libs $pkgname-doc $pkgname-lang"
+
+build() {
+
+	if [ "$CARCH" = s390x ]; then
+		doc_opts="-DWITH_DOC=OFF"
+	else
+		doc_opts="-DWITH_DOC=ON"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DWITH_OSS=OFF \
+		-DWITH_MP3=OFF \
+		$doc_opts
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+111a2159018c93fdd9d2b2627f926c39596dcc40241e15e467bb5909516fe6c6a07cb943a8f8611532c29de9aae28ec7c4eba53f7f38245b25d8b3386c0d69e3  kwave-21.08.3.tar.xz
+"

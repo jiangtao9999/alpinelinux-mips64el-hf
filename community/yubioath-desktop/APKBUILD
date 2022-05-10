@@ -1,0 +1,37 @@
+# Maintainer: Luca Weiss <luca@z3ntu.xyz>
+pkgname=yubioath-desktop
+pkgver=5.0.5
+pkgrel=0
+pkgdesc="Yubico Authenticator for Desktop"
+url="https://github.com/Yubico/yubioath-desktop"
+arch="all !armhf" # missing qt5-qtquickcontrols2
+license="BSD-2-Clause"
+depends="py3-pyotherside py3-ykman ccid"
+makedepends="qt5-qtquickcontrols2-dev"
+source="https://github.com/Yubico/yubioath-desktop/archive/yubioath-desktop-$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-$pkgname-$pkgver"
+options="!check" # No tests
+
+build() {
+	qmake-qt5 . \
+		PREFIX=/usr \
+		QMAKE_CFLAGS_RELEASE="$CFLAGS" \
+		QMAKE_CXXFLAGS_RELEASE="$CXXFLAGS"
+
+	make
+}
+
+package() {
+	make INSTALL_ROOT="$pkgdir" install
+
+	install -Dm644 resources/icons/com.yubico.yubioath.svg \
+		"$pkgdir"/usr/share/pixmaps/com.yubico.yubioath.svg
+	install -Dm755 resources/com.yubico.yubioath.desktop \
+		"$pkgdir"/usr/share/applications/com.yubico.yubioath.desktop
+	install -Dm755 resources/com.yubico.yubioath.appdata.xml \
+		"$pkgdir"/usr/share/metainfo/com.yubico.yubioath.appdata.xml
+}
+
+sha512sums="
+b5a0df306916896e1fd84d6a794a43365b0e0a2cecd97ec1dacc6312507dd2e4dd55fc12b0de9d72d1d0a1b40625330373b7c74dacb2ec37a24ea3e1fd2d4ff7  yubioath-desktop-5.0.5.tar.gz
+"

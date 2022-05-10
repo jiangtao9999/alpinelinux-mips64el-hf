@@ -1,0 +1,30 @@
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer:
+pkgname=py3-gst
+pkgver=1.18.5
+pkgrel=0
+pkgdesc="GStreamer Python3 bindings"
+url="https://cgit.freedesktop.org/gstreamer/gst-python/"
+arch="all"
+license="LGPL-2.1-or-later"
+depends="py3-gobject3 gst-plugins-base"
+makedepends="gst-plugins-base-dev gstreamer-dev meson py3-gobject3-dev
+	python3-dev"
+source="https://gstreamer.freedesktop.org/src/gst-python/gst-python-$pkgver.tar.xz
+	"
+builddir="$srcdir/gst-python-$pkgver"
+
+build() {
+	abuild-meson \
+		-Dpython=/usr/bin/python3 \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+0233e87593d8e6f9432b5212e59f08b8c3652a1bb236bef754742eefb54432786577bffb01ffeba51baa7929bb58ed9c33e11d6e653a551e9294d394b5d94270  gst-python-1.18.5.tar.xz
+"

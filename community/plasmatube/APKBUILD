@@ -1,0 +1,53 @@
+# Contributor: Ralf Rachinger <ralfrachinger@gmail.com>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=plasmatube
+pkgver=0_git20211101
+pkgrel=0
+_commit="5991dc5ed2551b4facaa9b017ea6cab7dc9fc535"
+pkgdesc="Kirigami YouTube video player based on Invidious"
+# armhf blocked by extra-cmake-modules
+# s390x and riscv64 blocked by polkit
+arch="all !armhf !s390x !riscv64"
+url="https://invent.kde.org/plasma-mobile/plasmatube"
+license="GPL-3.0-or-later AND CC0-1.0"
+depends="
+	gst-libav
+	gst-plugins-good
+	gst-plugins-good-qt
+	kcoreaddons
+	kdeclarative
+	kirigami2
+	qt5-qtmultimedia
+	qt5-qtquickcontrols2
+	"
+makedepends="
+	extra-cmake-modules
+	ki18n-dev
+	kirigami2-dev
+	qt5-qtbase-dev
+	qt5-qtquickcontrols2-dev
+	"
+source="https://invent.kde.org/plasma-mobile/plasmatube/-/archive/$_commit/plasmatube-$_commit.tar.gz"
+options="!check" # No tests
+builddir="$srcdir/$pkgname-$_commit"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+9e7a4f674fd1755e893b4f03648e1e120d7205a341425c52cedaa12da763c1c473159dcbc21b87f40341bd1bed2bcfa53b16991233621cdcc0e526a6806d4ba6  plasmatube-5991dc5ed2551b4facaa9b017ea6cab7dc9fc535.tar.gz
+"

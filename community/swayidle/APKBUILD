@@ -1,0 +1,43 @@
+# Contributor: Henrik Riomar <henrik.riomar@gmail.com>
+# Contributor: Drew DeVault <sir@cmpwn.com>
+# Maintainer: Michał Polański <michal@polanski.me>
+pkgname=swayidle
+pkgver=1.7
+pkgrel=0
+pkgdesc="Idle management daemon for Wayland"
+url="https://swaywm.org"
+license="MIT"
+arch="all"
+options="!check" # no test suite
+makedepends="
+	meson
+	scdoc
+	elogind-dev
+	wayland-dev
+	wayland-protocols
+	"
+subpackages="
+	$pkgname-doc
+	$pkgname-bash-completion
+	$pkgname-fish-completion
+	$pkgname-zsh-completion
+	"
+source="https://github.com/swaywm/swayidle/archive/$pkgver/swayidle-$pkgver.tar.gz"
+
+build() {
+	abuild-meson \
+		-Dlogind=enabled \
+		-Dlogind-provider=elogind \
+		. output
+	meson compile -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+
+	mv "$pkgdir"/usr/share/fish/vendor_completions.d "$pkgdir"/usr/share/fish/completions
+}
+
+sha512sums="
+26a48c510caaadb1ad694426e82880ab1547b7b0ef8ac62a2c2ee41c7b8cc0554f4925b0abdc6dc37f2501a171c0b6ae53c56b045b5c545093f3b0463aefcf24  swayidle-1.7.tar.gz
+"

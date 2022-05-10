@@ -1,0 +1,59 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=mingw-w64-crt
+pkgver=9.0.0
+pkgrel=0
+pkgdesc="MinGW-w64 CRT for Windows"
+options="!check !strip"
+url="http://mingw-w64.sourceforge.net"
+arch="x86_64 x86"
+license="custom"
+makedepends="
+	mingw-w64-gcc-base
+	mingw-w64-binutils
+	mingw-w64-headers
+	mingw-w64-headers-bootstrap
+	"
+source="https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/mingw-w64-v$pkgver.tar.bz2"
+builddir="$srcdir/mingw-w64-v$pkgver/mingw-w64-crt"
+
+case "$CARCH" in
+	x86_64)
+		_target="x86_64-w64-mingw32"
+		_configure_args="--disable-lib32 --enable-lib64"
+		;;
+	x86)
+		_target="i686-w64-mingw32"
+		_configure_args="--disable-lib64 --enable-lib32"
+		;;
+esac
+
+# Directory for out-of-tree builds
+_crtdir="$srcdir/crt-$_target"
+
+prepare() {
+	default_prepare
+
+	mkdir -p "$_crtdir"
+}
+
+build() {
+	cd "$_crtdir"
+	"$builddir"/configure \
+		--prefix=/usr/$_target \
+		--host=$_target \
+		--target=$_target \
+		--enable-wildcard \
+		$_configure_args \
+		CC=$_target-gcc
+	make
+}
+
+package() {
+	cd "$_crtdir"
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+6691331a2ab521d22c1d32bebe0ed049bd62a7a7722cff38e7792b4e42c6b8df4356084afff6c916b487b3ebddc4372b398ab7cd0c7f4ff6991a70fe64177386  mingw-w64-v9.0.0.tar.bz2
+"

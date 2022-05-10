@@ -1,0 +1,31 @@
+# Maintainer: Daniel Sabogal <dsabogalcc@gmail.com>
+pkgname=glfw
+pkgver=3.3.4
+pkgrel=0
+pkgdesc="Multi-platform library for OpenGL and Vulkan application development"
+url="https://www.glfw.org/"
+arch="all"
+license="Zlib"
+depends_dev="libxinerama-dev linux-headers mesa-dev"
+makedepends="$depends_dev cmake libx11-dev libxcursor-dev libxrandr-dev
+	libxi-dev"
+subpackages="$pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/glfw/glfw/archive/$pkgver.tar.gz"
+
+
+build() {
+	cmake . \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=ON
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir/" install
+}
+
+sha512sums="
+2b45ab72da7a2c007c0f42ccd56205f9684cfb980e2b1df127850cd057bb2b02ce02c7c64acd54cd433778e7017148f214afedf09badff9d2edf5f9b8d9d2701  glfw-3.3.4.tar.gz
+"

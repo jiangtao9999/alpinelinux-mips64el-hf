@@ -1,0 +1,30 @@
+# Contributor: Daniel Sabogal <dsabogalcc@gmail.com>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=msgpack-c
+_pkgname=msgpack-c-cpp
+pkgver=3.3.0
+pkgrel=0
+pkgdesc="An efficient object serialization library"
+url="https://msgpack.org"
+arch="all"
+license="BSL-1.0"
+makedepends="cmake"
+subpackages="$pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/msgpack/msgpack-c/archive/cpp-$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	cmake -B build . \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_C_FLAGS="$CFLAGS -DNDEBUG" \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS -DNDEBUG" \
+		-DCMAKE_VERBOSE_MAKEFILE=TRUE
+	make -C build
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+sha512sums="33ed87b23d776cadcc230666e6435088e402c5813e7e4dce5ce79c8c3aceba5a36db8f395278042c6ac44c474b33018ff1635889d8b20bc41c5f6f1d1c963cae  msgpack-c-3.3.0.tar.gz"

@@ -1,0 +1,81 @@
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=icingaweb2
+pkgver=2.9.4
+pkgrel=0
+pkgdesc="Web Interface for Icinga2"
+url="http://www.icinga.org"
+# x86: php6-pecl-imagick missing
+arch="noarch !armhf !armv7 !s390x !mips !mips64 !x86"
+license="GPL-2.0"
+_php=php8
+depends="$_php ${_php}-gd ${_php}-ldap ${_php}-intl ${_php}-dom
+	${_php}-opcache ${_php}-session ${_php}-curl
+	${_php}-gettext ${_php}-ctype ${_php}-openssl ${_php}-sockets
+	${_php}-pdo_mysql ${_php}-pgsql ${_php}-pdo_pgsql
+	${_php}-sqlite3 ${_php}-pdo_sqlite
+	${_php}-pecl-imagick
+	icinga-php-library icinga-php-thirdparty"
+pkggroups="icingaweb2"
+options="!check"
+install="$pkgname.pre-install $pkgname.post-install"
+subpackages="$pkgname-doc $pkgname-bash-completion:bashcomp:noarch"
+source="$pkgname-$pkgver.tar.gz::https://github.com/Icinga/${pkgname}/archive/v$pkgver.tar.gz
+fix-env-php8.patch"
+builddir="$srcdir"/$pkgname-$pkgver
+
+# secfixes:
+#   2.9.0-r0:
+#     - CVE-2021-32746
+#     - CVE-2021-32747
+
+build() {
+	return 0
+}
+
+package() {
+	mkdir -p "$pkgdir/etc/$pkgname"
+	mkdir -p "$pkgdir/usr/bin"
+	mkdir -p "$pkgdir/usr/share/webapps/$pkgname"
+	mkdir -p "$pkgdir/var/log/$pkgname"
+	mkdir -p "$pkgdir/usr/share/doc/$pkgname"
+	cp -r application doc library modules public bin etc "$pkgdir"/usr/share/webapps/$pkgname
+	ln -s /usr/share/webapps/icingaweb2/bin/icingacli "$pkgdir"/usr/bin/icingacli
+	chmod 2770 "$pkgdir"/etc/$pkgname
+	chgrp -R $pkggroups "$pkgdir"/etc/$pkgname
+	chmod 750 "$pkgdir"/var/log/$pkgname
+
+	install -d -g $pkggroups -m 0775 "$pkgdir"/var/lib/$pkgname
+	install -Dm644 COPYING "$pkgdir/usr/share/licenses/icingaweb2/LICENSE"
+
+	cat >"$pkgdir"/usr/share/doc/$pkgname/README.alpine <<EOF
+You need to add to $pkgroups group the owner of the user of your webserver
+
+For nginx, as example:
+    # adduser nginx $pkgusers
+or
+    #adduser nobody $pkgusers
+
+For Apache:
+    # adduser apache $pkgusers
+
+For lighttpd:
+    # adduser lighttpd $pkgusers
+
+Also, you may remove the user of your webserver from group 'icingacmd' if no other icinga web interface is installed.
+EOF
+}
+
+bashcomp() {
+	depends="bash"
+	pkgdesc="Bash completions for $pkgname"
+
+	cd "$builddir"
+	mkdir -p "$subpkgdir"/usr/share/bash-completion/completions
+	mv etc/bash_completion.d/icingacli "$subpkgdir"/usr/share/bash-completion/completions/icingacli
+}
+
+sha512sums="
+77e446c9b48e9db7817fd6a46a6be9f57dfb21278066cce70f6c85d04f04200ec862c3c29c93d62fa3d0468973ddfc04eac5aa957677ec02d09eb13a3aee4265  icingaweb2-2.9.4.tar.gz
+bd41f372647566704f847211b05e79a423e6d598251b3d0aa1badb38e389a7c8f1a794419f02b2b4be383354e4154102b1459407d9687c3792f1a2c052589c7d  fix-env-php8.patch
+"

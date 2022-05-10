@@ -1,0 +1,50 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=step
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# mips, mips64 and s390x blocked by khtml
+# riscv64 disabled due to missing rust in recursive dependency
+arch="all !armhf !mips !mips64 !s390x !riscv64"
+url="https://edu.kde.org/step/"
+pkgdesc="Interactive Physics Simulator"
+license="GPL-2.0-or-later AND GFDL-1.2-only"
+makedepends="
+	eigen-dev
+	extra-cmake-modules
+	kconfig-dev
+	kcrash-dev
+	kdoctools-dev
+	khtml-dev
+	kiconthemes-dev
+	knewstuff-dev
+	kplotting-dev
+	qt5-qtbase-dev
+	qt5-qtsvg-dev
+	qt5-qttools-dev
+	shared-mime-info
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/step-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="
+de865263325c54c8b6a697c3ec9b7b3e3c20938fbe01e4bd9326f02b7f3bcc2d72926b3439f20e48ef0fdecf8e3076195ecc91a3be4284b4a513de08f576afac  step-21.08.3.tar.xz
+"

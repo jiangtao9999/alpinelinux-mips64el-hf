@@ -1,0 +1,33 @@
+# Contributor: Alex Yam <alex@alexyam.com>
+# Maintainer: Alex Yam <alex@alexyam.com>
+pkgname=ginac
+pkgver=1.8.1
+pkgrel=0
+pkgdesc="C++ library for symbolic computations"
+url="https://www.ginac.de/"
+arch="all !armv7 !armhf !mips64" # no cln
+license="GPL"
+makedepends="cmake cln-dev flex bison readline-dev python3 texinfo"
+subpackages="$pkgname-dev $pkgname-doc"
+source="https://www.ginac.de/ginac-$pkgver.tar.bz2"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_PREFIX_PATH=/usr \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cmake --build build --target check
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+sha512sums="
+95e4a38dd44fd898f37cd8cdbdf0af711bf59b9db31fdb8ee728183f3b8f5dd262632182c925a520c7a0fa0c6f20862e76672f8c668286c7753e7d672247e515  ginac-1.8.1.tar.bz2
+"

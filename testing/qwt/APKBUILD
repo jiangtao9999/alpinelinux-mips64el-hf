@@ -1,0 +1,37 @@
+# Contributor: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+# Maintainer: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+pkgname=qwt
+pkgver=6.1.6
+pkgrel=0
+pkgdesc="Qt Widgets for Technical Applications"
+url="https://qwt.sourceforge.io/"
+arch="all"
+license="custom" # Based on LGPL but more liberal
+makedepends="qt5-qtbase-dev qt5-qtsvg-dev qt5-qttools-dev"
+subpackages="$pkgname-dev $pkgname-doc"
+source="https://downloads.sourceforge.net/qwt/qwt-$pkgver.tar.bz2"
+options="!check" # no unit tests
+
+prepare() {
+	default_prepare
+
+	# Fix installation paths, based on Arch Linux's qwt package
+	sed -e '/^\s*QWT_INSTALL_PREFIX/ s|=.*|= /usr|' \
+		-e '/^QWT_INSTALL_DOCS/ s|/doc|/share/doc/qwt|' \
+		-e '/^QWT_INSTALL_HEADERS/ s|include|&/qwt|' \
+		-e '/^QWT_INSTALL_PLUGINS/ s|plugins/designer|lib/qt/&|' \
+		-e '/^QWT_INSTALL_FEATURES/ s|features|lib/qt/mkspecs/&|' \
+		-i qwtconfig.pri
+}
+
+build() {
+	qmake-qt5 qwt.pro
+	make
+}
+
+package() {
+	INSTALL_ROOT="$pkgdir" make install
+	install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname"
+}
+
+sha512sums="0525672a2cbc07aeb4b9c0fb1c020540dcb8963d845e697a220ae0dfa8f543c529fa1fc2aa862826e627579cb5e987d0bd1da8ca95ccf02bcbced80fe5f8ed17  qwt-6.1.6.tar.bz2"

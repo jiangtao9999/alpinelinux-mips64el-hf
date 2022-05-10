@@ -1,0 +1,25 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-backgrounds
+pkgver=40.1
+pkgrel=0
+pkgdesc="Default wallpaper set for GNOME"
+url="https://gitlab.gnome.org/GNOME/gnome-backgrounds"
+arch="noarch"
+license="GPL-2.0-or-later AND CC-BY-2.0 AND CC-BY-SA-2.0 AND CC-BY-SA-3.0"
+makedepends="meson gettext-dev"
+options="!check" # no tests for wallpapers
+source="https://download.gnome.org/sources/gnome-backgrounds/${pkgver%.*}/gnome-backgrounds-$pkgver.tar.xz"
+
+build() {
+	abuild-meson output .
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+e94dd31b99ebaa5671881bffe788f7d3990f1b430f833513229fea244c9afb216d224ac57f39241934a9965d063d4faa3fcc2b41535ebd75cfb666bdd213d371  gnome-backgrounds-40.1.tar.xz
+"

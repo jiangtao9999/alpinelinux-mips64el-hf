@@ -1,0 +1,279 @@
+# Contributor: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+# Maintainer: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+pkgname=texmf-dist
+_core=2021.58710
+_bibtexextra=2021.58697
+_fontsextra=2021.58704
+_formatsextra=2021.57972
+_games=2021.56833
+_humanities=2021.58589
+_langchinese=2021.58583
+_langcyrillic=2021.58426
+_langextra=2021.58019
+_langgreek=2021.57684
+_langjapanese=2021.58632
+_langkorean=2021.58468
+_latexextra=2021.58668
+_music=2021.58331
+_pictures=2021.58558
+_pstricks=2021.58293
+_publishers=2021.58683
+_science=2021.58667
+pkgver=$_core
+pkgrel=2
+pkgdesc="TeX Live texmf core distribution"
+url="https://tug.org/texlive/"
+arch="noarch"
+license="LPPL-1.0 LPPL-1.1 LPPL-1.2 LPPL-1.3a LPPL-1.3c GPL-2.0-only"
+makedepends="unzip xz"
+subpackages="
+	$pkgname-most
+	$pkgname-lang
+	$pkgname-full
+	$pkgname-bibtexextra
+	$pkgname-fontsextra
+	$pkgname-formatsextra
+	$pkgname-games
+	$pkgname-humanities
+	$pkgname-langchinese
+	$pkgname-langcyrillic
+	$pkgname-langextra
+	$pkgname-langgreek
+	$pkgname-langjapanese
+	$pkgname-langkorean
+	$pkgname-latexextra
+	$pkgname-music
+	$pkgname-pictures
+	$pkgname-pstricks
+	$pkgname-publishers
+	$pkgname-science
+	"
+source="
+	https://sources.archlinux.org/other/texlive/texlive-core-$_core-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-bibtexextra-$_bibtexextra-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-fontsextra-$_fontsextra-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-formatsextra-$_formatsextra-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-games-$_games-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-humanities-$_humanities-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-langchinese-$_langchinese-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-langcyrillic-$_langcyrillic-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-langextra-$_langextra-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-langgreek-$_langgreek-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-langjapanese-$_langjapanese-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-langkorean-$_langkorean-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-latexextra-$_latexextra-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-music-$_music-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-pictures-$_pictures-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-pstricks-$_pstricks-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-publishers-$_publishers-src.zip
+	https://sources.archlinux.org/other/texlive/texlive-science-$_science-src.zip
+	"
+# This is a data only package; no unit tests to run
+options="!check"
+
+unpack() {
+	# Prevent unpacking by overwriting the unpack() function, but still verify integrity
+	verify
+	return 0
+}
+
+build() {
+	return 0
+}
+
+package() {
+	# Packages are packed in .tar.xz archives, which in turn are bundled into a
+	# zip. We will unzip each bundle into pkgs-packed and untar all packages of
+	# that bundle into pkgs-unpacked. Since some packages are expected to
+	# be unpacked into /usr/share and others into /usr/shared/texmf-dist, this
+	# will create a mess. We will later copy all folders beginning with texmf
+	# into /usr/share, and merge every remaining file into
+	# /usr/share/texmf-dist to clean up this mess.
+
+	mkdir -p "$pkgdir/usr/share/"
+	mkdir -p "$srcdir/pkgs-packed"
+	mkdir -p "$srcdir/pkgs-unpacked"
+	cd "$srcdir/pkgs-packed"
+	unzip "$srcdir/texlive-core-$_core-src.zip" > /dev/null
+	cd "$srcdir/pkgs-unpacked"
+	find "$srcdir/pkgs-packed" -name '*.tar.xz' -exec tar -xf {} \;
+	find . -maxdepth 1 -name 'texmf*' -exec mv {} "$pkgdir/usr/share/" \;
+	find . -type d -mindepth 1 -exec mkdir -p "$pkgdir/usr/share/texmf-dist/"{} \;
+	find . -type f -exec mv {} "$pkgdir/usr/share/texmf-dist/"{} \;
+
+	# Fix paths
+	sed -i -e 's:^\(TEXMFROOT *= *\)$SELFAUTOPARENT$:\1/usr/share:g' \
+	          "$pkgdir"/usr/share/texmf-dist/web2c/texmf.cnf
+	sed -i -e 's:\$TEXMFROOT/tlpkg:\$TEXMFROOT/texmf-dist/tlpkg:g' \
+	          "$pkgdir"/usr/share/texmf-dist/scripts/texlive/updmap.pl \
+	          "$pkgdir"/usr/share/texmf-dist/scripts/texlive/fmtutil.pl \
+
+	# Remove tlmgr, users should use apk to manage packages
+	rm "$pkgdir"/usr/share/texmf-dist/scripts/texlive/tlmgr.pl
+	rm "$pkgdir"/usr/share/texmf-dist/scripts/texlive/tlmgrgui.pl
+
+	rm -rf "$srcdir/pkgs-packed" "$srcdir/pkgs-unpacked"
+}
+
+pack_subpkg() {
+	local our_pkgver="$1"
+
+	# See comment in package(), same applies here
+	mkdir -p "$subpkgdir/usr/share/"
+	mkdir -p "$srcdir/pkgs-packed"
+	mkdir -p "$srcdir/pkgs-unpacked"
+	cd "$srcdir/pkgs-packed"
+	unzip "$srcdir/texlive-${subpkgname#texmf-dist-}-$our_pkgver-src.zip" > /dev/null
+	cd "$srcdir/pkgs-unpacked"
+	find "$srcdir/pkgs-packed" -name '*.tar.xz' -exec tar -xf {} \;
+	find . -maxdepth 1 -name 'texmf*' -exec mv {} "$subpkgdir/usr/share/" \;
+	find . -type d -mindepth 1 -exec mkdir -p "$subpkgdir/usr/share/texmf-dist/"{} \;
+	find . -type f -exec mv {} "$subpkgdir/usr/share/texmf-dist/"{} \;
+
+	rm -rf "$srcdir/pkgs-packed" "$srcdir/pkgs-unpacked"
+}
+
+most() {
+	pkgdesc="TeX Live texmf distribution including most packages"
+	depends="
+		$pkgname
+		$pkgname-bibtexextra
+		$pkgname-fontsextra
+		$pkgname-formatsextra
+		$pkgname-games
+		$pkgname-humanities
+		$pkgname-latexextra
+		$pkgname-music
+		$pkgname-pictures
+		$pkgname-pstricks
+		$pkgname-publishers
+		$pkgname-science
+		"
+	mkdir -p "$subpkgdir"
+}
+
+lang() {
+	pkgdesc="TeX Live texmf distribution: Additional languages"
+	depends="
+		$pkgname
+		$pkgname-langchinese
+		$pkgname-langcyrillic
+		$pkgname-langextra
+		$pkgname-langgreek
+		$pkgname-langjapanese
+		$pkgname-langkorean
+		"
+	mkdir -p "$subpkgdir"
+}
+
+full() {
+	pkgdesc="Full TeX Live texmf distribution"
+	depends="$pkgname-most $pkgname-lang"
+	mkdir -p "$subpkgdir"
+}
+
+bibtexextra() {
+	pkgdesc="TeX Live texmf distribution: Additional BibTeX styles and bibliography DBs"
+	pack_subpkg "$_bibtexextra"
+}
+
+fontsextra() {
+	pkgdesc="TeX Live texmf distribution: Additional fonts"
+	pack_subpkg "$_fontsextra"
+}
+
+formatsextra() {
+	pkgdesc="TeX Live texmf distribution: Additional TeX formats"
+	pack_subpkg "$_formatsextra"
+}
+
+games() {
+	pkgdesc="TeX Live texmf distribution: Typesetting board games including chess"
+	pack_subpkg "$_games"
+}
+
+humanities() {
+	pkgdesc="TeX Live texmf distribution: Packages for humanities, law, linguistics, ..."
+	pack_subpkg "$_humanities"
+}
+
+langchinese() {
+	pkgdesc="TeX Live texmf distribution: Support for Chinese"
+	pack_subpkg "$_langchinese"
+}
+
+langcyrillic() {
+	pkgdesc="TeX Live texmf distribution: Support for Cyrillic languages"
+	pack_subpkg "$_langcyrillic"
+}
+
+langextra() {
+	pkgdesc="TeX Live texmf distribution: Additional languages"
+	pack_subpkg "$_langextra"
+}
+
+langgreek() {
+	pkgdesc="TeX Live texmf distribution: Support for Greek"
+	pack_subpkg "$_langgreek"
+}
+
+langjapanese() {
+	pkgdesc="TeX Live texmf distribution: Support for Japanese"
+	pack_subpkg "$_langjapanese"
+}
+
+langkorean() {
+	pkgdesc="TeX Live texmf distribution: Support for Korean"
+	pack_subpkg "$_langkorean"
+}
+
+latexextra() {
+	pkgdesc="TeX Live texmf distribution: Add-onpackages for LaTeX"
+	pack_subpkg "$_latexextra"
+}
+
+music() {
+	pkgdesc="TeX Live texmf distribution: Music typesetting packages"
+	pack_subpkg "$_music"
+}
+
+pictures() {
+	pkgdesc="TeX Live texmf distribution: Packages for drawing graphics"
+	pack_subpkg "$_pictures"
+}
+
+pstricks() {
+	pkgdesc="TeX Live texmf distribution: Additional PSTricks packages"
+	pack_subpkg "$_pstricks"
+}
+
+publishers() {
+	pkgdesc="TeX Live texmf distribution: LaTeX packages for specific publishers"
+	pack_subpkg "$_publishers"
+}
+
+science() {
+	pkgdesc="TeX Live texmf distribution: Typesetting for math and sciences"
+	pack_subpkg "$_science"
+}
+
+sha512sums="
+e6742185e6685693c6321ed2151cc08d535ed875499282b62f020871c1e8f689b87000986afd2481af9abf1f1799bad743dadf9d2af4602b4ad88bd1936edad4  texlive-core-2021.58710-src.zip
+dac95662d1d85d6fe647d0af2bd4891d5840a5ff46ce4584f15f382ed7ae11707ef30eb9442a18a7d09d1eb78163fc2166a258850f56a705e566a3ea4f21da9d  texlive-bibtexextra-2021.58697-src.zip
+25c9dee3a5f92faaf634d081609e24f222f9d85337b822dd1171c1be9052d30ee6d7d7257755aa557b06bbe3335a09e6bd555412beffacefcf688fc703aad360  texlive-fontsextra-2021.58704-src.zip
+e302065219331407f93c412edace51965c814f3839bf44af7dd456c8b7a577f6f320716704778402b9443534f40d5fa51877946676fd33bc80faa1ddd35f3bb9  texlive-formatsextra-2021.57972-src.zip
+40c1687fe6e3ca5f0fa6be9d560e62161df0216a0984a1deb553e6d267fefb07dad757a998369a3002a2c475f0a15bfff9f6b0a28bc312d4b6f1b0d12ab6dc7d  texlive-games-2021.56833-src.zip
+d9be4edcbbc80edb76c09f3fc8f6de77919f2dce004f98eb7cbc3dc540e0abcd25adf5b158c129b01f290192dbd8f2f98da295536ba4796b75b058b2bdaa7080  texlive-humanities-2021.58589-src.zip
+4c6f602b7b792ecd568378d25a62a31cc251b42fe56d7752956f32739a000e792ae87d521ff5cc1643f95a138f4751106f2616479d4e19c734d1b48ee11c2605  texlive-langchinese-2021.58583-src.zip
+07127a1c1601226a81979a32383060f896b735e51cd85ede6a726e3fceec88e6f062a05fa128b9e12b67397a1fa33a544643e7839889fb74661c0a52c2097b41  texlive-langcyrillic-2021.58426-src.zip
+da56ebc127a3b686d9443bedeb526b129c2b07bfe7f2e2b4d7f806354c32daf551c3ddf44a3bae1e92b9ec4c824b109ff750bb96782f513fdea97125b7f3011e  texlive-langextra-2021.58019-src.zip
+e61f361870b71d1a0aacb6bbc26776fd24ab4d08ab722352b3ccb0924414288f79fc1467554b2620d6adaea6582afe500c77e79846276ee5ce4bd0a2e21b19f3  texlive-langgreek-2021.57684-src.zip
+b5f25274efd1bdae626a8c23251727e375be84e05aafe62e7cf48bbc5b3aba66a93ec648eb54507fd20b439eb8bda15012b777df32d3c0526cda1c9fd5fac782  texlive-langjapanese-2021.58632-src.zip
+8ba28d981e6e35297f0d4f147de78d513a307bb55d3b186ca9499fae8def535f51275ad79bdba42514b2f959d51a987fdb8cd58aa26776196dab491a5f389583  texlive-langkorean-2021.58468-src.zip
+3fe46a7aeb1655f7eefe39e0235b5e995914e9596439c25296ed996d49b9e3f81b07a0f200bd3f9484fb7fc3c125b4f2f2066c06ac66780185b7b919b5dc3172  texlive-latexextra-2021.58668-src.zip
+149870fa5c2975c7176ad80e245895c8921fea26319b1950548896a25b0ba40952464d7528d5a21ce8692c29fda076c0798a4ed104a73c211dcff6ee1c0981b7  texlive-music-2021.58331-src.zip
+9fb4500dc4f0fee1842225fe4b4085938a63f55ffcd575d9c1d69bb8a3cb73b688be28be109e2c0124df2f7c049dabbd8498ec53c8b1b36b96f9a3a7d030ac90  texlive-pictures-2021.58558-src.zip
+c574bb0c44728280228c6372c705ca3d4b7eafc22b48ba323f3e4fce5e696765ca59726e399ac0724e7b44c596a483c381720b5dbadee1129ae78dfd27c657b3  texlive-pstricks-2021.58293-src.zip
+1769b7fbcbed0e9d8bcbf17688657919022b795bd657c6b9c91d0e200b7b0afc78cd4bb749d6ee66de3a82503d6c5ec69adc84fa96b4ce19c20837b65f392a7f  texlive-publishers-2021.58683-src.zip
+6b83f76076014002af9e8bbef27a20bf02498a56ba2b1f96d53732b6499241e0289e144826bed5d4dc7e79fbe87a44b1d9c94f73d4665ba6b17f0e58fcb10c6f  texlive-science-2021.58667-src.zip
+"

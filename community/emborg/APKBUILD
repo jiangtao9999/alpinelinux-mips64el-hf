@@ -1,0 +1,44 @@
+# Contributor: Andy Hawkins <andy@gently.org.uk>
+# Maintainer: Andy Hawkins <andy@gently.org.uk>
+pkgname=emborg
+pkgver=1.28
+pkgrel=0
+pkgdesc="Front-End to Borg Backup"
+url="https://emborg.readthedocs.io/"
+arch="noarch !s390x !mips !mips64" # limited by borgbackup
+license="GPL-3.0-or-later"
+depends="
+	borgbackup
+	python3
+	py3-appdirs
+	py3-arrow
+	py3-docopt
+	py3-inform
+	py3-quantiphy
+	py3-requests
+	py3-shlib
+	"
+makedepends="py3-setuptools"
+checkdepends="
+	py3-pytest
+	py3-nestedtext
+	py3-parametrize-from-file
+	py3-voluptuous
+	"
+source="https://github.com/KenKundert/emborg/archive/v$pkgver/emborg-v$pkgver.tar.gz"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	MISSING_DEPENDENCIES="fuse" PYTHONPATH="$PWD/build/lib" pytest
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+2bd81e56f1ad6c3430fa116e154ec4231fe7672f3231ca491b61c724fb9269a74d525cc9607ea2a4393c72e1e57f328b173081838aef673130d018e637b13a5e  emborg-v1.28.tar.gz
+"

@@ -1,0 +1,31 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=devhelp
+pkgver=40.1
+pkgrel=0
+pkgdesc="API documentation browser for GTK+ and GNOME"
+url="https://wiki.gnome.org/Apps/Devhelp"
+arch="all !mips64 !riscv64" # limited by webkit2gtk
+license="GPL-2.0-or-later"
+depends="gsettings-desktop-schemas"
+makedepends="meson gobject-introspection-dev gsettings-desktop-schemas-dev
+	webkit2gtk-dev amtk-dev glib-dev itstool"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+source="https://download.gnome.org/sources/devhelp/${pkgver%.*}/devhelp-$pkgver.tar.xz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+4c541db9a2222dce4064f401c1d0a9f3233e2dbab17206358dfcce360286f69698248d08172fb236a692b125d8cd3a5bb76b6377b01b52c3d096fa4528400acd  devhelp-40.1.tar.xz
+"

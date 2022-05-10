@@ -1,0 +1,32 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=vala-language-server
+pkgver=0.48.3
+pkgrel=0
+pkgdesc="Code Intelligence for Vala"
+url="https://github.com/Prince781/vala-language-server"
+arch="all"
+license="LGPL-2.1-or-later"
+makedepends="meson vala json-glib-dev glib-dev libgee-dev jsonrpc-glib-dev scdoc"
+subpackages="$pkgname-dbg $pkgname-doc"
+source="https://github.com/Prince781/vala-language-server/releases/download/$pkgver/vala-language-server-$pkgver.tar.xz"
+
+build() {
+	abuild-meson \
+		-Ddefault_library=shared \
+		-Dbuilder_abi=3.40 \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+625ccc55fd2ce0e2151632ea5ec02cbfbfcf4ebab5139b8543569d8b37d1d8b0733df7905e05e081c8be35c2829282635b50612d7a4b3bdf9318d2ef859f7161  vala-language-server-0.48.3.tar.xz
+"

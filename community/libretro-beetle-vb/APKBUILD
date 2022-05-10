@@ -1,0 +1,23 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-beetle-vb
+pkgver=0_git20210405
+pkgrel=0
+_commit="06f9017dbaf0083ad87696728c4f404e689584c0"
+pkgdesc="standalone port of Mednafen VB to libretro"
+url="https://github.com/libretro/beetle-vb-libretro"
+arch="all"
+license="GPL-2.0-only"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/beetle-vb-libretro/archive/$_commit.tar.gz"
+builddir="$srcdir/beetle-vb-libretro-$_commit"
+options="!check" # No tests
+
+build() {
+	make
+}
+
+package() {
+	install -Dm644 mednafen_vb_libretro.so "$pkgdir"/usr/lib/libretro/mednafen_vb_libretro.so
+}
+
+sha512sums="01fc7c30d6260b922f3006dc5b31b1e2ccb71b13712cd37753d758c0a4943d04d2b589c8e6fd2ccdb599486b805822318bbc3cf77286ac013d8fc655b9be4079  libretro-beetle-vb-06f9017dbaf0083ad87696728c4f404e689584c0.tar.gz"

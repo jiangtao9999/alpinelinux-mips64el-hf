@@ -1,0 +1,67 @@
+# Contributor: Mark Riedesel <mark@klowner.com>
+# Contributor: Leon Marz <main@lmarz.org>
+# Maintainer: Mark Riedesel <mark@klowner.com>
+pkgname=opensubdiv
+pkgver=3.4.4
+_pkgver=${pkgver//./_}
+pkgrel=0
+pkgdesc="An Open-Source subdivision surface library"
+url="http://graphics.pixar.com/opensubdiv"
+arch="all !s390x !mips !mips64" # ptex isn't available on these arches
+license="Apache-2.0"
+makedepends="cmake
+	doxygen
+	glfw-dev
+	libtbb-dev
+	libxcursor-dev
+	libxi-dev
+	libxrandr-dev
+	ptex-dev
+	ptex
+	py3-docutils
+	zlib-dev
+	"
+subpackages="$pkgname-dev $pkgname-doc $pkgname-tutorials $pkgname-tools"
+source="$pkgname-$pkgver.tar.gz::https://github.com/PixarAnimationStudios/OpenSubdiv/archive/v$_pkgver.tar.gz
+	0001-remove-rpath.patch
+	"
+builddir="$srcdir/OpenSubdiv-$_pkgver"
+
+build() {
+	cmake -B build  \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DNO_CLEW=ON \
+		-DNO_CUDA=ON \
+		-DNO_GLTESTS=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+tutorials() {
+	pkgdesc="$pkgdesc (tutorials)"
+	depends="$pkgname"
+
+	mkdir -p "$subpkgdir"/usr/bin/
+	local tut; for tut in "$pkgdir"/usr/bin/tutorials/*; do
+		mv $tut "$subpkgdir"/usr/bin/opensubdiv_${tut##*/}
+	done
+	rmdir "$pkgdir"/usr/bin/tutorials
+}
+
+tools() {
+	pkgdesc="$pkgdesc (tools)"
+
+	amove usr/bin
+}
+
+sha512sums="fc8f28b79347015c8991150535c1339e695d96947c72fadd4fa27b546a0813c1125cd175ee03bed5aacdb3609f74c4e526ef70103d1195ba9f7df041e73ea9fb  opensubdiv-3.4.4.tar.gz
+2b00a32cc6708fcd0cfe54d5b4895f64f8295044fdfa1c5e7adcddb630fe6cb3564330a9ebd6b801e7469befc45a26f48aa18620f3b7cf5a27272d54cda442c0  0001-remove-rpath.patch"

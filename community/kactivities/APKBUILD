@@ -1,0 +1,46 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kactivities
+pkgver=5.88.0
+pkgrel=0
+# armhf blocked by qt5-qtdeclarative
+arch="all !armhf"
+pkgdesc="Core components for the KDE's Activities"
+url="https://community.kde.org/Frameworks"
+license="GPL-2.0-or-later AND LGPL-2.1-or-later AND (LGPL-2.1-only OR LGPL-3.0-only)"
+depends="qt5-qtbase-sqlite"
+depends_dev="
+	kconfig-dev
+	kcoreaddons-dev
+	kwindowsystem-dev
+	qt5-qtdeclarative-dev
+	"
+makedepends="$depends_dev
+	boost-dev
+	doxygen
+	extra-cmake-modules
+	qt5-qttools-dev
+	"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/kactivities-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-libs $pkgname-doc"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_QCH=ON
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+sha512sums="
+96112d7f4e5817e3dd0c0cc8e4d8e7eba7a2ed1e0a9d92da563bfad8141b340e7fff3b5e41809c8c8c9f9cae07ad7523e360da8c018d28963377736f253d8259  kactivities-5.88.0.tar.xz
+"

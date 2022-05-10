@@ -1,0 +1,39 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=intel-gmmlib
+pkgver=21.3.3
+pkgrel=0
+pkgdesc="Intel Graphics Memory Management Library"
+options="!check"
+url="https://github.com/intel/gmmlib/"
+arch="x86_64 x86"
+license="MIT"
+makedepends="cmake"
+subpackages="$pkgname-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/intel/gmmlib/archive/intel-gmmlib-$pkgver.tar.gz"
+builddir="$srcdir/gmmlib-intel-gmmlib-$pkgver"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		-DCMAKE_C_FLAGS="$CFLAGS" \
+		-Wno-dev \
+		-DRUN_TEST_SUITE=OFF \
+		$CMAKE_CROSSOPTS .
+	make -C build
+}
+
+package() {
+	make -C build DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+9680b2c38f71467a7c4f2c1a6136d1de9c906355ca675ebbafc697daea15fe615aa45f3af3140330f1610946f9c55471038eeb815b1d677b64efb4896515d8fb  intel-gmmlib-21.3.3.tar.gz
+"

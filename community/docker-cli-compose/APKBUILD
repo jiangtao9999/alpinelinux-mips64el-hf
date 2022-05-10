@@ -1,0 +1,43 @@
+# Contributor: Jake Buchholz Göktürk <tomalok@gmail.com>
+# Maintainer: Jake Buchholz Göktürk <tomalok@gmail.com>
+pkgname=docker-cli-compose
+pkgver=2.1.1
+_ver=2.1.1
+pkgrel=0
+pkgdesc="A Docker CLI plugin for extended build capabilities"
+url="https://docs.docker.com/compose/cli-command"
+arch="all"
+license="Apache-2.0"
+depends="docker-cli"
+makedepends="go"
+options="net"
+source="compose-$_ver.tar.gz::https://github.com/docker/compose/archive/v$_ver.tar.gz"
+
+_plugin_installdir="/usr/libexec/docker/cli-plugins"
+
+builddir="$srcdir"/compose-"$_ver"
+
+export GOPATH=$srcdir/go
+export GOCACHE=$srcdir/go-build
+export GOTMPDIR=$srcdir
+
+build() {
+	PKG=github.com/docker/compose/v2
+	local ldflags="-s -w -X '$PKG/internal.Version=v$_ver'"
+	go build -modcacherw -ldflags="$ldflags" -o docker-compose ./cmd
+}
+
+check() {
+	# e2e tests are excluded because they depend on live dockerd/kubernetes/ecs
+	local pkgs="$(go list -modcacherw ./... | grep -Ev '/e2e(/|$)')"
+	go test -modcacherw -short $pkgs
+	./docker-compose compose version
+}
+
+package() {
+	install -Dm755 docker-compose "$pkgdir$_plugin_installdir"/docker-compose
+}
+
+sha512sums="
+28e01f4c75f2025984c3361a203a5980792a10d8c3563fc96de1acdacce804c3fdef81a64d3a28bcae634e23d92ba7391d37f24175bb81a8cdbb12a1c6e46d61  compose-2.1.1.tar.gz
+"

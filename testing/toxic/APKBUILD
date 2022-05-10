@@ -1,0 +1,25 @@
+# Maintainer: Jonathan Sieber <mail@strfry.org>
+pkgname=toxic
+pkgver=0.11.1
+pkgrel=0
+pkgdesc="ncurses-based Tox client"
+url="https://github.com/JFreegman/toxic"
+arch="all"
+license="GPL-3.0-or-later"
+options="!check"
+subpackages="$pkgname-doc"
+makedepends="toxcore-dev libconfig-dev ncurses-dev openal-soft-dev linux-headers
+	libvpx-dev opus-dev libnotify-dev libqrencode-dev curl-dev libx11-dev"
+source="$pkgname-$pkgver.tar.gz::https://github.com/JFreegman/toxic/archive/v$pkgver.tar.gz"
+
+build() {
+	make
+}
+
+package() {
+	make PREFIX="$pkgdir"/usr install
+}
+
+sha512sums="
+53fba05271020547e779d63bea777f90f56b61e3eb2775afabe92e047a8347b4a9166628bb59d2eaab2e36a1121d791206ac68ff6604cb06fac6aaddbb05e787  toxic-0.11.1.tar.gz
+"

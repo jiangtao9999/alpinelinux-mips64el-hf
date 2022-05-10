@@ -1,0 +1,35 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=freac
+pkgver=1.1.5
+pkgrel=0
+arch="all"
+url="https://www.freac.org/"
+pkgdesc="Audio converter and CD ripper with support for various popular formats and encoders"
+license="GPL-2.0-or-later"
+makedepends="
+	boca-dev
+	eudev-dev
+	smooth-dev
+	"
+source="https://github.com/enzo1982/freac/archive/v$pkgver/freac-v$pkgver.tar.gz"
+subpackages="$pkgname-doc"
+options="!check" # No tests
+
+prepare() {
+	default_prepare
+
+	find . -type f -exec sed -i 's|/usr/local|/usr|g' {} \;
+}
+
+build() {
+	make
+}
+
+package() {
+	DESTDIR="$pkgdir" make install
+}
+
+sha512sums="
+335234f5f78fef948d1c049b0fcc2100102084fa8240cbc1b51da99cb19f598d5296fc4dbd769fc561a4b01ea3281a328ec82d33712751569a85f6828e64a908  freac-v1.1.5.tar.gz
+"

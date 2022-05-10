@@ -1,0 +1,118 @@
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Maintainer: Carlo Landmeter <clandmeter@alpinelinux.org>
+pkgname=font-noto
+pkgver=0_git20211101
+_commit=364fb14e20f82887280f103f638ff6450dbfc525
+pkgrel=0
+pkgdesc="Google's font family that aims to support all the world's languages"
+url="https://github.com/googlefonts/noto-fonts/"
+arch="noarch"
+license="OFL-1.1"
+depends="fontconfig"
+options="!check" # No test suite
+source="https://github.com/googlefonts/noto-fonts/archive/$_commit/noto-fonts-$_commit.tar.gz"
+builddir="$srcdir/noto-fonts-$_commit"
+#
+# NOTE: sort list by string length >
+# to prevent find doing partial matching
+#
+_langs="
+	egyptianhieroglyphs
+	adlamunjoined
+	glagolitic
+	devanagari
+	oldturkic
+	malayalam
+	cuneiform
+	tifinagh
+	gurmukhi
+	gujarati
+	georgian
+	ethiopic
+	cherokee
+	armenian
+	tibetan
+	sinhala
+	shavian
+	osmanya
+	olchiki
+	myanmar
+	mandaic
+	kayahli
+	kannada
+	deseret
+	cypriot
+	bengali
+	avestan
+	thaana
+	telugu
+	hebrew
+	gothic
+	chakma
+	carian
+	arabic
+	tamil
+	osage
+	oriya
+	khmer
+	buhid
+	bamum
+	adlam
+	thai
+	lisu
+	vai
+	nko
+	lao
+	"
+for _lang in $_langs; do
+	subpackages="$subpackages $pkgname-$_lang:_split"
+done
+subpackages="$subpackages font-croscore:croscore $pkgname-extra $pkgname-all:noto_all"
+
+package() {
+	mkdir -p "$pkgdir"/usr/share/fonts/noto
+	install -m644 "$builddir"/hinted/ttf/*/*.ttf \
+		"$pkgdir"/usr/share/fonts/noto/
+}
+
+extra()	{
+	pkgdesc="$pkgdesc (additional variants)"
+	mkdir -p "$subpkgdir"/usr/share/fonts/noto
+	local font
+	for font in Condensed SemiBold Extra; do
+		mv "$pkgdir"/usr/share/fonts/noto/*${font}*.ttf \
+			"$subpkgdir"/usr/share/fonts/noto
+	done
+}
+
+croscore() {
+	pkgdesc="Chrome OS core fonts"
+	mkdir -p "$subpkgdir"/usr/share/fonts/noto
+	local font
+	for font in Arimo Cousine Tinos; do
+		mv "$pkgdir"/usr/share/fonts/noto/${font}*.ttf \
+			"$subpkgdir"/usr/share/fonts/noto
+	done
+}
+
+_split() {
+	local lang=${subpkgname##*-}
+	pkgdesc="$pkgdesc ($lang)"
+	mkdir -p "$subpkgdir"/usr/share/fonts/noto
+	find "$pkgdir"/usr/share/fonts/noto \
+		-iname "Noto*${lang}*.ttf" -exec \
+		mv {} "$subpkgdir"/usr/share/fonts/noto \;
+}
+
+noto_all() {
+	pkgdesc="$pkgdesc (meta package)"
+	mkdir -p "$subpkgdir"
+	depends="$pkgname font-croscore $pkgname-extra"
+	for _lang in $_langs; do
+		depends="$depends $pkgname-$_lang"
+	done
+}
+
+sha512sums="
+cb484098015a6847c1b2538635f5bc92e7fc50d1ffd9fbd406ae086b4c0dd8ae9a504ac6cf65320cc96c13a5b7462463466e72799a7facd116bcb092b9142452  noto-fonts-364fb14e20f82887280f103f638ff6450dbfc525.tar.gz
+"

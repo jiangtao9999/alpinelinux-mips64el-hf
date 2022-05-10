@@ -1,0 +1,50 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Contributor: Natanael Copa <ncopa@alpinelinux.org>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=pango
+pkgver=1.48.10
+pkgrel=0
+pkgdesc="library for layout and rendering of text"
+url="https://www.pango.org/"
+arch="all"
+license="LGPL-2.1-or-later"
+depends_dev="pango-tools=$pkgver-r$pkgrel"
+makedepends="meson cairo-dev expat-dev gobject-introspection-dev help2man
+	fontconfig-dev glib-dev harfbuzz-dev libxft-dev fribidi-dev
+	gtk-doc"
+checkdepends="ttf-dejavu ttf-cantarell ttf-droid ttf-tlwg"
+install="$pkgname.pre-deinstall"
+triggers="$pkgname.trigger=/usr/lib/pango/*/modules"
+subpackages="$pkgname-dbg $pkgname-dev $pkgname-doc $pkgname-tools"
+source="https://download.gnome.org/sources/pango/${pkgver%.*}/pango-$pkgver.tar.xz
+	"
+
+# secfixes:
+#   1.44.1-r0:
+#     - CVE-2019-1010238
+
+build() {
+	abuild-meson \
+		-Dintrospection=enabled \
+		-Dgtk_doc=false \
+		build
+	meson compile ${JOBS:+-j ${JOBS}} -C build
+}
+
+check() {
+	meson test --no-rebuild -v -C build
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C build
+}
+
+tools() {
+	pkgdesc="$pkgdesc (tools)"
+	mkdir -p "$subpkgdir"/usr/bin
+	mv "$pkgdir"/usr/bin/* "$subpkgdir"/usr/bin
+}
+
+sha512sums="
+f9acdfb3fde50e8fb4b3dfad329624754ef7cb1c6ff6d80485c1fc7a24d92095b7e9053cd8713a291fbee68cd1cd699dcdb8110265b44e97a34c5b4ef0c06390  pango-1.48.10.tar.xz
+"

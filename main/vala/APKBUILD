@@ -1,0 +1,35 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Contributor: Natanael Copa <ncopa@alpinelinux.org>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=vala
+pkgver=0.54.3
+pkgrel=0
+pkgdesc="Compiler for the GObject type system"
+url="https://wiki.gnome.org/Projects/Vala"
+arch="all"
+license="LGPL-2.0-or-later"
+subpackages="$pkgname-dbg $pkgname-doc"
+depends="glib-dev"
+makedepends="libxslt-dev bash flex bison gobject-introspection-dev graphviz-dev"
+checkdepends="dbus-x11"
+source="https://download.gnome.org/sources/vala/${pkgver%.*}/vala-$pkgver.tar.xz"
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+dbba5adcab21eb172ca8adc276864e65f87215a754a592bb294e347b85c159744eb02cfc65be6dc0392b875477cc2eecf3baa0d070902c903e602e2eeac2b6de  vala-0.54.3.tar.xz
+"

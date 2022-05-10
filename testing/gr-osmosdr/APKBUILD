@@ -1,0 +1,49 @@
+# Contributor: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+# Maintainer: Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+pkgname=gr-osmosdr
+pkgver=0.2.3
+pkgrel=0
+pkgdesc="osmocom Gnu Radio Blocks"
+url="https://osmocom.org/projects/gr-osmosdr/wiki"
+arch="x86_64 aarch64" # limited by libvolk and gnuradio
+license="GPL-3.0-only"
+subpackages="$pkgname-doc"
+makedepends="
+	boost-dev
+	cmake
+	doxygen
+	fftw-dev
+	gmp-dev
+	gnuradio-dev
+	graphviz
+	hackrf
+	librtlsdr-dev
+	libvolk-dev
+	log4cpp-dev
+	mpir-dev
+	python3-dev
+	soapy-sdr-dev
+	swig
+	"
+source="$pkgname-$pkgver.tar.gz::https://github.com/osmocom/gr-osmosdr/archive/v$pkgver.tar.gz"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-Wno-dev
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+
+check() {
+	cmake --build build --target test
+}
+
+sha512sums="
+3c82a39972a309aa5b023b9c5e61f1fc80b797380b7a6c6c23cd4fe278cfaba3ab3019f32d38ebc01300868bb892f6aaaa7f12c9ee9b7ab5ba3e38817a40bf3e  gr-osmosdr-0.2.3.tar.gz
+"

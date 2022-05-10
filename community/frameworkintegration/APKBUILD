@@ -1,0 +1,50 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=frameworkintegration
+pkgver=5.88.0
+pkgrel=0
+pkgdesc="Framework providing components to allow applications to integrate with a KDE Workspace"
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit -> knewstuff
+arch="all !armhf !mips64 !s390x !riscv64"
+url="https://www.kde.org"
+license="LGPL-2.1-or-later"
+depends_dev="
+	appstream-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	ki18n-dev
+	kiconthemes-dev
+	knewstuff-dev
+	knotifications-dev
+	kpackage-dev
+	kwidgetsaddons-dev
+	qt5-qtbase-dev
+	"
+makedepends="$depends_dev
+	extra-cmake-modules
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/frameworks/${pkgver%.*}/frameworkintegration-$pkgver.tar.xz"
+subpackages="$pkgname-dev"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+50944c4eaf40213cbb25f19bd35fa1e410778791c8a993b75ffed922f8e07d984735a0a6362bb2598dca085be7739e4981d0469bd07783b2276d3bb564274e0d  frameworkintegration-5.88.0.tar.xz
+"

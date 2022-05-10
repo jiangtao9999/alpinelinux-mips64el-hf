@@ -1,0 +1,41 @@
+# Contributor: Leon Marz <main@lmarz.org>
+# Maintainer: Leon Marz <main@lmarz.org>
+pkgname=cglm
+pkgver=0.8.4
+pkgrel=0
+pkgdesc="Highly Optimized Graphics Math (glm) for C"
+url="https://github.com/recp/cglm"
+arch="all"
+license="MIT"
+makedepends="autoconf automake libtool py3-sphinx py3-sphinx_rtd_theme"
+subpackages="$pkgname-dev $pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/recp/cglm/archive/v$pkgver.tar.gz"
+
+prepare() {
+	default_prepare
+	sh autogen.sh
+}
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr
+	make
+	cd "docs"
+	sphinx-build source build
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+	mkdir -p "$pkgdir/usr/share/doc/cglm"
+	cp -a docs/build "$pkgdir/usr/share/doc/cglm"
+}
+
+sha512sums="
+507875119eac77cb3f60fe2353cd92b39f50605fdbf68f56d27b7062b7ec6b1cadd868f70c059ebde17adaf4a9167e5082c0151f1af5b0a5e751864a1eca1fa8  cglm-0.8.4.tar.gz
+"

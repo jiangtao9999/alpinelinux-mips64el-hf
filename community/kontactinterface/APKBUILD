@@ -1,0 +1,43 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kontactinterface
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kparts
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://kontact.kde.org/"
+pkgdesc="Kontact Plugin Interface Library"
+license="LGPL-2.0-only OR LGPL-3.0-only"
+depends_dev="
+	kcoreaddons-dev
+	ki18n-dev
+	kiconthemes-dev
+	kparts-dev
+	kwindowsystem-dev
+	kxmlgui-dev
+	"
+makedepends="$depends_dev extra-cmake-modules"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kontactinterface-$pkgver.tar.xz"
+subpackages="$pkgname-dev $pkgname-lang"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+a56f840b3bccc26a0f9bb50c5bb16e7b2fd25442136e7852ee101169f4c3746b64a64e1910cd6780f63a7c5ebaa901d7fef7e8cf6adbeb8b3df662fbb93c74e6  kontactinterface-21.08.3.tar.xz
+"

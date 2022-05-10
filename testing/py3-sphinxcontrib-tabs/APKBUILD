@@ -1,0 +1,27 @@
+# Contributor: Duncan Bellamy <dunk@denkimushi.com>
+# Maintainer: Duncan Bellamy <dunk@denkimushi.com>
+pkgname=py3-sphinxcontrib-tabs
+pkgver=3.2.0
+pkgrel=0
+pkgdesc="Create tabbed content in Sphinx documentation when building HTML"
+url="https://github.com/executablebooks/sphinx-tabs"
+arch="noarch"
+license="MIT"
+#test files are not included in pypi archive
+options="!check"
+depends="python3"
+makedepends="py3-setuptools"
+source="https://files.pythonhosted.org/packages/source/s/sphinx-tabs/sphinx-tabs-$pkgver.tar.gz"
+builddir="$srcdir/sphinx-tabs-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+965086fce54ea87803b85a36d2f2f56b863d82f14fbcabfd85adb98bf665b539bfca75758e87686b094a3e4c396ed890d66ecef32b5791037a5e56ef41b0daa2  sphinx-tabs-3.2.0.tar.gz
+"

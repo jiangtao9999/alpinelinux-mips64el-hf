@@ -1,0 +1,26 @@
+# Contributor: TBK <alpine@jjtc.eu>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=libportal
+pkgver=0.4
+pkgrel=0
+pkgdesc="GIO-style async APIs for most Flatpak portals"
+url="https://github.com/flatpak/libportal"
+arch="all"
+license="GPL-2.0-or-later"
+makedepends="meson glib-dev gtk-doc"
+subpackages="$pkgname-dev $pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/flatpak/libportal/archive/$pkgver.tar.gz"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+sha512sums="3c00923b438918484d681bc47b58254f8291f2cc557aa2c5f4a826fb71d370d387083433b684a74f0a3ea7aec510d98318d1a3e07f8b60f87e01a25790f434d9  libportal-0.4.tar.gz"

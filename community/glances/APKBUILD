@@ -1,0 +1,36 @@
+# Contributor: Łukasz Jendrysik <scadu@yandex.com>
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=glances
+pkgver=3.2.3.1
+pkgrel=0
+pkgdesc="CLI curses based monitoring tool"
+url="http://nicolargo.github.com/glances/"
+arch="noarch"
+license="LGPL-3.0-or-later"
+depends="py3-future py3-psutil py3-bottle py3-snmp py3-batinfo docker-py py3-defusedxml"
+makedepends="py3-setuptools"
+subpackages="$pkgname-doc"
+source="glances-$pkgver.tar.gz::https://github.com/nicolargo/glances/archive/v$pkgver.tar.gz"
+options="!check"  # tests fail on builder infra due to env. limitations
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 unitest.py
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+
+	# Remove images and HTML doc depending on those
+	rm -rf "$pkgdir"/usr/share/doc/$pkgname/$pkgname-doc.html \
+		"$pkgdir"/usr/share/doc/$pkgname/images
+}
+
+sha512sums="
+3c6908a15faa3088cedbe4da964ca574e062e425b3a1211899a5d2e960679571c6af7f5c5b67024838a1c7def8afb68ee9c83d919d10e5b262f3113d9bf51e73  glances-3.2.3.1.tar.gz
+"

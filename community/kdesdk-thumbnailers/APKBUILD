@@ -1,0 +1,43 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kdesdk-thumbnailers
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://www.kde.org/applications/development/"
+pkgdesc="Plugins for the thumbnailing system"
+license="GPL-2.0-only OR GPL-3.0-only"
+makedepends="
+	extra-cmake-modules
+	gettext-dev
+	kconfig-dev
+	ki18n-dev
+	kio-dev
+	qt5-qtbase-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kdesdk-thumbnailers-$pkgver.tar.xz"
+subpackages="$pkgname-lang"
+options="!check" # No tests
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+2b50d1dc391e2585bad3b2b97b93738a1945b0e36b49ae6d5fef8124c6bb0fa66d1c4d72d9bd577737a13777247f787a8fdb71e2897da0e0e08b73e7125c45b0  kdesdk-thumbnailers-21.08.3.tar.xz
+"

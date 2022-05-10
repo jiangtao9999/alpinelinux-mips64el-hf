@@ -1,0 +1,23 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-sameboy
+pkgver=0_git20210314
+pkgrel=0
+_commit="d478d3e0d98ea6bd7d9cde5b9feccbf3fd52631d"
+pkgdesc="Gameboy and Gameboy Color emulator for libretro"
+url="https://github.com/libretro/SameBoy"
+arch="all"
+license="MIT"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/SameBoy/archive/$_commit.tar.gz"
+builddir="$srcdir/SameBoy-$_commit"
+options="!check" # No tests
+
+build() {
+	make -C libretro
+}
+
+package() {
+	install -Dm644 libretro/sameboy_libretro.so "$pkgdir"/usr/lib/libretro/sameboy_libretro.so
+}
+
+sha512sums="2abb37c76d790e8cf4664ecc348f6c64c86181da55e659dba993d86142bd8472f8e04b9ece8c242d1b04b255766f5e9d96517b7300d79f474725da8d32a4f125  libretro-sameboy-d478d3e0d98ea6bd7d9cde5b9feccbf3fd52631d.tar.gz"

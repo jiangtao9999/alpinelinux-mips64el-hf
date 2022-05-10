@@ -1,0 +1,25 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer:
+pkgname=onefetch
+pkgver=2.10.2
+pkgrel=1
+pkgdesc="Git repository summary on your terminal"
+url="https://github.com/o2sh/onefetch"
+arch="all !s390x !mips !mips64 !riscv64"
+license="MIT"
+makedepends="cargo libgit2-dev zlib-dev"
+source="$pkgname-$pkgver.tar.gz::https://crates.io/api/v1/crates/onefetch/$pkgver/download"
+
+build() {
+	cargo build --release --locked
+}
+
+check() {
+	cargo test --release --locked
+}
+
+package() {
+	install -Dm0755 target/release/onefetch "$pkgdir"/usr/bin/onefetch
+}
+
+sha512sums="35699f0e50250be1efb92f2c8182ffd27e7842fe732b205c08b80e79ef1bc1b6a1f5c5dc9799e9c2555de50a489b9c642d0ce2478aaee270979c4505692fd883  onefetch-2.10.2.tar.gz"

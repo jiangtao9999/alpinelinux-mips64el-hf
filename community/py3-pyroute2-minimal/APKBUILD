@@ -1,0 +1,26 @@
+# Maintainer: Thomas Liske <thomas@fiasko-nw.net>
+pkgname=py3-pyroute2-minimal
+_pkgname=pyroute2.minimal
+pkgver=0.6.5
+pkgrel=0
+pkgdesc="Python Netlink library: minimal installation"
+url="https://github.com/svinota/pyroute2"
+arch="noarch"
+license="GPL-2.0-or-later OR Apache-2.0"
+makedepends="py3-setuptools"
+depends="!py3-pyroute2 py3-pyroute2.core"
+options="!check" # not supported for pr2modules namespace
+source="https://files.pythonhosted.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+00c274b396ed2a35375fb18ce4b71fd2ebdd73be93ed353f289d678261a05a33753b90ae9e75ba9e64c0522a2e649c31cb2e5f1f6b9d6c643de3c5b872c7669f  pyroute2.minimal-0.6.5.tar.gz
+"

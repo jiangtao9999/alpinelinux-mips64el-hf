@@ -1,0 +1,37 @@
+# Contributor: Rasmus Thomsen <oss@cogitri.dev>
+# Maintainer: Rasmus Thomsen <oss@cogitri.dev>
+pkgname=gnome-desktop
+pkgver=41.1
+pkgrel=0
+pkgdesc="GNOME desktop core libraries"
+url="https://gitlab.gnome.org/GNOME/gnome-desktop"
+arch="all !s390x" # s390x: build fails
+license="GPL-2.0-or-later AND LGPL-2.1-or-later"
+depends_dev="gobject-introspection-dev gsettings-desktop-schemas-dev
+	gtk+3.0-dev"
+makedepends="$depends_dev eudev-dev iso-codes-dev libseccomp-dev libx11-dev
+	itstool libxml2-utils gtk-doc meson glib-dev xkeyboard-config"
+depends="bubblewrap musl-locales"
+options="!check" # Can't find its own GSettings schemas
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang $pkgname-dbg"
+source="https://download.gnome.org/sources/gnome-desktop/${pkgver%.*}/gnome-desktop-$pkgver.tar.xz
+	"
+
+build() {
+	abuild-meson \
+		-Dgnome_distributor="Alpine Linux" \
+		-Dudev=enabled \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+sha512sums="
+dd90ebfe54f4af614c0f21544c50fa0853db520749a6dd710d493e8f86a498369a66413d3442e985cb5cca4dad05c90a3e24d8d0c634bd7994e4d83c6d1ec762  gnome-desktop-41.1.tar.xz
+"

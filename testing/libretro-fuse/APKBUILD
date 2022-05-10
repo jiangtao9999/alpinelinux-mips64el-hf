@@ -1,0 +1,23 @@
+# Contributor: David Demelier <markand@malikania.fr>
+# Maintainer: David Demelier <markand@malikania.fr>
+pkgname=libretro-fuse
+pkgver=0_git20210419
+pkgrel=0
+_commit="330655e4735ce2ace887dcc641a837fb5747d47f"
+pkgdesc="port of the Fuse Unix Spectrum Emulator to libretro"
+url="https://github.com/libretro/fuse-libretro"
+arch="all"
+license="GPL-3.0-only"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/fuse-libretro/archive/$_commit.tar.gz"
+builddir="$srcdir/fuse-libretro-$_commit"
+options="!check" # No tests
+
+build() {
+	make -f Makefile.libretro
+}
+
+package() {
+	install -Dm644 fuse_libretro.so "$pkgdir"/usr/lib/libretro/fuse_libretro.so
+}
+
+sha512sums="425b00bb91611b827d9c8ab418e6ea0de27671799e1a9cadcf7d87cdc4c166eae262949026f734609ce170d86adbabc5e31a6f76bb1eb1937a109a7206a7ad22  libretro-fuse-330655e4735ce2ace887dcc641a837fb5747d47f.tar.gz"

@@ -1,0 +1,31 @@
+# Contributor: Emanuele Sorce <emanuele.sorce@hotmail.com>
+# Maintainer: Emanuele Sorce <emanuele.sorce@hotmail.com>
+pkgname=sturmreader
+pkgver=3.5.2
+pkgrel=0
+pkgdesc="E-Book and comic reader for mobile devices"
+url="https://gitlab.com/tronfortytwo/sturmreader"
+arch="aarch64 armv7 x86 x86_64" # Limited by qt5-qtwebengine
+license="GPL-3.0-or-later"
+depends="qt5-qtsvg qt5-qtbase-sqlite qt5-qtwebengine qt5-qtquickcontrols"
+makedepends="cmake qt5-qtdeclarative-dev qt5-qtquickcontrols2-dev qt5-qtsvg-dev
+	qt5-qtlocation-dev qt5-qtwebengine-dev qt5-qtwebchannel-dev poppler-qt5-dev
+	quazip-dev gettext-dev libintl"
+subpackages="$pkgname-lang"
+source="https://gitlab.com/tronfortytwo/sturmreader/-/archive/$pkgver/sturmreader-$pkgver.tar.gz"
+
+# Sturm reader has no testing! Not even a --version thing
+options="!check"
+
+build() {
+	cmake -DCLICK_MODE=OFF . -B build
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+c7dd34e4b22a1e175031b52208ba51787d2d6359a1f4c766125f7a906d853b0386597e2aa6add3eae9805704539dd31eb52c6db296981534ecb5188a88e8b3e0  sturmreader-3.5.2.tar.gz
+"

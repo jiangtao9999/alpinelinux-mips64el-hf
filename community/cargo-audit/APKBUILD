@@ -1,0 +1,38 @@
+# Contributor: kpcyrd <git@rxv.cc>
+# Maintainer: kpcyrd <git@rxv.cc>
+pkgname=cargo-audit
+pkgver=0.16.0
+pkgrel=0
+pkgdesc="Audit Cargo.lock for crates with security vulnerabilities"
+url="https://github.com/RustSec/rustsec"
+# mips64, s390x and riscv64 blocked by cargo
+arch="all !mips64 !s390x !riscv64"
+license="MIT OR Apache-2.0"
+makedepends="cargo openssl1.1-compat-dev"
+subpackages="$pkgname-doc"
+options="net"
+source="$pkgname-$pkgver.tar.gz::https://github.com/RustSec/cargo-audit/archive/cargo-audit/v$pkgver.tar.gz"
+builddir="$srcdir/rustsec-$pkgname-v$pkgver/$pkgname"
+
+prepare() {
+	default_prepare
+
+	cargo fetch --locked
+}
+
+build() {
+	cargo build --release --frozen
+}
+
+check() {
+	cargo test --release --frozen
+}
+
+package() {
+	install -Dm 755 ../target/release/cargo-audit -t "$pkgdir/usr/bin"
+	install -Dm 644 -t "$pkgdir/usr/share/doc/cargo-audit" README.md
+}
+
+sha512sums="
+cc04c86224cd3120abc97b26ac31471cf69550fc9272eb5fb7022703b22a1b7af582d7bb974aeb359605abd363a9d5c7cab684ac304ad636058a546dc85890d7  cargo-audit-0.16.0.tar.gz
+"

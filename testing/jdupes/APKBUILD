@@ -1,0 +1,23 @@
+# Contributor: tcely <tcely@users.noreply.github.com>
+# Maintainer: Roberto Oliveira <robertoguimaraes8@gmail.com>
+pkgname=jdupes
+pkgver=1.19.1
+pkgrel=0
+pkgdesc="identifying and taking actions upon duplicate files"
+options="!check" # No testsuite
+url="https://github.com/jbruchon/jdupes"
+arch="all"
+license="MIT"
+subpackages="$pkgname-doc"
+makedepends="linux-headers"
+source="$pkgname-$pkgver.tar.gz::https://github.com/jbruchon/jdupes/archive/v$pkgver.tar.gz"
+
+build() {
+	make ENABLE_DEDUPE=1
+}
+
+package() {
+	make DESTDIR="$pkgdir" PREFIX=/usr install
+}
+
+sha512sums="ffae61dba438ee24199ff983cb6b2a2abff6470082bc6d7e95c7432b8b05a1739cf4ded6ebb9542d1f4a52b57ff0ac450e052b049f3c7e3060304ad6b09a05b4  jdupes-1.19.1.tar.gz"

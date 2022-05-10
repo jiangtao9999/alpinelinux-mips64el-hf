@@ -1,0 +1,29 @@
+# Contributor: Anjandev Momi <anjan@momi.ca>
+# Maintainer: Anjandev Momi <anjan@momi.ca>
+pkgname=editorconfig-checker
+pkgver=2.3.5
+pkgrel=2
+pkgdesc="A tool to verify that your files are in harmony with your .editorconfig"
+url="https://editorconfig-checker.github.io/"
+license="MIT"
+arch="all"
+makedepends="go"
+options="!check chmod-clean" # tests broken
+builddir="$srcdir/github.com/editorconfig-checker/$pkgname"
+source="$pkgname-$pkgver.tar.gz::https://github.com/editorconfig-checker/editorconfig-checker/archive/$pkgver.tar.gz"
+
+prepare() {
+	mkdir -p "$srcdir/github.com/editorconfig-checker"
+	mv "$srcdir/$pkgname-$pkgver" "$srcdir/github.com/editorconfig-checker/editorconfig-checker"
+	default_prepare
+}
+
+build() {
+	GOPATH="$srcdir" make build
+}
+
+package() {
+	install -Dm755 "$builddir/bin/ec" -t "$pkgdir/usr/bin"
+}
+
+sha512sums="4ab67309836dc02f046a042026c73148793c222bb19483d97c4612a1e0bc46d21bfc0ebc8a43364b24972c760e5a8eedee6a6b1430537bcb66244c04c788fd66  editorconfig-checker-2.3.5.tar.gz"

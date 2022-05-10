@@ -1,0 +1,87 @@
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=gst-plugins-good
+pkgver=1.18.5
+pkgrel=0
+pkgdesc="GStreamer streaming media framework good plug-ins"
+url="https://gstreamer.freedesktop.org"
+arch="all"
+license="GPL-2.0-or-later LGPL-2.0-or-later"
+subpackages="$pkgname-lang $pkgname-gtk"
+replaces="gst-plugins-good1"
+makedepends="cairo-dev flac-dev gdk-pixbuf-dev glib-dev gst-plugins-base-dev
+	gstreamer-dev gtk+3.0-dev jack-dev lame-dev libavc1394-dev libcaca-dev
+	libdv-dev libgudev-dev libice-dev libiec61883-dev libjpeg-turbo-dev
+	libogg-dev libpng-dev libshout-dev libsm-dev libsoup-dev libvpx-dev
+	libxdamage-dev libxext-dev libxv-dev linux-headers meson mpg123-dev
+	orc-compiler orc-dev taglib-dev v4l-utils-dev wavpack-dev zlib-dev
+	pulseaudio-dev"
+ldpath="/usr/lib/gstreamer-1.0"
+source="https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-$pkgver.tar.xz"
+options="!check" # elements/souphttpsrc fails
+
+case "$CARCH" in
+	armhf) ;;
+	*)
+		makedepends="$makedepends qt5-qtdeclarative-dev qt5-qtx11extras-dev"
+		subpackages="$subpackages $pkgname-qt"
+	;;
+esac
+
+# secfixes:
+#   1.18.4-r0:
+#     - CVE-2021-3497
+#     - CVE-2021-3498
+#   1.10.4-r0:
+#     - CVE-2017-5840
+#     - CVE-2017-5841
+#     - CVE-2017-5845
+#     - CVE-2016-9634
+#     - CVE-2016-9635
+#     - CVE-2016-9636
+#     - CVE-2016-9808
+#     - CVE-2016-10198
+#     - CVE-2016-10199
+
+build() {
+	abuild-meson \
+		-Dpackage-origin="https://alpinelinux.org" \
+		-Dpackage-name="GStreamer good plug-ins (Alpine Linux)" \
+		. output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	make check
+}
+
+package() {
+	export GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+_mv() {
+	mkdir -p "$subpkgdir"/"$ldpath"
+	mv "$1" "$subpkgdir"/"$ldpath"
+}
+
+qt() {
+	pkgdesc="Gstreamer Qt plug-in"
+	find "$pkgdir" -type f | while read -r i; do
+		if ldd $i 2>/dev/null | grep -q "libQt"; then
+			_mv "$i"
+		fi
+	done
+}
+
+gtk() {
+	pkgdesc="Gstreamer gtk-3 plug-in"
+	find "$pkgdir" -type f | while read -r i; do
+		if ldd $i 2>/dev/null | grep -q "libgtk-3"; then
+			_mv "$i"
+		fi
+	done
+}
+
+sha512sums="
+c872f3bb1d5e8f1dcc9a226d161299de5113bc20694ef8c6b6d426f536e8b259a1751951fb69c9a7507ad42ef77b91aae9e4f6e957502dc94f48ed023ee70433  gst-plugins-good-1.18.5.tar.xz
+"

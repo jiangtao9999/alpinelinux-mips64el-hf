@@ -1,0 +1,67 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kio-extras
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# s390x, mips64 and riscv64 blocked by polkit -> kio
+arch="all !armhf !s390x !mips64 !riscv64"
+url="https://www.kde.org/applications/internet/"
+pkgdesc="Additional components to increase the functionality of KIO"
+license="GPL-2.0-or-later (LGPL-2.1-only OR LGPL-3.0-only)"
+depends="kinit"
+makedepends="
+	extra-cmake-modules
+	gperf
+	kactivities-dev
+	karchive-dev
+	kbookmarks-dev
+	kconfig-dev
+	kconfigwidgets-dev
+	kcoreaddons-dev
+	kdbusaddons-dev
+	kdnssd-dev
+	kdoctools-dev
+	kdsoap-dev
+	kguiaddons-dev
+	khtml-dev
+	ki18n-dev
+	kiconthemes-dev
+	kio-dev
+	kpty-dev
+	libmtp-dev
+	libssh-dev
+	nfs-utils-dev
+	phonon-dev
+	qt5-qtbase-dev
+	qt5-qtsvg-dev
+	samba-dev
+	shared-mime-info
+	solid-dev
+	syntax-highlighting-dev
+	"
+checkdepends="xvfb-run"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kio-extras-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # Requires running dbus-server
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+404eefda445391c2e20f0f7ce6103aa787af050fe6419f65c0153f69c19ed81d62479c2296c5e4b3abd8c0b4971ec102a94a858f7085f5af20eb75cdacc07095  kio-extras-21.08.3.tar.xz
+"

@@ -1,0 +1,43 @@
+# Contributor: Oleg Titov <oleg.titov@gmail.com>
+# Maintainer: Oleg Titov <oleg.titov@gmail.com>
+pkgname=libzim
+pkgver=6.3.0
+pkgrel=2
+pkgdesc="Reference implementation of the ZIM file format"
+url="https://openzim.org/"
+arch="all !mips !mips64" # tests crash
+license="GPL-2.0-or-later"
+makedepends="
+	icu-dev
+	libexecinfo-dev
+	meson
+	xapian-core-dev
+	xz-dev
+	zlib-dev
+	zstd-dev
+	"
+checkdepends="
+	cython
+	gtest-dev
+	python3-dev
+	"
+subpackages="$pkgname-dev $pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/openzim/libzim/archive/$pkgver.tar.gz"
+
+build() {
+	LDFLAGS="$LDFLAGS -lexecinfo"
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+check() {
+	meson test --no-rebuild -v -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+
+	install -Dm 644 -t "$pkgdir/usr/share/doc/$pkgname/" README.md
+}
+
+sha512sums="822e293bb1dc376256063326951571b705e5735132a137f5966d0f6ed0bb8c8289765680503b449c271ffce7e771da1f304d9ab9455cfc968a2d9943a5955090  libzim-6.3.0.tar.gz"

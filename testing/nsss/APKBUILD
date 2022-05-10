@@ -1,0 +1,37 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Maintainer: Laurent Bercot <ska-devel@skarnet.org>
+pkgname=nsss
+pkgver=0.2.0.0
+pkgrel=1
+pkgdesc=" A small and statically linkable alternative to Name Service Switch"
+url="https://skarnet.org/software/nsss"
+arch="all"
+license="ISC"
+makedepends="skalibs-dev>=2.11"
+subpackages="$pkgname-dev $pkgname-doc"
+source="https://skarnet.org/software/nsss/nsss-$pkgver.tar.gz"
+
+build() {
+	./configure \
+		--enable-shared \
+		--enable-static \
+		--disable-allstatic \
+		--prefix=/usr \
+		--libdir=/usr/lib \
+		--libexecdir="/usr/lib/$pkgname" \
+		--with-dynlib=/lib
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+doc() {
+	default_doc
+	mkdir -p "$subpkgdir/usr/share/doc"
+	cp -a "$builddir/doc" "$subpkgdir/usr/share/doc/$pkgname"
+}
+sha512sums="
+42779a1f1e6ee8b47bc65648fd88cda41fe3a666ec39bbd26538f901230410f22d3b7395b9e92ea4e56dd0b5560d81a6c60ce5d06e5c41fb6a9176a71c51bbcf  nsss-0.2.0.0.tar.gz
+"

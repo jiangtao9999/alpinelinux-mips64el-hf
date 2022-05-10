@@ -1,0 +1,31 @@
+# Maintainer: Antoni Aloy <aaloytorrens@gmail.com>
+pkgname=lxqt-themes
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Themes for LXQt"
+url="https://github.com/lxqt/lxqt-themes"
+arch="noarch"
+license="LGPL-2.0-or-later"
+makedepends="cmake lxqt-build-tools perl-dev"
+options="!check" # No testsuite
+source="https://github.com/lxqt/lxqt-themes/releases/download/$pkgver/lxqt-themes-$pkgver.tar.xz"
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		$CMAKE_CROSSOPTS .
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --build build --target install
+}
+sha512sums="
+53cff6c9369f6d9d009426b7a7f2d1ae92f5455e35891b054fae2c24acad714dd0d7c0528de633e578128c36e619665ba744a20a968ad5e8787c6a16123b24ab  lxqt-themes-1.0.0.tar.xz
+"

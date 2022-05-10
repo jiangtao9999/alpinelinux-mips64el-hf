@@ -1,0 +1,35 @@
+# Maintainer: Francesco Colista <fcolista@alpinelinux.org>
+pkgname=py3-libvirt
+_pkgname=libvirt-python
+pkgver=7.9.0
+pkgrel=0
+pkgdesc="The libvirt virtualization API python binding"
+url="http://libvirt.org"
+# s390x, mips64 and riscv64 blocked by polkit -> libvirt
+arch="all !s390x !mips64 !riscv64"
+license="LGPL-2.0-or-later"
+makedepends="py3-setuptools python3-dev libvirt-dev"
+checkdepends="py3-pytest"
+source="https://libvirt.org/sources/python/$_pkgname-$pkgver.tar.gz
+	disable-screenshot-test.patch"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+replaces="py-libvirt" # Backwards compatibility
+provides="py-libvirt=$pkgver" # Backwards compatibility
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	python3 setup.py test
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+d147da38710853c1dcf93dc271b1d1ff32afb45e3eb5c24c931da4943827ecec0c3840b975fb40e240ec7038cc81cb7848d387e7550e4f4803f35e2d08cbedff  libvirt-python-7.9.0.tar.gz
+3d1d62a5d5283e5679dd1318a335b2785c895499f1fedae5d75947e29b0a55f6e4925108cf74e6b36f1c9f140aaf5c89171b84d8e94b1c3d3fc6fdc8c7f2f5fc  disable-screenshot-test.patch
+"

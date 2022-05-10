@@ -1,0 +1,56 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=kamoso
+pkgver=21.08.3
+pkgrel=0
+# armhf blocked by extra-cmake-modules
+# mips64, s390x and riscv64 blocked by polkit -> kio
+# ppc64le blocked by qt5-qtwebengine -> purpose
+arch="all !armhf !mips64 !s390x !riscv64 !ppc64le"
+url="https://kde.org/applications/multimedia/org.kde.kamoso"
+pkgdesc="An application to take pictures and videos out of your webcam"
+license="GPL-2.0-or-later AND LGPL-2.1-only"
+depends="
+	gst-plugins-bad
+	gst-plugins-good
+	kirigami2
+	qt5-qtquickcontrols2
+	"
+makedepends="
+	extra-cmake-modules
+	glib-dev
+	gobject-introspection-dev
+	gst-plugins-base-dev
+	gstreamer-dev
+	kconfig-dev
+	kdoctools-dev
+	ki18n-dev
+	kio-dev
+	knotifications-dev
+	purpose-dev
+	qt5-qtbase-dev
+	"
+source="https://download.kde.org/stable/release-service/$pkgver/src/kamoso-$pkgver.tar.xz"
+subpackages="$pkgname-doc $pkgname-lang"
+options="!check" # Broken
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib
+	cmake --build build
+}
+
+check() {
+	cd build
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+197a088b2b5cb15c27b023c7b00a220aeb704d4e261b7d9efdad50c91ac3b4c5a0dca287709793d280dc762c73941837133f8caba7ad12aecd8c3b3c25466b97  kamoso-21.08.3.tar.xz
+"

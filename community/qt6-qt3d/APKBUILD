@@ -1,0 +1,45 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=qt6-qt3d
+pkgver=6.2.1
+pkgrel=0
+pkgdesc="C++ and QML APIs for easy inclusion of 3D graphics"
+url="https://qt.io/"
+# s390x blocked by CMake failure
+arch="all !s390x"
+license="LGPL-2.1-only AND LGPL-3.0-only AND GPL-3.0-only AND Qt-GPL-exception-1.0"
+depends_dev="
+	qt6-qtbase-dev
+	qt6-qtdeclarative-dev
+	qt6-qtshadertools-dev
+	"
+makedepends="$depends_dev
+	cmake
+	perl
+	"
+subpackages="$pkgname-dev"
+options="!check" # No tests
+builddir="$srcdir/qt3d-everywhere-src-${pkgver/_/-}"
+
+case $pkgver in
+	*_alpha*|*_beta*|*_rc*) _rel=development_releases;;
+	*) _rel=official_releases;;
+esac
+
+source="https://download.qt.io/$_rel/qt/${pkgver%.*}/${pkgver/_/-}/submodules/qt3d-everywhere-src-${pkgver/_/-}.tar.xz"
+
+build() {
+	cmake -B build \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DINPUT_qt3d_assimp=system
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+f0fbea1534c769b5e3c79e25c334e1f3f1b00a1aaa838c52ce1cc7412d6dc1444351c432148daaf86c5c2963eb24e385ad5c7aa209e480674c8278b837e57b62  qt3d-everywhere-src-6.2.1.tar.xz
+"

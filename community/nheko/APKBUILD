@@ -1,0 +1,87 @@
+# Contributor: Leo <thinkabit.ukim@gmail.com>
+# Contributor: Sheila Aman <sheila@vulpine.house>
+# Maintainer: Sheila Aman <sheila@vulpine.house>
+pkgname=nheko
+pkgver=0.8.2
+pkgrel=7
+pkgdesc="Qt5-based client for Matrix protocol"
+url="https://github.com/Nheko-Reborn/nheko/releases"
+# armhf blocked by qt5-qtmultimedia
+arch="all !armhf"
+license="GPL-3.0-or-later"
+options="!check" # no test suite
+depends="
+	qt5-qtquickcontrols2
+	so:libgstdtls.so
+	so:libgstopus.so
+	so:libgstrtpmanager.so
+	so:libgstsrtp.so
+	so:libgstwebrtc.so
+	so:libgstcompositor.so
+	so:libgstopengl.so
+	so:libgstqmlgl.so
+	so:libgstrtp.so
+	so:libgstvpx.so
+	libnice-gstreamer
+	"
+makedepends="
+	cmake
+	ninja
+	boost-dev
+	lmdb-dev
+	lmdbxx
+	tweeny
+	qt5-qtbase-dev
+	qt5-qttools-dev
+	qt5-qtmultimedia-dev
+	qt5-qtsvg-dev
+	qt5-qtdeclarative-dev
+	qt5-qtquickcontrols2-dev
+	qt5-qtkeychain-dev
+	zlib-dev
+	openssl1.1-compat-dev
+	olm-dev
+	nlohmann-json
+	cmark-dev
+	spdlog-dev
+	mtxclient-dev
+	gstreamer-dev
+	gst-plugins-base-dev
+	gst-plugins-bad-dev
+	"
+source="$pkgname-$pkgver.tar.gz::https://github.com/Nheko-Reborn/nheko/archive/v$pkgver.tar.gz"
+
+prepare() {
+	default_prepare
+	sed -e '/-Wall/d' \
+		-e '/-Wextra/d' \
+		-e '/-Werror/d' \
+		-e '/-pedantic/d' \
+		-e '/-pipe/d' \
+		-i CMakeLists.txt
+}
+
+build() {
+	if [ "$CBUILD" != "$CHOST" ]; then
+		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
+	fi
+	cmake -B build \
+		-GNinja \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DBUILD_SHARED_LIBS=True \
+		-DCMAKE_SKIP_RPATH=True \
+		-DCMAKE_BUILD_TYPE=None \
+		$CMAKE_CROSSOPTS .
+	ninja -C build
+}
+
+check() {
+	ninja -C build check
+}
+
+package() {
+	DESTDIR="$pkgdir" ninja -C build install
+}
+
+sha512sums="907b5fd770c2e451ee4d5a4483810cf87529f643d584784b2f3c471b54229243842313206bbd38c8b6ca9a91bf505b683d6741bdce8ea24407ae4178da579465  nheko-0.8.2.tar.gz"

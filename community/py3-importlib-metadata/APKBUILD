@@ -1,0 +1,39 @@
+# Contributor: prspkt <prspkt@protonmail.com>
+# Maintainer: Bart Ribbers <bribbers@disroot.org>
+pkgname=py3-importlib-metadata
+pkgver=4.8.1
+pkgrel=0
+pkgdesc="Read metadata from Python packages"
+url="https://github.com/python/importlib_metadata"
+# ppc64le and mips64 blocked by py3-zipp
+arch="noarch !ppc64le !mips64"
+license="Apache-2.0"
+depends="py3-zipp"
+makedepends="
+	py3-setuptools
+	py3-setuptools_scm
+	py3-toml
+	"
+checkdepends="
+	py3-pyfakefs
+	py3-pytest
+	"
+source="https://pypi.python.org/packages/source/i/importlib_metadata/importlib_metadata-$pkgver.tar.gz"
+options="!check" # Tests fail to find module "test"
+builddir="$srcdir/importlib_metadata-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	pytest
+}
+
+package() {
+	python3 setup.py install --prefix=/usr --root="$pkgdir"
+}
+
+sha512sums="
+ad9ab435d4a49a12c9440d1d53cfc835fd889fee032db6ad1dded59b6e453f26ef97bca303e22d945124295ec7c50fa55837a13e7790dea01562a1724571f9fe  importlib_metadata-4.8.1.tar.gz
+"
