@@ -1,3 +1,28 @@
+# AlpineLinux port for MIPS64EL and HardFloat
+
+### New pkgs:
+
+- additional/libcroco:
+
+- additional/librsvg:
+
+  Non-Rust version of librsvg.
+
+- additional/openssl1.1-compat:
+
+  Some pkg depend on this name.
+
+- openssl1.1-compat/polkit:
+
+  replace mozjs to duktape. Patch from gentoo-musl.
+
+### Gcc configure:
+
+_arch_configure="--with-arch=mips3 --with-tune=mips64 --with-mips-plt --with-float=hard --with-abi=64";;
+
+
+### Next is origin readme.
+
 Alpine Linux aports repository
 ==============================
 
