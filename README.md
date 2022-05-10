@@ -20,6 +20,14 @@
 
 _arch_configure="--with-arch=mips3 --with-tune=mips64 --with-mips-plt --with-float=hard --with-abi=64";;
 
+### Binary pkg Download:
+
+https://pan.baidu.com/s/1c1xs7I5xKN46I2tqsHunoQ?pwd=uhds
+
+sha512sum:
+
+692870615b9150bf0183c7841cc75f4b045b82edf0cd019280c2f86d481f3e3a3ad216982e397a57924e3f1dc23de0bc6b56c84618a28d060f327530e838387a  alpinelinux-3.15.0-mips64el-sha5122sum.txt
+
 
 ### Next is origin readme.
 
