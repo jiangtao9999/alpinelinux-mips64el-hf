@@ -11,6 +11,7 @@ arch="$arch !x86 !armhf !armv7 !mips !mips64" # JDK dropped support
 arch="$arch !riscv64" # JDK not yet bootstrapped
 arch="$arch !ppc64le" # absl: Must implement UnscaledCycleClock::Frequency()
 arch="$arch !s390x" # aborted: SIGFPE (0x8) at pc=0x000003ffb1f18462 (sent by kill)
+arch="$arch !mips64el" # with debian's patch: Caused by: java.lang.reflect.InaccessibleObjectException: Unable to make java.lang.String(byte[],byte) accessible: module java.base does not "opens java.lang" to unnamed module @76908cc0
 license="Apache-2.0"
 depends="bash java-jdk libarchive unzip zip"
 makedepends="coreutils linux-headers protobuf python3 coreutils"

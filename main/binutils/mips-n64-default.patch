@@ -1,0 +1,63 @@
+diff -Nuir binutils-2.35.2-orig/bfd/config.bfd binutils-2.35.2/bfd/config.bfd
+--- binutils-2.35.2-orig/bfd/config.bfd	2021-10-12 16:32:40.012185901 +0800
++++ binutils-2.35.2/bfd/config.bfd	2021-10-12 16:36:40.151381928 +0800
+@@ -894,12 +894,14 @@
+     targ_selvecs="mips_elf32_le_vec mips_elf64_be_vec mips_elf64_le_vec mips_ecoff_be_vec mips_ecoff_le_vec"
+     ;;
+   mips64*el-*-linux*)
+-    targ_defvec=mips_elf32_ntrad_le_vec
+-    targ_selvecs="mips_elf32_ntrad_be_vec mips_elf32_trad_le_vec mips_elf32_trad_be_vec mips_elf64_trad_le_vec mips_elf64_trad_be_vec"
++    targ_defvec=mips_elf64_trad_le_vec
++    targ_selvecs="mips_elf32_ntrad_be_vec mips_elf32_ntrad_le_vec mips_elf32_trad_be_vec mips_elf32_trad_le_vec mips_elf64_trad_be_vec"
++    want64=true
+     ;;
+   mips64*-*-linux*)
+-    targ_defvec=mips_elf32_ntrad_be_vec
+-    targ_selvecs="mips_elf32_ntrad_le_vec mips_elf32_trad_be_vec mips_elf32_trad_le_vec mips_elf64_trad_be_vec mips_elf64_trad_le_vec"
++    targ_defvec=mips_elf64_trad_be_vec
++    targ_selvecs="mips_elf32_ntrad_be_vec mips_elf32_ntrad_le_vec mips_elf32_trad_be_vec mips_elf32_trad_le_vec mips_elf64_trad_le_vec"
++    want64=true
+     ;;
+   mips*el-*-linux*)
+     targ_defvec=mips_elf32_trad_le_vec
+diff -Nuir binutils-2.35.2-orig/gas/configure binutils-2.35.2/gas/configure
+--- binutils-2.35.2-orig/gas/configure	2021-10-12 16:32:53.196346532 +0800
++++ binutils-2.35.2/gas/configure	2021-10-12 16:37:15.785715926 +0800
+@@ -12768,7 +12768,7 @@
+ 	case ${target} in
+ 	  mips64*-linux* | mips-sgi-irix6* | mips64*-freebsd* \
+ 	  | mips64*-kfreebsd*-gnu | mips64*-ps2-elf*)
+-	    mips_default_abi=N32_ABI
++	    mips_default_abi=N64_ABI
+ 	    ;;
+ 	  mips*-linux* | mips*-freebsd* | mips*-kfreebsd*-gnu)
+ 	    mips_default_abi=O32_ABI
+diff -Nuir binutils-2.35.2-orig/gas/configure.ac binutils-2.35.2/gas/configure.ac
+--- binutils-2.35.2-orig/gas/configure.ac	2021-10-12 16:32:55.723798925 +0800
++++ binutils-2.35.2/gas/configure.ac	2021-10-12 16:38:11.467778673 +0800
+@@ -379,7 +379,7 @@
+ 	case ${target} in
+ 	  mips64*-linux* | mips-sgi-irix6* | mips64*-freebsd* \
+ 	  | mips64*-kfreebsd*-gnu | mips64*-ps2-elf*)
+-	    mips_default_abi=N32_ABI
++	    mips_default_abi=N64_ABI
+ 	    ;;
+ 	  mips*-linux* | mips*-freebsd* | mips*-kfreebsd*-gnu)
+ 	    mips_default_abi=O32_ABI
+diff -Nuir binutils-2.35.2-orig/ld/configure.tgt binutils-2.35.2/ld/configure.tgt
+--- binutils-2.35.2-orig/ld/configure.tgt	2021-10-12 16:32:43.930323147 +0800
++++ binutils-2.35.2/ld/configure.tgt	2021-10-12 16:40:33.020681351 +0800
+@@ -532,11 +532,12 @@
+ mips*-*-windiss)	targ_emul=elf32mipswindiss
+ 			;;
+ mips64*el-*-linux-*)	targ_emul=elf64ltsmip
+-			targ_extra_emuls="elf32ltsmipn32 elf32btsmipn32 elf32ltsmip elf32btsmip elf64btsmip"
++			targ_extra_emuls="elf32btsmipn32 elf32ltsmipn32 elf32ltsmip elf32btsmip elf64btsmip"
+ 			targ_extra_libpath=$targ_extra_emuls
+ 			;;
+ mips64*-*-linux-*)	targ_emul=elf64btsmip
+ 			targ_extra_emuls="elf32btsmipn32 elf32ltsmipn32 elf32btsmip elf32ltsmip elf64ltsmip"
++			targ_extra_emuls="elf32btsmipn32 elf32ltsmipn32 elf32btsmip elf32ltsmip elf64ltsmip"
+ 			targ_extra_libpath=$targ_extra_emuls
+ 			;;
+ mips*el-*-linux-*)	targ_emul=elf32ltsmip

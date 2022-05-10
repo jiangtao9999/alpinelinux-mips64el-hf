@@ -6,7 +6,7 @@ pkgrel=0
 pkgdesc="Browse and play your games"
 url="https://wiki.gnome.org/Apps/Games"
 # s390x, mips64 and riscv64 blocked by librsvg
-arch="all !s390x !mips64 !riscv64"
+arch="all !s390x !mips64 !mips64el !riscv64"
 license="GPL-3.0-or-later"
 makedepends="meson gtk+3.0-dev vala grilo-dev libhandy1-dev librsvg-dev libmanette-dev
 	libsoup-dev tracker-dev sqlite-dev libxml2-dev libarchive-dev retro-gtk-dev"

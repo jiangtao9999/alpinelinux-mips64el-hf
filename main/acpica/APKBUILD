@@ -12,6 +12,7 @@ subpackages="iasl"
 options="!check"
 source="acpica-unix-$pkgver.tar.gz::https://acpica.org/sites/acpica/files/acpica-unix-$pkgver.tar.gz
 	disable-werror.patch
+	fix_ftbfs_mips64el.patch
 	"
 
 builddir="$srcdir"/acpica-unix-$pkgver
@@ -32,4 +33,5 @@ iasl() {
 sha512sums="
 b02470bdda891eb7ca556ec4eee3387f80535b43b213f61e68e3913f4f8173dbf4c2dadaf28ad181ecc76171d40175d5ea5734dbc1237b3c3d2fba3072314c9e  acpica-unix-20210930.tar.gz
 1f5049568d612d4debf3690e0d918d8d56abbed14ade7b2e6282eba17b25934b695d1a9fe10f99469efe8d4382c4546481d0579afdf5cdb9695fcdc93559fbab  disable-werror.patch
+cbebddd8ba65af7e2a28eb1762e7398366a6aeb63982a072a93d57d1b28b3d7b748b2872b00a010d4d7006416c93c8e601800fec912277c699a8a9eac8feeae6  fix_ftbfs_mips64el.patch
 "

@@ -35,6 +35,7 @@ makedepends="
 	wayland-protocols
 	woff2-dev
 	xdg-dbus-proxy
+	$( [ "$CARCH" = "mips64el" ] && echo clang )
 	"
 subpackages="$pkgname-dev $pkgname-doc"
 source="https://wpewebkit.org/releases/wpewebkit-$pkgver.tar.xz
@@ -45,6 +46,8 @@ build() {
 	if [ "$CBUILD" != "$CHOST" ]; then
 		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
 	fi
+	[ "$CARCH" = "mips64el" ] && export CC="clang"
+	[ "$CARCH" = "mips64el" ] && export CXX="clang++"
 	cmake -B build \
 		-DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_INSTALL_LIBDIR=lib \

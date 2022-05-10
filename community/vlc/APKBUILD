@@ -186,7 +186,7 @@ package() {
 }
 
 check() {
-	make check
+	make check -j1
 }
 
 _mv() {

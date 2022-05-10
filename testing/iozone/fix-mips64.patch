@@ -1,0 +1,12 @@
+--- iozone3_492-orig/src/current/iozone.c
++++ iozone3_492/src/current/iozone.c
+@@ -362,7 +362,9 @@
+ #endif
+ 
+ #ifdef generic
++#ifndef __mips64
+ typedef long long off64_t;
++#endif
+ #endif
+ 
+ #if defined(__FreeBSD__)

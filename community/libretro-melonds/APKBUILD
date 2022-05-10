@@ -9,7 +9,8 @@ url="https://github.com/libretro/melonDS"
 arch="all !mips !mips64"
 license="GPL-3.0-only"
 makedepends="mesa-dev"
-source="$pkgname-$_commit.tar.gz::https://github.com/libretro/melonDS/archive/$_commit.tar.gz"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/melonDS/archive/$_commit.tar.gz
+	fix-mips.patch"
 builddir="$srcdir/melonDS-$_commit"
 options="!check" # No tests
 
@@ -21,4 +22,5 @@ package() {
 	install -Dm644 melonds_libretro.so "$pkgdir"/usr/lib/libretro/melonds_libretro.so
 }
 
-sha512sums="be16e6bb3b6e3f9c2646949715182defe045338c7a888bdaf26cbf2fbfa54dde3d5c046f86b26aa036f4ee549c2e9a9aafe7d475ea95b3f0589aff01b7b18211  libretro-melonds-657c729e7473e9b2c09ddf2eef9dcf4ba5b247ec.tar.gz"
+sha512sums="be16e6bb3b6e3f9c2646949715182defe045338c7a888bdaf26cbf2fbfa54dde3d5c046f86b26aa036f4ee549c2e9a9aafe7d475ea95b3f0589aff01b7b18211  libretro-melonds-657c729e7473e9b2c09ddf2eef9dcf4ba5b247ec.tar.gz
+9e2b9c92f17139589efa74007d8a9df498622452b8944252150ead8867d274371451b7fbe925b5a7ff4e2995da084dfb6f793136c2d89affb62528d5f003ae18  fix-mips.patch"

@@ -46,6 +46,8 @@ source="https://community.ardour.org/src/Ardour-$pkgver.tar.bz2
 builddir="$srcdir/Ardour-$pkgver"
 
 build() {
+	[ "$CARCH" = "mips64el" ] && export CFLAGS="$CFLAGS -mxgot"
+	[ "$CARCH" = "mips64el" ] && export CXXFLAGS="$CXXFLAGS -mxgot"
 	python3 waf configure \
 		--prefix=/usr \
 		--cxx11 \

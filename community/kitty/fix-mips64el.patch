@@ -1,0 +1,11 @@
+--- kitty-0.23.1/kitty/child-monitor.c-orig
++++ kitty-0.23.1/kitty/child-monitor.c
+@@ -440,7 +440,7 @@
+ static bool
+ pty_resize(int fd, struct winsize *dim) {
+     while(true) {
+-#if defined(__powerpc64__) && (!defined(__GLIBC__) && !defined(__UCLIBC__))
++#if (defined(__powerpc64__) || defined(__mips64)) && (!defined(__GLIBC__) && !defined(__UCLIBC__))
+         if (ioctl(fd, (int) TIOCSWINSZ, dim) == -1) {
+ #else
+         if (ioctl(fd, TIOCSWINSZ, dim) == -1) {

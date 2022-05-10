@@ -1,0 +1,29 @@
+--- monero-0.17.2.3-orig/CMakeLists.txt
++++ monero-0.17.2.3/CMakeLists.txt
+@@ -234,6 +234,10 @@
+   set(PPC     1)
+ endif()
+ 
++if(ARCH_ID MATCHES "^mips*")
++  set(MIPS 1)
++endif()
++
+ if(ARCH_ID STREQUAL "s390x")
+   set(S390X 1)
+ endif()
+@@ -634,12 +638,14 @@
+     message(STATUS "AES support explicitly disabled")
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_AES")
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_AES")
+-  elseif(NOT ARM AND NOT PPC64LE AND NOT PPC64 AND NOT PPC AND NOT S390X)
++  elseif(NOT ARM AND NOT PPC64LE AND NOT PPC64 AND NOT PPC AND NOT S390X AND NOT MIPS)
+     message(STATUS "AES support enabled")
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -maes")
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maes")
+   elseif(PPC64LE OR PPC64 OR PPC)
+     message(STATUS "AES support not available on POWER")
++  elseif(MIPS)
++    message(STATUS "AES support not available on mips*")
+   elseif(S390X)
+     message(STATUS "AES support not available on s390x")
+   elseif(ARM6)

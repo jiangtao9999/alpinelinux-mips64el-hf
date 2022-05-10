@@ -13,7 +13,8 @@ license="MIT ICU Unicode-TOU"
 subpackages="$pkgname-static $pkgname-dev $pkgname-doc $pkgname-libs $pkgname-data::noarch"
 depends_dev="$pkgname=$pkgver-r$pkgrel"
 checkdepends="diffutils python3"
-source="https://github.com/unicode-org/icu/releases/download/release-${pkgver//./-}/icu4c-${pkgver//./_}-src.tgz"
+source="https://github.com/unicode-org/icu/releases/download/release-${pkgver//./-}/icu4c-${pkgver//./_}-src.tgz
+	ICU-21613.patch"
 builddir="$srcdir"/icu/source
 
 # secfixes:
@@ -80,4 +81,5 @@ data() {
 
 sha512sums="
 d4aeb781715144ea6e3c6b98df5bbe0490bfa3175221a1d667f3e6851b7bd4a638fa4a37d4a921ccb31f02b5d15a6dded9464d98051964a86f7b1cde0ff0aab7  icu4c-69_1-src.tgz
+1f06851426605395a5a1124404e9994196002db06a2cf2b70077a1cd0513f0a7c9dd35b8254bd9ac7d1f187510f53fb9da99d88dffcd44062fbbb734c17b1834  ICU-21613.patch
 "

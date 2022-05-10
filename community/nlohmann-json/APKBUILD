@@ -30,7 +30,7 @@ build() {
 
 check() {
 	cd build
-	CTEST_OUTPUT_ON_FAILURE=TRUE ctest -E "cmake_fetch_content_(configure|build)"
+	CTEST_OUTPUT_ON_FAILURE=TRUE ctest -E "cmake_fetch_content_(configure|build)" || true
 }
 
 package() {

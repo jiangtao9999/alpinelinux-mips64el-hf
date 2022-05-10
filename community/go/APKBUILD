@@ -104,8 +104,8 @@ ppc64)	export GOARCH="ppc64" ;;
 ppc64le) export GOARCH="ppc64le" ;;
 mips)   export GOARCH="mips" GOMIPS=softfloat ;;
 mips64) export GOARCH="mips64" GOMIPS64=softfloat ;;
-mips64el) export GOARCH="mips64le" GOMIPS64=softfloat ;;
-mipsel) export GOARCH="mipsle" GOMIPS=softfloat ;;
+mips64el) export GOARCH="mips64le" GOMIPS64=hardfloat ;;
+mipsel) export GOARCH="mipsle" GOMIPS=hardfloat ;;
 riscv64) export GOARCH="riscv64" ;;
 *)      export GOARCH="unsupported";;
 esac

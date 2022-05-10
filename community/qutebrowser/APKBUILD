@@ -12,7 +12,7 @@ license="GPL-3.0-only"
 depends="
 	py3-jinja2 py3-qt5 py3-yaml qt5-qtbase
 	qt5-qtwebengine qt5-qtbase-sqlite py3-qtwebengine
-	py3-sip-pyqt5 py3-adblock
+	py3-sip-pyqt5 $( [ "$CARCH" = "mips64el" ] || echo py3-adblock )
 	"
 makedepends="asciidoc py3-setuptools"
 checkdepends="py3-pytest py3-pytest-benchmark py3-pytest-rerunfailures py3-pytest-mock py3-hypothesis"

@@ -1,0 +1,33 @@
+--- cri-o-1.22.0-orig/utils/fifo/handle.go
++++ cri-o-1.22.0/utils/fifo/handle.go
+@@ -54,7 +54,7 @@
+ 	h := &handle{
+ 		f:    f,
+ 		name: fn,
+-		dev:  stat.Dev,
++		dev:  uint64(stat.Dev),
+ 		ino:  stat.Ino,
+ 		fd:   fd,
+ 	}
+@@ -81,7 +81,7 @@
+ 	if err := syscall.Stat(h.procPath(), &stat); err != nil {
+ 		return "", errors.Wrapf(err, "path %v could not be statted", h.procPath())
+ 	}
+-	if stat.Dev != h.dev || stat.Ino != h.ino {
++	if uint64(stat.Dev) != h.dev || stat.Ino != h.ino {
+ 		return "", errors.Errorf("failed to verify handle %v/%v %v/%v", stat.Dev, h.dev, stat.Ino, h.ino)
+ 	}
+ 	return h.procPath(), nil
+--- cri-o-1.22.0-orig/vendor/github.com/intel/goresctrl/pkg/blockio/blockio.go
++++ cri-o-1.22.0/vendor/github.com/intel/goresctrl/pkg/blockio/blockio.go
+@@ -435,8 +435,8 @@
+ 			continue
+ 		}
+ 		sys, ok := fileInfo.Sys().(*syscall.Stat_t)
+-		major := unix.Major(sys.Rdev)
+-		minor := unix.Minor(sys.Rdev)
++		major := unix.Major(uint64(sys.Rdev))
++		minor := unix.Minor(uint64(sys.Rdev))
+ 		if !ok {
+ 			errors = multierror.Append(errors, fmt.Errorf("cannot get syscall stat_t from %#v: %w%s", devRealpath, err, origin))
+ 			continue

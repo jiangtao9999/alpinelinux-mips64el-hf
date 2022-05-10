@@ -243,7 +243,7 @@ build() {
 	case "$CARCH" in
 		# disable _FORTIFY_SOURCE to work around:
 		# cc1plus: out of memory allocating 65536 bytes after a total of 3131101184 bytes
-		x86) CXXFLAGS="$CXXFLAGS -U_FORTIFY_SOURCE";;
+		x86|mips64el) CXXFLAGS="$CXXFLAGS -U_FORTIFY_SOURCE";;
 		armhf|ppc64le|s390x) _archopt="-DENABLE_JIT=OFF";;
 	esac
 

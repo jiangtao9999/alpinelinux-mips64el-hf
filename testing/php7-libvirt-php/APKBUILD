@@ -12,7 +12,8 @@ subpackages="$pkgname-doc"
 source="https://libvirt.org/sources/php/libvirt-php-$pkgver.tar.gz
 	offline-tests.patch
 	musl-idn.patch
-	musl-fixes.patch"
+	musl-fixes.patch
+	0002-src-don-t-declare-global-variables-in-header-files.patch"
 builddir="$srcdir/libvirt-php-$pkgver"
 
 prepare() {
@@ -39,4 +40,5 @@ package() {
 sha512sums="2ea263561a0bf5d155314e06dcf3c3b5c278640bc5edfa674cdd777cb6d0810bda0492c6cf77a02bc88fb6aa99b0ff1f0cbaeea87ff2e45bff9b5774a2507684  libvirt-php-0.5.5.tar.gz
 a212746438428537422716f5883f6941704137cd2cdceafb965fec8306c81c3bc4a4ce1caf65efc2a033823e8eb6f5afa1b452f9a191c50cd07d4c979e10d5fd  offline-tests.patch
 cae4423b361c7735052ae1c1ec4e24090486020d4f3aaf87c16991b9fb90960d90cd8bc392bb017449525fc4567de1080e3d29337b2d756f46edac672b2bd81b  musl-idn.patch
-732f22ca206187b7a0ea41fe2d63808c8afc0994f941fbbb933dbde219f597d108aa3ed10b67e074fe90ac6ab571ee0dc70ef725ce8ed746d8f6e4689e972291  musl-fixes.patch"
+732f22ca206187b7a0ea41fe2d63808c8afc0994f941fbbb933dbde219f597d108aa3ed10b67e074fe90ac6ab571ee0dc70ef725ce8ed746d8f6e4689e972291  musl-fixes.patch
+7ec41aa4fc63c561e64956041341892cddd0f23de19435ae66d30930df49ebb6c90e77ee15918d0fb949c65a4323112bdc2324df4b347cf5ae3f4b0bc90bbac8  0002-src-don-t-declare-global-variables-in-header-files.patch"

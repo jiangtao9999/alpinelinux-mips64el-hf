@@ -12,7 +12,7 @@ subpackages="$pkgname-static $pkgname-dev"
 source="$pkgname-$pkgver.tar.gz::https://github.com/cisco/libsrtp/archive/v$pkgver.tar.gz"
 
 case "$CARCH" in
-	s390x) options="$options !check" ;;
+	s390x|mips64el) options="$options !check" ;;
 esac
 
 build() {

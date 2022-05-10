@@ -16,7 +16,7 @@ case "$CARCH" in
 esac
 
 case "$CARCH" in
-	s390x|mips64|riscv64) ;;
+	s390x|mips64|mips64el|riscv64) ;;
 	*) makedepends="$makedepends gjs-dev" ;;
 esac
 

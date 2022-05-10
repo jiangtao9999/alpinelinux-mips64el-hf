@@ -32,6 +32,7 @@ prepare() {
 }
 
 build() {
+	echo "$pkgver" > .tarball-version
 	./autogen.sh
 	./configure \
 		--prefix=/usr

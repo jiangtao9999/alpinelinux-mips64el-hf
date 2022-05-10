@@ -95,6 +95,8 @@ build() {
 	export CXXFLAGS="$CXXFLAGS $CFLAGS"
 	export LDFLAGS="$LDFLAGS -L/usr/lib/lua5.3"
 
+	[ "$CARCH" = "mips64el" ] && export CXXFLAGS="$CXXFLAGS -mxgot"
+
 _build="make
 	TARGETOS=linux
 	NOWERROR=1

@@ -130,6 +130,7 @@ source="https://download.ceph.com/tarballs/ceph_$pkgver.orig.tar.gz
 	44-staticcast.patch
 	44-node_modules.patch
 	44-missing-include.patch
+	cmake-test-for-16-bytes-atomic-support-on-mips-also.patch
 	"
 
 subpackages="
@@ -570,4 +571,5 @@ abb3cab9c01cc3d6d42a9858678059a8c9c43bda2649bf97b489fdc205eb10ae27f9fb7302062e0f
 f89c913a53e2806c59508d26f5dc72abb428c7e4e3b7c1aeb6eaf92744ea9a13cac2f00a2ac90f91ad7682f66d876a5fffedd10feeceecd71a944793581da443  44-staticcast.patch
 85d0009b0d1442af81d115402cdbd17667d85314030e1748a4656c1ee798b02efdcff41ccb374a6b63f7bf012bf1756b61e75c5d2b6399c329a6e62024ad0011  44-node_modules.patch
 b95ec157f9c77177afd3deb8e3485bb5f10e1b634a15617d14e09b08d6680d32201ecb249ea5ea98127a312e1fdb22fdbe9f0216690291a2849419aa7ab81610  44-missing-include.patch
+afcde0fe5825ad9cc2b4dbeafd05bffaf9e1907c6d6afe78892181e05aed8f3df8607999dfea6fd6888b9b579e3d26f798bbd6db0ef9c2a2702fa288e927aa41  cmake-test-for-16-bytes-atomic-support-on-mips-also.patch
 "

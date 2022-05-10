@@ -26,6 +26,7 @@ case "$CARCH" in
 	x86_64)		_cpu=x86-64;;
 	x86)		_cpu=i586;;
 	s390x)		_cpu=z900;;
+	mips64el)	_cpu=mips3;;
 	*)			_cpu="$CARCH";;
 esac
 

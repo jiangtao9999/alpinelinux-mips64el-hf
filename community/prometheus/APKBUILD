@@ -5,7 +5,8 @@ pkgrel=0
 pkgdesc="The Prometheus monitoring system and time series database"
 url="https://github.com/prometheus/prometheus"
 # mips64 and riscv64 blocked by nodejs -> yarn
-arch="all !mips64 !riscv64"
+# mips64el build failed
+arch="all !mips64 !riscv64 !mips64el"
 license="Apache-2.0"
 options="!check" # Broken by integrations we don't care about
 install="prometheus.pre-install"

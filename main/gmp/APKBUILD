@@ -19,6 +19,7 @@ prepare() {
 }
 
 build() {
+	[ "$CARCH" = "mips64el" ] && export ABI=64
 	./configure \
 		--build=$CBUILD \
 		--host=$CHOST \

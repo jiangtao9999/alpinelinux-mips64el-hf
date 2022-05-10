@@ -60,6 +60,7 @@ source="jdk-$_pkgver-root.tar.bz2::https://hg.openjdk.java.net/jdk-updates/jdk9u
 	JDK-8187578.patch
 	JDK-8245051.patch
 	JDK-8241296.patch
+	jdk9-add-mips64el.patch
 
 	HelloWorld.java
 	TestECDSA.java
@@ -149,7 +150,8 @@ build() {
 		--disable-warnings-as-errors \
 		--disable-precompiled-headers \
 		--enable-dtrace=no \
-		--with-jvm-variants=server \
+		$( [ "$CARCH" = "mips64el" ] || echo '--with-jvm-variants=server' ) \
+		$( [ "$CARCH" = "mips64el" ] && echo '--with-jvm-variants=zero' ) \
 		--with-debug-level=release \
 		--with-version-pre= \
 		--with-version-opt="alpine-r$pkgrel" \
@@ -163,7 +165,7 @@ build() {
 }
 
 check() {
-	local _java_bin="./build/*-normal-server-release/images/jdk/bin"
+	local _java_bin="./build/*-normal-*-release/images/jdk/bin"
 
 	# 1) compile and run a simple hello world
 	$_java_bin/javac -d . "$srcdir"/HelloWorld.java
@@ -183,7 +185,8 @@ check() {
 
 	# run the gtest unittest suites
 	# they don't take long, DO NOT DISABLE THEM!
-	MAKEFLAGS='' make test-hotspot-gtest
+	# mips64el: No such file or directory(zero -> server), "ln -s" check faild, JDK-8273376 ?
+	[ "$CARCH" = "mips64el" ] || MAKEFLAGS='' make test-hotspot-gtest
 
 	# The jtreg tests take very, very long to finish and show some failures (9 - 12 on my machine, varying between runs)
 	# I think these are not critical and can be safely ignored.
@@ -206,7 +209,7 @@ check() {
 
 package() {
 	mkdir -p "$pkgdir/$_java_home"
-	cp -r build/*-normal-server-release/images/jdk/* "$pkgdir/$_java_home"
+	cp -r build/*-normal-*-release/images/jdk/* "$pkgdir/$_java_home"
 }
 
 _jmods() {
@@ -338,6 +341,7 @@ c2cba2987030924afabb4a8fd56cb6173ce3719b67c8374cadedb4b8f4da4efb33ef5df38106101c
 2798a4866e2d34eafc32fe83c768ff5c27179db55312223eb403d43461c701b349818f65112129487a7d628cf679ed560c84f429cd047796277d47b8b4678d1d  JDK-8187578.patch
 78925ea347400ee67f21a405f4c5beae6227764f06d85bbefbe3ca977b9bcd9e8a42a514471c836f4e0f65a1ebfc02429c17e10f23d0125c88c76b0d04164362  JDK-8245051.patch
 33504e31e99f370a8825c6d321e0b6e7f46eebf0c8adc171a62b63a956d85137fce2992f827651212e8aaf270352d27b26bc4cdbe3ca653e7ddcfc577d24092b  JDK-8241296.patch
+70827fc74fa6e5fc997dfde6347530538c18ce3bbb5321652540f5828f51c5e29d29d6c6dd02d281d3910345f15403eff3b169ca6aea752aed6d701d476c3ab2  jdk9-add-mips64el.patch
 d1767dddd8e0956e25c0f77ed45c6fc86a1191bae1704a6dc33be490fd20eaa50461fe5c2a3349512059d555651e2eb41437dd3c1096c351e8ee68b4534a2579  HelloWorld.java
 27e91edef89d26c0c5b9a813e2045f8d2b348745a506ae37b34b660fa7093da9a4e0e676ea41dc4a5c901bce02e5304d95e90f68d6c99cbf461b2da40a7a9853  TestECDSA.java
 b02dff8d549f88317bb4c741a9e269e8d59eef990197d085388fc49c7423a4eb9367dbe1e02bffb10e7862f5980301eb58d4494e177d0e8f60af6b05c7fbbe60  TestCryptoLevel.java

@@ -1,0 +1,11 @@
+--- game-music-emu-0.6.3-orig/gme/blargg_endian.h
++++ game-music-emu-0.6.3/gme/blargg_endian.h
+@@ -39,7 +39,7 @@
+ 	defined (__sparc__) || \
+ 	(defined (BIG_ENDIAN) && BIG_ENDIAN+0 != 4321)
+ 	#define BLARGG_BIG_ENDIAN 1
+-#elif !defined (__mips__)
++#elif !(defined (__mips__) && defined (__MIPSEB))
+ 	// No endian specified; assume little-endian, since it's most common
+ 	#define BLARGG_LITTLE_ENDIAN 1
+ #endif

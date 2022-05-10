@@ -29,7 +29,7 @@ check() {
 	cd "$builddir"
 
 	# tests keep running indefinitely
-	case "$CARCH" in armv7) return 0;; esac
+	case "$CARCH" in armv7|mips64el) return 0;; esac
 
 	local lver; for lver in $_luaversions; do
 		msg "Testing on lua$lver"

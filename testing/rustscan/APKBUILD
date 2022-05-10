@@ -9,7 +9,7 @@ license="GPL-3.0-or-later"
 # s390x and riscv64 blocked by rust/cargo
 # ppc64le blocked by ring crate
 # armhf timout while building
-arch="all !s390x !ppc64le !riscv64 !armhf"
+arch="all !s390x !ppc64le !riscv64 !armhf !mips64el"
 makedepends="cargo python3 perl bash"
 source="$pkgname-$pkgver.tar.gz::https://github.com/RustScan/RustScan/archive/refs/tags/$pkgver.tar.gz"
 builddir="$srcdir/RustScan-$pkgver"

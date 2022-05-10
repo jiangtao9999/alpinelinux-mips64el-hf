@@ -53,6 +53,8 @@ case "$CARCH" in
 	ppc64le) _flags="$_flags TARGET=POWER8";;
 	s390x) _flags="$_flags TARGET=ZARCH_GENERIC";;
 	riscv64) _flags="$_flags TARGET=RISCV64_GENERIC";;
+	mips64el) _flags="$_flags TARGET=SICORTEX";;
+	mipsel) _flags="$_flags TARGET=P5600 CORE=1004K";;
 esac
 
 # Flags for ILP64 variant.

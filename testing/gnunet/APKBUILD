@@ -71,6 +71,8 @@ package() {
 		$pkgdir/etc/init.d/$pkgname-user-services
 	install -m755 -D $srcdir/setup-$pkgname-user \
 		$pkgdir/usr/bin/setup-$pkgname-user
+
+	rm -v $pkgdir/usr/bin/gnunet-config
 }
 
 dev() {

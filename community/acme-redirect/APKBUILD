@@ -7,7 +7,7 @@ pkgdesc="Tiny http daemon that answers acme challenges and redirects everything 
 url="https://github.com/kpcyrd/acme-redirect"
 # mips64, s390x and riscv64 blocked by rust/cargo
 # ppc64le blocked by ring crate
-arch="all !mips64 !s390x !ppc64le !riscv64"
+arch="all !mips64 !mips64el !s390x !ppc64le !riscv64"
 license="GPL-3.0-or-later"
 makedepends="
 	cargo

@@ -13,7 +13,7 @@ makedepends="
 	fontconfig-dev
 	freeimage-dev
 	sdl2_ttf-dev
-	librsvg-dev
+	$( [ "$CARCH" = "mips64el" ] || echo librsvg-dev )
 	wayland-dev
 	mesa-dev
 	libxkbcommon-dev
@@ -40,7 +40,7 @@ build() {
 		-Dlibtiff=disabled \
 		-Dlibpng=disabled \
 		-Dlibjpeg=disabled \
-		-Dlibrsvg=enabled \
+		$( [ "$CARCH" = "mips64el" ] || echo '-Dlibrsvg=enabled' ) \
 		-Dlibnsgif=disabled \
 		-Dlibheif=disabled \
 		. output

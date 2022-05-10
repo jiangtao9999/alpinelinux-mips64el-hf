@@ -6,7 +6,7 @@ pkgrel=0
 pkgdesc="Permission Manager for Flatpak"
 url="https://github.com/tchx84/Flatseal"
 # s390x, mips64 and riscv64 blocked by gjs
-arch="noarch !s390x !mips64 !riscv64"
+arch="noarch !s390x !mips64 !mips64el !riscv64"
 license="GPL-3.0-or-later"
 depends="appstream-glib gjs gtk+3.0 libhandy1"
 makedepends="gettext glib-dev meson"

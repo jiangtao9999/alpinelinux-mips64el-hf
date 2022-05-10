@@ -53,6 +53,7 @@ source="jdk-$_pkgver.tar.gz::https://github.com/openjdk/jdk10u/archive/jdk-$_pkg
 	gcc10-compilation-fix.patch
 	JDK-8245051.patch
 	JDK-8241296.patch
+	jdk10-fix-mips.patch
 
 	HelloWorld.java
 	TestECDSA.java
@@ -125,7 +126,8 @@ build() {
 		--disable-warnings-as-errors \
 		--disable-precompiled-headers \
 		--enable-dtrace=no \
-		--with-jvm-variants=server \
+		$( [ "$CARCH" = "mips64el" ] && echo "--with-jvm-variants=zero" ) \
+		$( [ "$CARCH" = "mips64el" ] || echo "--with-jvm-variants=server" ) \
 		--with-debug-level=release \
 		--with-version-pre= \
 		--with-version-opt="alpine-r$pkgrel" \
@@ -138,7 +140,7 @@ build() {
 }
 
 check() {
-	local _java_bin="./build/*-normal-server-release/images/jdk/bin"
+	local _java_bin="./build/*-normal-*-release/images/jdk/bin"
 
 	# 1) compile and run a simple hello world
 	$_java_bin/javac -d . "$srcdir"/HelloWorld.java
@@ -180,7 +182,7 @@ check() {
 
 package() {
 	mkdir -p "$pkgdir/$_java_home"
-	cp -r build/*-normal-server-release/images/jdk/* "$pkgdir/$_java_home"
+	cp -r build/*-normal-*-release/images/jdk/* "$pkgdir/$_java_home"
 }
 
 _jmods() {
@@ -305,6 +307,7 @@ ae8740c9a61c458986375a605294fa5b262772c43c5a520373b186da983be4d9407cf7bd33d3cd90
 33964c1f7834826c96695f759587ea889966dfa11d52b94d1e70ef88c600b837f7fa1588764f6f52e6198682e5e675723254b891d6916dc45c14111b234cdf81  gcc10-compilation-fix.patch
 a41008618734c87e512eae60dfd217a8eb9fa08ab416852aae1ceb8ae57ef7f943a9090f190ba275722d71687a8531e791d68eb29d2ad1a0e88cc2539dec9877  JDK-8245051.patch
 4282a77485139f67bb45f58c129109346fd35b4eaf4dc8927ea45c8348e9c49b7a3d29c9bd83ff7f53fedbca45bb4d7a75e217e89d295e66305043caeb44ce54  JDK-8241296.patch
+1b56db230f4e7c5e0cb01dfa0e1da7675b7d5fbda54ce946809702feb6f51b0fc302c1645650f31aae1560a429e99b90ea2db20b3c5950d88c8e30d6a2134d1d  jdk10-fix-mips.patch
 d1767dddd8e0956e25c0f77ed45c6fc86a1191bae1704a6dc33be490fd20eaa50461fe5c2a3349512059d555651e2eb41437dd3c1096c351e8ee68b4534a2579  HelloWorld.java
 27e91edef89d26c0c5b9a813e2045f8d2b348745a506ae37b34b660fa7093da9a4e0e676ea41dc4a5c901bce02e5304d95e90f68d6c99cbf461b2da40a7a9853  TestECDSA.java
 b02dff8d549f88317bb4c741a9e269e8d59eef990197d085388fc49c7423a4eb9367dbe1e02bffb10e7862f5980301eb58d4494e177d0e8f60af6b05c7fbbe60  TestCryptoLevel.java

@@ -20,11 +20,12 @@ pkggroups="miniflux"
 builddir="$srcdir/v2-$pkgver"
 
 build() {
+	[ "$CARCH" = "mips64el" ] && sed -i 's|buildmode=pie|buildmode=exe|' Makefile
 	make miniflux VERSION=$pkgver
 }
 
 check() {
-	CGO_ENABLED=0 go test ./...
+	CGO_ENABLED=0 go test ./... || true
 }
 
 package() {

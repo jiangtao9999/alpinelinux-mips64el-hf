@@ -28,6 +28,7 @@ subpackages="
 install="flatpak.pre-install flatpak.pre-upgrade flatpak.post-install"
 source="https://github.com/flatpak/flatpak/releases/download/$pkgver/flatpak-$pkgver.tar.xz
 	modules-load.conf
+	fix-mips-abi-macros.patch
 	"
 options="!check"  # Tests fail with no error message
 
@@ -81,4 +82,5 @@ package() {
 sha512sums="
 4887fe540a821f2c8539fbe1fd89b1cc350126a6fa90c1acf070e08db0de1073406a061f5483bc7a7ef9b07f73409beb7bc02d055d4b3ae1c33ba5c318e11b6f  flatpak-1.12.2.tar.xz
 57d23d2778556eafc3035e6be575bf95b4032f123b35f2b1657eff5e7496de253173edc657f90531ee58e25673f4f27a5cd1cc76b14a038edb244f104a231771  modules-load.conf
+96b74141e850d68fca6e30101172aaac9824359cf5ded5c9dc2e9d29a76f62c3e1215261e594beabb879826d808a4386c03b8722fec589a836b5bc6973bc3d8b  fix-mips-abi-macros.patch
 "

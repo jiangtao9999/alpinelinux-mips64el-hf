@@ -9,7 +9,7 @@ url="http://sigar.hyperic.com/"
 # ppc64le: hang during build
 arch="all !mips64 !riscv64 !s390x !ppc64le"
 license="Apache-2.0"
-makedepends="libtirpc-dev perl apache-ant java-jdk"
+makedepends="libtirpc-dev perl apache-ant java-jdk openjdk11-jdk"
 source="https://github.com/hyperic/sigar/archive/sigar-$pkgver.tar.gz
 	0001-fix-compilation-with-musl-libc.patch
 	0002-only-enable-the-GNU-libc-strerror_r-on-GNU-libc.patch

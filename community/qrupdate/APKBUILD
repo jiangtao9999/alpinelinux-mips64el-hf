@@ -13,6 +13,7 @@ source="$pkgname-$pkgver.tar.gz::https://gitlab.mpi-magdeburg.mpg.de/koehlerm/qr
 builddir="$srcdir/$pkgname-ng-v$pkgver-8861abb3c945bb8602eb90a057a424f189f2b86f"
 
 case "$CARCH" in
+	mips64el) makedepends="$makedepends openblas-dev" ;;
 	mips*) makedepends="$makedepends blas-dev" ;;
 	*) makedepends="$makedepends openblas-dev" ;;
 esac

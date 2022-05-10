@@ -16,6 +16,7 @@ source="https://kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-$p
 
 # faulty test of libcap.so itself (?!) on mips
 [ "$CARCH" = "mips64" ] && options="!check"
+[ "$CARCH" = "mips64el" ] && options="!check"
 
 build() {
 	make BUILD_CC=gcc CC="${CC:-gcc}" lib=lib prefix=/usr GOLANG=no \

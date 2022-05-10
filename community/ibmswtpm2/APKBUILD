@@ -10,7 +10,8 @@ license="MIT"
 makedepends="musl-dev openssl1.1-compat-dev"
 options="!check"  # No selftest available
 source="https://downloads.sourceforge.net/project/ibmswtpm2/ibmtpm${pkgver}.tar.gz
-	riscv64.patch"
+	riscv64.patch
+	mips.patch"
 builddir="${srcdir}/src"
 
 build() {
@@ -25,4 +26,5 @@ package() {
 sha512sums="
 942baa26311472d6af6b2c3b3b4132718e5e2b1eaa7decb0f64d910cbb7acaa4814ac95b18b5f2a4ea43990978cd5577b8fd50b158a055ff475710ad2426f6cb  ibmtpm1661.tar.gz
 52f0416909c89b46fefba50523e0360fb86661eeb58069276b3cfa2c500d3bf5eb5ef5efea6528da8e2f9638d3a9b75e3c414320f239d72993dd5fa3472e8710  riscv64.patch
+c3a1c13cd2e6ea2738261a53b36180a7eda2ab350103642fa0ccb160e7b51383f6141ee85981d3f39d6dcdccbc327babe99b25e51a5eb07cc10ddd97392aaa07  mips.patch
 "

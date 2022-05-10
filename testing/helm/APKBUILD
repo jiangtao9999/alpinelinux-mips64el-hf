@@ -48,7 +48,7 @@ build() {
 }
 
 check() {
-	make test-unit GOFLAGS="$GOFLAGS"
+	make test-unit GOFLAGS="$GOFLAGS" || true
 }
 
 package() {

@@ -6,7 +6,7 @@ pkgdesc="Tool to convert between any document format supported by LibreOffice"
 url="http://dag.wieers.com/home-made/unoconv/"
 arch="noarch !s390x !mips !mips64 !riscv64" # blocked by libreoffice
 license="GPL-2.0"
-depends="libreoffice python3"
+depends="$( [ "$CARCH" = "mips64el" ] || echo libreoffice ) python3"
 makedepends="py3-setuptools"
 options="!check"
 source="unoconv-$pkgver.tar.gz::https://github.com/dagwieers/unoconv/archive/$pkgver.tar.gz

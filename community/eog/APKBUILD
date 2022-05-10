@@ -16,6 +16,7 @@ source="https://download.gnome.org/sources/eog/${pkgver%.*}/eog-$pkgver.tar.xz"
 
 build() {
 	abuild-meson \
+	$( [ "$CARCH" = "mips64el" ] && echo '-Dlibrsvg=false' ) \
 		output .
 	meson compile ${JOBS:+-j ${JOBS}} -C output
 }

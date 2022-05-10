@@ -11,7 +11,7 @@ license="GPL-2.0-or-later"
 depends="alsa-plugins-pulse
 	bash
 	dconf
-	gnome-shell
+	$( [ "$CARCH" = "mips64el" ] || echo gnome-shell )
 	mesa
 	mesa-dri-gallium
 	polkit

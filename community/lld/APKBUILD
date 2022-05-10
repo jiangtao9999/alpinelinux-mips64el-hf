@@ -33,6 +33,8 @@ case "$CARCH" in
 esac
 
 build() {
+	[ "$CARCH" = "mips64el" ] && export CXXFLAGS="$CXXFLAGS -UR4000"
+
 	cmake -B build -G Ninja -Wno-dev \
 		-DCMAKE_BUILD_TYPE=MinSizeRel \
 		-DCMAKE_VERBOSE_MAKEFILE=OFF \

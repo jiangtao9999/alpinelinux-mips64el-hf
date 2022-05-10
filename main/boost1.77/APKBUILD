@@ -76,6 +76,8 @@ _set_options() {
 	local _options_python="${PY2_VERSION:+$PY2_VERSION,}$PY3_VERSION"
 	[ -z "$_options_python" ] || _options_python="python=$_options_python"
 
+	[ "$CARCH" = "mips64el" ] && _options_carch="abi=n64"
+
 	_options="
 		--user-config=\"$builddir/user-config.jam\"
 		--prefix=\"$pkgdir/usr\"

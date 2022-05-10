@@ -41,7 +41,8 @@ subpackages="
 	$pkgname-xetex:xetex
 	$pkgname-luatex:lua
 	"
-source="https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/${pkgver:0:4}/texlive-$pkgver-source.tar.xz"
+source="https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/${pkgver:0:4}/texlive-$pkgver-source.tar.xz
+	fix-mips64.patch"
 
 builddir="$srcdir"/texlive-$pkgver-source
 
@@ -203,4 +204,5 @@ xdvi() {
 
 sha512sums="
 afd6eb24efaeac7c58d43ff24162aece919079a9ae02934509f068c7a3828223c33c14d9db11ff7fea3560b08a06f352446ba7f845eefb4a56a87b96f088f213  texlive-20210325-source.tar.xz
+d474f9f62c81e2c79a83436b62d353df4be4eaff0c1a8581bc7b978fbf4952e66d0783622193613b9b95f26f496cd0b2a032ce5cff97cafefc316f8248852fc2  fix-mips64.patch
 "

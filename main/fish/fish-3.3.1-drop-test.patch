@@ -1,0 +1,12 @@
+diff -Nur fish-3.3.1-orig/src/fish_tests.cpp fish-3.3.1/src/fish_tests.cpp
+--- fish-3.3.1-orig/src/fish_tests.cpp	2021-12-22 15:40:42.470746714 +0800
++++ fish-3.3.1/src/fish_tests.cpp	2021-12-22 15:45:33.220335441 +0800
+@@ -5723,8 +5723,6 @@
+         {{L"string", L"match", L"-r", L"-a", L"a*", L"b", 0}, STATUS_CMD_OK, L"\n\n"},
+         {{L"string", L"match", L"-r", L"foo\\Kbar", L"foobar", 0}, STATUS_CMD_OK, L"bar\n"},
+         {{L"string", L"match", L"-r", L"(foo)\\Kbar", L"foobar", 0}, STATUS_CMD_OK, L"bar\nfoo\n"},
+-        {{L"string", L"match", L"-r", L"(?=ab\\K)", L"ab", 0}, STATUS_CMD_OK, L"\n"},
+-        {{L"string", L"match", L"-r", L"(?=ab\\K)..(?=cd\\K)", L"abcd", 0}, STATUS_CMD_OK, L"\n"},
+ 
+         {{L"string", L"replace", 0}, STATUS_INVALID_ARGS, L""},
+         {{L"string", L"replace", L"", 0}, STATUS_INVALID_ARGS, L""},

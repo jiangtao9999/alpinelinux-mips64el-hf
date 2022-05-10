@@ -12,7 +12,7 @@ depends="dbus
 	dconf
 	gnome-session
 	gnome-settings-daemon
-	gnome-shell
+	$( [ "$CARCH" = "mips64el" ] || echo gnome-shell )
 	gsettings-desktop-schemas
 	linux-pam>=1.4
 	xorg-server

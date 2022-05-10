@@ -1,0 +1,12 @@
+--- parallel-n64-0a67445ce63513584d92e5c57ea87efe0da9b3bd-orig/Makefile
++++ parallel-n64-0a67445ce63513584d92e5c57ea87efe0da9b3bd/Makefile
+@@ -97,6 +97,9 @@
+ else ifneq (, $(findstring arm, $(ARCH)))
+    WITH_DYNAREC = arm
+    CFLAGS += -DARM_FIX
++else
++   WITH_DYNAREC =
++   CFLAGS += -DARM_FIX
+ endif
+ 
+ ifeq ($(HAVE_VULKAN_DEBUG),1)

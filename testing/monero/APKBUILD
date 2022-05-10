@@ -18,6 +18,7 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/monero-project/monero/archiv
 	easylogging.patch
 	system-miniupnpc.patch
 	version-string.patch
+	monero-0.17.2.3-fix-mips.patch
 	"
 
 build() {
@@ -45,4 +46,5 @@ sha512sums="
 c149f1e6a6968115f95213d512116457b36665ff1159c5137dda45fa27712ce6f088b908663fb429b8e5f74e41d6cd57669db79d596564ddaca481dbdc63393e  easylogging.patch
 70c8e981d87442e0c8eccb6804af8ba78c312cfeb547957b20c8e4e83e533f161ce1b094891a99df4113e901f43954a0f1473e39781e8dae77faa0726132563b  system-miniupnpc.patch
 087e48b0507c0fb7cc9dbab05b0373b61687de3935642299c6df0194539934e7cccad497435c32291c063b10f4d91d4fbc98d81e269148c4e14780ed38d43559  version-string.patch
+a3846f39bbfc5cfd8cf495b7396ad2b76572a47c0640cd3ee0849bd526e9f4182e135e63bfe894ab4bb65e06c7d9d9050060582763ae3b0b23b00a0fe0142655  monero-0.17.2.3-fix-mips.patch
 "

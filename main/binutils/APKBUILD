@@ -19,6 +19,7 @@ source="https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz
 	binutils-mips-disable-assert.patch
 	bfd-close-file-desriptor-if-there-is-no-archive-fd.patch
 	defang-no-split.patch
+	mips-n64-default.patch
 	"
 builddir="$srcdir/$pkgname-$pkgver"
 
@@ -69,7 +70,7 @@ build() {
 	fi
 
 	case "$CTARGET_ARCH" in
-	mips*)  _hash_style_configure="--enable-default-hash-style=sysv" ;;
+	mips*)  _hash_style_configure="--enable-default-hash-style=both" ;;
 	*)      _hash_style_configure="--enable-default-hash-style=gnu"	;;
 	esac
 
@@ -142,4 +143,5 @@ f55cf2e0bf82f97583a1abe10710e4013ecf7d64f1da2ef8659a44a06d0dd8beaf58dab98a183488
 609cd90d8b334eb309f586b17b9d335a08d3dbb6def7c3eb5c010028fcb681674031e5b9d853aa7a39a50304356a86afc184b85562b3f228f8197f4d29395c8f  binutils-mips-disable-assert.patch
 10a0074583d2cc4598710c7e434ba7088da074b105f4f5e951fc61af7150ad62adf60a7c98f6fd13b1771f169e45a5a1ef618240c6893d3f0f3d93fd768a03c6  bfd-close-file-desriptor-if-there-is-no-archive-fd.patch
 4652f092c9376f0cb7fd6c72cb37ff7c15c1c6e3408fac79329b7f41a7925c98eb35989a9a040682130988a36401901d6d95afa44f0ce50caa85ee478db6bf03  defang-no-split.patch
+85b22de5e3a2262ee8e201f127115b4b8afe0085e1be665fa607d3a81690dd449902817810227a2245ced59d0d0ac96fb1d4deef798e236d1502d8e22174d200  mips-n64-default.patch
 "

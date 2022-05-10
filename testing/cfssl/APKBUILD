@@ -15,6 +15,7 @@ export GOPATH="$srcdir"
 export GOFLAGS="$GOFLAGS -trimpath -modcacherw -mod=vendor"
 
 build() {
+	export GOFLAGS="$( echo $GOFLAGS | sed -e 's|-buildmode=exe||'  )"
 	go build \
 		-ldflags="-s -w -X github.com/cloudflare/cfssl/cli/version.version=$pkgver" \
 		-v -o bin/ ./cmd/...

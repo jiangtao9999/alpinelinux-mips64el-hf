@@ -13,6 +13,7 @@ source="https://downloads.sourceforge.net/project/gnu-efi/gnu-efi-$pkgver.tar.bz
 	"
 
 build() {
+	[ "$CARCH" = "mips64el" ] && sed -i "s|__mips64__|__mips64|" inc/efirtlib.h inc/efi.h inc/efilib.h
 	make -j1
 }
 

@@ -1,0 +1,271 @@
+From: =?utf-8?b?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>
+Date: Mon, 4 May 2020 18:18:23 +0100
+Subject: src: don't declare global variables in header files
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+In Fedora 32 and later the linker will no longer merge duplicate global
+variables. Thus headers need fixing to properly use "extern" and put the
+actual declaration in the source files.
+
+Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ src/libvirt-connection.c | 2 ++
+ src/libvirt-connection.h | 2 +-
+ src/libvirt-domain.c     | 2 ++
+ src/libvirt-domain.h     | 2 +-
+ src/libvirt-network.c    | 2 ++
+ src/libvirt-network.h    | 2 +-
+ src/libvirt-nodedev.c    | 2 ++
+ src/libvirt-nodedev.h    | 2 +-
+ src/libvirt-nwfilter.c   | 2 ++
+ src/libvirt-nwfilter.h   | 2 +-
+ src/libvirt-php.c        | 2 ++
+ src/libvirt-php.h        | 2 +-
+ src/libvirt-snapshot.c   | 2 ++
+ src/libvirt-snapshot.h   | 2 +-
+ src/libvirt-storage.c    | 3 +++
+ src/libvirt-storage.h    | 4 ++--
+ src/libvirt-stream.c     | 2 ++
+ src/libvirt-stream.h     | 2 +-
+ 18 files changed, 29 insertions(+), 10 deletions(-)
+
+diff --git a/src/libvirt-connection.c b/src/libvirt-connection.c
+index 9e70031..adc0045 100644
+--- a/src/libvirt-connection.c
++++ b/src/libvirt-connection.c
+@@ -11,6 +11,8 @@
+ 
+ DEBUG_INIT("connection");
+ 
++int le_libvirt_connection;
++
+ /*
+  * Private function name:   free_resources_on_connection
+  * Since version:           0.4.2
+diff --git a/src/libvirt-connection.h b/src/libvirt-connection.h
+index 0cae5ec..20f79e0 100644
+--- a/src/libvirt-connection.h
++++ b/src/libvirt-connection.h
+@@ -46,7 +46,7 @@
+             RETURN_FALSE;                                                      \
+     } while (0)
+ 
+-int le_libvirt_connection;
++extern int le_libvirt_connection;
+ 
+ typedef struct _php_libvirt_connection {
+     virConnectPtr conn;
+diff --git a/src/libvirt-domain.c b/src/libvirt-domain.c
+index 9a7f28c..44b29f2 100644
+--- a/src/libvirt-domain.c
++++ b/src/libvirt-domain.c
+@@ -15,6 +15,8 @@
+ 
+ DEBUG_INIT("domain");
+ 
++int le_libvirt_domain;
++
+ void
+ php_libvirt_domain_dtor(virt_resource *rsrc TSRMLS_DC)
+ {
+diff --git a/src/libvirt-domain.h b/src/libvirt-domain.h
+index 8b80c9c..8640df8 100644
+--- a/src/libvirt-domain.h
++++ b/src/libvirt-domain.h
+@@ -120,7 +120,7 @@
+     PHP_FE(libvirt_list_active_domains,          arginfo_libvirt_conn)                         \
+     PHP_FE(libvirt_list_inactive_domains,        arginfo_libvirt_conn)
+ 
+-int le_libvirt_domain;
++extern int le_libvirt_domain;
+ 
+ typedef struct _php_libvirt_domain {
+     virDomainPtr domain;
+diff --git a/src/libvirt-network.c b/src/libvirt-network.c
+index 98ae539..8a6d8ac 100644
+--- a/src/libvirt-network.c
++++ b/src/libvirt-network.c
+@@ -11,6 +11,8 @@
+ 
+ DEBUG_INIT("network");
+ 
++int le_libvirt_network;
++
+ void
+ php_libvirt_network_dtor(virt_resource *rsrc TSRMLS_DC)
+ {
+diff --git a/src/libvirt-network.h b/src/libvirt-network.h
+index 604b803..634c681 100644
+--- a/src/libvirt-network.h
++++ b/src/libvirt-network.h
+@@ -45,7 +45,7 @@
+     PHP_FE(libvirt_list_all_networks,       arginfo_libvirt_conn_optflags)     \
+     PHP_FE(libvirt_list_networks,           arginfo_libvirt_conn_optflags)
+ 
+-int le_libvirt_network;
++extern int le_libvirt_network;
+ 
+ typedef struct _php_libvirt_network {
+     virNetworkPtr network;
+diff --git a/src/libvirt-nodedev.c b/src/libvirt-nodedev.c
+index 5cfe428..e7a8535 100644
+--- a/src/libvirt-nodedev.c
++++ b/src/libvirt-nodedev.c
+@@ -11,6 +11,8 @@
+ 
+ DEBUG_INIT("nodedev");
+ 
++int le_libvirt_nodedev;
++
+ void
+ php_libvirt_nodedev_dtor(virt_resource *rsrc TSRMLS_DC)
+ {
+diff --git a/src/libvirt-nodedev.h b/src/libvirt-nodedev.h
+index 350b213..1357037 100644
+--- a/src/libvirt-nodedev.h
++++ b/src/libvirt-nodedev.h
+@@ -35,7 +35,7 @@
+             RETURN_FALSE;                                                      \
+     } while (0)
+ 
+-int le_libvirt_nodedev;
++extern int le_libvirt_nodedev;
+ 
+ typedef struct _php_libvirt_nodedev {
+     virNodeDevicePtr device;
+diff --git a/src/libvirt-nwfilter.c b/src/libvirt-nwfilter.c
+index 6edaead..049eab1 100644
+--- a/src/libvirt-nwfilter.c
++++ b/src/libvirt-nwfilter.c
+@@ -11,6 +11,8 @@
+ 
+ DEBUG_INIT("nwfilter");
+ 
++int le_libvirt_nwfilter;
++
+ void
+ php_libvirt_nwfilter_dtor(virt_resource *rsrc TSRMLS_DC)
+ {
+diff --git a/src/libvirt-nwfilter.h b/src/libvirt-nwfilter.h
+index c0cebb3..b450419 100644
+--- a/src/libvirt-nwfilter.h
++++ b/src/libvirt-nwfilter.h
+@@ -42,7 +42,7 @@
+             RETURN_FALSE;                                                      \
+     } while (0)                                                                \
+ 
+-int le_libvirt_nwfilter;
++extern int le_libvirt_nwfilter;
+ 
+ typedef struct _php_libvirt_nwfilter {
+     virNWFilterPtr nwfilter;
+diff --git a/src/libvirt-php.c b/src/libvirt-php.c
+index 75cbf68..04f73d9 100644
+--- a/src/libvirt-php.c
++++ b/src/libvirt-php.c
+@@ -31,6 +31,8 @@
+ 
+ DEBUG_INIT("core");
+ 
++ZEND_DECLARE_MODULE_GLOBALS(libvirt)
++
+ #ifndef EXTWIN
+ /* Additional binaries */
+ const char *features[] = { "screenshot", "create-image", "screenshot-convert", NULL };
+diff --git a/src/libvirt-php.h b/src/libvirt-php.h
+index d6e61c5..f0c77ce 100644
+--- a/src/libvirt-php.h
++++ b/src/libvirt-php.h
+@@ -155,7 +155,7 @@ ZEND_BEGIN_MODULE_GLOBALS(libvirt)
+     int binding_resources_count;
+ ZEND_END_MODULE_GLOBALS(libvirt)
+ 
+-ZEND_DECLARE_MODULE_GLOBALS(libvirt)
++ZEND_EXTERN_MODULE_GLOBALS(libvirt)
+ 
+ /* Private definitions */
+ void set_error(char *msg TSRMLS_DC);
+diff --git a/src/libvirt-snapshot.c b/src/libvirt-snapshot.c
+index 1388d88..4517640 100644
+--- a/src/libvirt-snapshot.c
++++ b/src/libvirt-snapshot.c
+@@ -11,6 +11,8 @@
+ 
+ DEBUG_INIT("snapshot");
+ 
++int le_libvirt_snapshot;
++
+ void php_libvirt_snapshot_dtor(virt_resource *rsrc TSRMLS_DC)
+ {
+     php_libvirt_snapshot *snapshot = (php_libvirt_snapshot *)rsrc->ptr;
+diff --git a/src/libvirt-snapshot.h b/src/libvirt-snapshot.h
+index e6092aa..a9e78fc 100644
+--- a/src/libvirt-snapshot.h
++++ b/src/libvirt-snapshot.h
+@@ -38,7 +38,7 @@
+             RETURN_FALSE;                                                      \
+     } while (0)                                                                \
+ 
+-int le_libvirt_snapshot;
++extern int le_libvirt_snapshot;
+ 
+ typedef struct _php_libvirt_snapshot {
+     virDomainSnapshotPtr snapshot;
+diff --git a/src/libvirt-storage.c b/src/libvirt-storage.c
+index 8245227..749b853 100644
+--- a/src/libvirt-storage.c
++++ b/src/libvirt-storage.c
+@@ -12,6 +12,9 @@
+ 
+ DEBUG_INIT("storage");
+ 
++int le_libvirt_storagepool;
++int le_libvirt_volume;
++
+ void
+ php_libvirt_storagepool_dtor(virt_resource *rsrc TSRMLS_DC)
+ {
+diff --git a/src/libvirt-storage.h b/src/libvirt-storage.h
+index de972f7..7620c15 100644
+--- a/src/libvirt-storage.h
++++ b/src/libvirt-storage.h
+@@ -83,8 +83,8 @@
+             RETURN_FALSE;                                                      \
+     } while (0)                                                                \
+ 
+-int le_libvirt_storagepool;
+-int le_libvirt_volume;
++extern int le_libvirt_storagepool;
++extern int le_libvirt_volume;
+ 
+ typedef struct _php_libvirt_storagepool {
+     virStoragePoolPtr pool;
+diff --git a/src/libvirt-stream.c b/src/libvirt-stream.c
+index f1fc1ff..11d7752 100644
+--- a/src/libvirt-stream.c
++++ b/src/libvirt-stream.c
+@@ -11,6 +11,8 @@
+ 
+ DEBUG_INIT("stream");
+ 
++int le_libvirt_stream;
++
+ void
+ php_libvirt_stream_dtor(virt_resource *rsrc TSRMLS_DC)
+ {
+diff --git a/src/libvirt-stream.h b/src/libvirt-stream.h
+index 89b28a6..c041ccb 100644
+--- a/src/libvirt-stream.h
++++ b/src/libvirt-stream.h
+@@ -20,7 +20,7 @@
+     PHP_FE(libvirt_stream_send,   arginfo_libvirt_stream_send)                 \
+     PHP_FE(libvirt_stream_recv,   arginfo_libvirt_stream_recv)
+ 
+-int le_libvirt_stream;
++extern int le_libvirt_stream;
+ 
+ typedef struct _php_libvirt_stream {
+     virStreamPtr stream;

@@ -45,7 +45,7 @@ check() {
 package() {
 	### Other options
 	#make install doesn't install html documentation
-	make -j1 DESTDIR="$pkgdir" install-all
+	make -j1 DESTDIR="$pkgdir" install
 }
 
 sha512sums="24d60af361e3f0309a896ce8163da6fc0a9d6587efe726c5acf874dcb74f4d51b4bad8146a615ff54173ef06dac53117fd1cc09c77940271adc9f64cac6bcfe6  asymptote-2.70.src.tgz"

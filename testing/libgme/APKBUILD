@@ -12,7 +12,8 @@ makedepends="cmake"
 subpackages="$pkgname-dev"
 options="!check" # make check not implemented
 source="$pkgname-$pkgver.tar.xz::https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-$pkgver.tar.xz
-	ppc-musl.patch"
+	ppc-musl.patch
+	fix-mips.patch"
 builddir="$srcdir/game-music-emu-$pkgver"
 
 build() {
@@ -36,4 +37,5 @@ package() {
 }
 
 sha512sums="4b20c69ced696bb879c34bcb7ce0f5f276642458d4cebca8ede673eed7d50664e527626e2077f85a3411a26660f1b3f01e43cccd72945e1edb2994421efeb552  libgme-0.6.3.tar.xz
-5134ab6028467f67fd83750dc5a8bcc5511ca66fdabb2adde121e8b7eaed80785d05db2ffd7be7d0d929a7e06f44c92037006899852e39f92a0f473215e7b8f0  ppc-musl.patch"
+5134ab6028467f67fd83750dc5a8bcc5511ca66fdabb2adde121e8b7eaed80785d05db2ffd7be7d0d929a7e06f44c92037006899852e39f92a0f473215e7b8f0  ppc-musl.patch
+16ee4ee581ef8f6ca9df0b7460d91ae5016314be76c63096c9d15135eaf1bae6a5194224c40d41620593df9e8ba5af2a109a65f91bf91cfd2d5ba8c311b7f59b  fix-mips.patch"

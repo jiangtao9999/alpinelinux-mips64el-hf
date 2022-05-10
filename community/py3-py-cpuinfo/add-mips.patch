@@ -1,0 +1,44 @@
+--- py-cpuinfo-7.0.0-orig/cpuinfo/cpuinfo.py
++++ py-cpuinfo-7.0.0/cpuinfo/cpuinfo.py
+@@ -226,7 +226,7 @@
+ # Make sure we are running on a supported system
+ def _check_arch():
+ 	arch, bits = _parse_arch(DataSource.arch_string_raw)
+-	if not arch in ['X86_32', 'X86_64', 'ARM_7', 'ARM_8', 'PPC_64', 'S390X']:
++	if not arch in ['X86_32', 'X86_64', 'ARM_7', 'ARM_8', 'PPC_64', 'S390X', 'MIPS', 'MIPS64']:
+ 		raise Exception("py-cpuinfo currently only works on X86 and some ARM/PPC/S390X CPUs.")
+ 
+ def _obj_to_b64(thing):
+@@ -670,6 +670,13 @@
+ 	elif re.match(r'^s390x$', arch_string_raw):
+ 		arch = 'S390X'
+ 		bits = 64
++	# MIPS
++	elif re.match(r'^mips64$', arch_string_raw):
++		arch = 'MIPS64'
++		bits = 64
++	elif re.match(r'^mips$', arch_string_raw):
++		arch = 'MIPS'
++		bits = 32
+ 
+ 	return (arch, bits)
+ 
+@@ -1462,15 +1469,15 @@
+ 
+ 		# Various fields
+ 		vendor_id = _get_field(False, output, None, '', 'vendor_id', 'vendor id', 'vendor')
+-		processor_brand = _get_field(True, output, None, None, 'model name','cpu', 'processor')
++		processor_brand = _get_field(True, output, None, None, 'model name','cpu', 'processor', 'cpu model')
+ 		cache_size = _get_field(False, output, None, '', 'cache size')
+ 		stepping = _get_field(False, output, int, 0, 'stepping')
+ 		model = _get_field(False, output, int, 0, 'model')
+ 		family = _get_field(False, output, int, 0, 'cpu family')
+-		hardware = _get_field(False, output, None, '', 'Hardware')
++		hardware = _get_field(False, output, None, '', 'Hardware', 'system type')
+ 
+ 		# Flags
+-		flags = _get_field(False, output, None, None, 'flags', 'Features')
++		flags = _get_field(False, output, None, None, 'flags', 'Features', 'ASEs implemented')
+ 		if flags:
+ 			flags = flags.split()
+ 			flags.sort()

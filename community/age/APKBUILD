@@ -15,6 +15,7 @@ source="https://github.com/FiloSottile/age/archive/v$pkgver/age-$pkgver.tar.gz"
 
 export GOPATH="$srcdir"
 export GOFLAGS="$GOFLAGS -trimpath -modcacherw"
+export GOFLAGS="$( echo $GOFLAGS |sed 's/-buildmode=exe//' )"
 export CGO_ENABLED=0
 
 build() {

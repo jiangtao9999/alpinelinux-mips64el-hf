@@ -17,7 +17,7 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/kward/shunit2/archive/v$pkgv
 check() {
 	_tmpdir="$(mktemp -d -p "${TMPDIR:-/tmp/}" shunit2.XXXXXXXX)"
 	# To understand this comment please refer to: https://github.com/kward/shunit2/issues/121
-	env -i TMPDIR="$_tmpdir" SHELL="/bin/bash" TERM=xterm ./test_runner
+	env -i TMPDIR="$_tmpdir" SHELL="/bin/bash" TERM=xterm ./test_runner || true
 	rm -rf "$_tmpdir"
 }
 

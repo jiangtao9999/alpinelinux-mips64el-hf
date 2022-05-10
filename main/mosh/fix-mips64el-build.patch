@@ -1,0 +1,33 @@
+diff -Nuir mosh-1.3.2-orig/src/examples/termemu.cc mosh-1.3.2/src/examples/termemu.cc
+--- mosh-1.3.2-orig/src/examples/termemu.cc	2021-09-25 20:34:03.697382375 +0800
++++ mosh-1.3.2/src/examples/termemu.cc	2021-09-25 20:37:19.379025124 +0800
+@@ -226,7 +226,7 @@
+   }
+ 
+   /* tell child process */
+-  #if defined(__powerpc64__) && (!defined(__GLIBC__) && !defined(__UCLIBC__))
++  #if (defined(__mips64) || defined(__powerpc64__)) && (!defined(__GLIBC__) && !defined(__UCLIBC__))
+   if ( ioctl( fd, (int) TIOCSWINSZ, &window_size ) < 0 ) {
+   #else
+   if ( ioctl( fd, TIOCSWINSZ, &window_size ) < 0 ) {
+@@ -310,7 +310,7 @@
+       complete.act( &r );
+ 
+       /* tell child process */
+-      #if defined(__powerpc64__) && (!defined(__GLIBC__) && !defined(__UCLIBC__))
++      #if (defined(__mips64) || defined(__powerpc64__)) && (!defined(__GLIBC__) && !defined(__UCLIBC__))
+       if ( ioctl( fd, (int) TIOCSWINSZ, &window_size ) < 0 ) {
+       #else
+       if ( ioctl( fd, TIOCSWINSZ, &window_size ) < 0 ) {
+diff -Nuir mosh-1.3.2-orig/src/frontend/mosh-server.cc mosh-1.3.2/src/frontend/mosh-server.cc
+--- mosh-1.3.2-orig/src/frontend/mosh-server.cc	2021-09-25 20:34:03.693475846 +0800
++++ mosh-1.3.2/src/frontend/mosh-server.cc	2021-09-25 20:36:12.140003650 +0800
+@@ -728,7 +728,7 @@
+ 	      window_size.ws_col = res->width;
+ 	      window_size.ws_row = res->height;
+ 
+-	      #if defined(__powerpc64__) && (!defined(__GLIBC__) && !defined(__UCLIBC__))
++	      #if (defined(__mips64) || defined(__powerpc64__)) && (!defined(__GLIBC__) && !defined(__UCLIBC__))
+ 	      if ( ioctl( host_fd, (int) TIOCSWINSZ, &window_size ) < 0 ) { 
+ 	      #else
+ 	      if ( ioctl( host_fd, TIOCSWINSZ, &window_size ) < 0 ) { 

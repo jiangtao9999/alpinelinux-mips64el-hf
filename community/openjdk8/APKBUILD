@@ -109,6 +109,7 @@ source="https://icedtea.classpath.org/download/source/icedtea-$_icedteaver.tar.x
 	icedtea-JDK-6515172_1_apply-jdk9-version.patch
 	icedtea-issue13032.patch
 	autoconf-2.7x.patch
+	icedtea-add-mips.patch
 	"
 builddir="$srcdir/icedtea-$_icedteaver"
 
@@ -418,4 +419,5 @@ c70fee8f1a10c155494ab9c6e55e979d8a3e23f12358ffe9de2029ae15feff361957f1aa43af43c9
 52572221ed4f3129bb5de5f134448ffa12b9225980d92684c45b00be42d63f5f89bbf80e0b7294e768fdf6abbbc34301b96289a3c6543bfa4edd0249c1224c77  icedtea-JDK-6515172_1_apply-jdk9-version.patch
 e1bca07aa1a25258ee9c8e9870f8d475db788bab1a354c5458196012aaf20fba8b3968b646d18792ab7135e9b75cbebafc53fda176166bc6ddfd13e4a43b1c8d  icedtea-issue13032.patch
 d05ef2da69d3e02cbee5bd55be86b61c0a701f65e8cfac287f9b5025934059870d09d5b006c1ffe4e9b9c8aca33842199512d3433249e19346d855e768c0d94f  autoconf-2.7x.patch
+b0c861d27517032e50744712e03b0a3c1d7f6bdac0a29dfb8d06ba3f25651e73c9906c6cb22b971d03dd5dbfb0a69cf3aa9698269f5faeca63905a2f44d1c7f4  icedtea-add-mips.patch
 "

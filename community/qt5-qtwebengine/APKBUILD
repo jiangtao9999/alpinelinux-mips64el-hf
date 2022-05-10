@@ -12,7 +12,7 @@ pkgdesc="Qt5 - QtWebEngine components"
 url="https://doc.qt.io/QT-5/qtwebengine-index.html"
 # ppc64le and s390x are not supported
 # armhf blocked by qt5-qtdeclarative
-arch="aarch64 armv7 x86 x86_64"
+arch="aarch64 armv7 x86 x86_64 mips64el"
 license="LGPL-2.1-only AND LGPL-3.0-only AND GPL-3.0-only AND Qt-GPL-exception-1.0"
 depends_dev="
 	ffmpeg-dev
@@ -93,6 +93,13 @@ source="$pkgname-$pkgver.tar.gz::https://invent.kde.org/qt/qt/qtwebengine/-/arch
 	qt-musl-thread-stacksize.patch
 	remove-glibc-check.patch
 	fix-chromium-build.patch
+	mipsel-no-dav1d.patch
+	mips64el-bad-define.patch
+	breakpad-getcontext.patch
+	qt-musl-fix-mips_reg.patch
+	mips64el-crashpad.patch
+	mipsel-linux-5.patch
+	mips64el-kernel_stat64.patch
 	"
 builddir="$srcdir/qtwebengine-$_commit"
 
@@ -282,4 +289,11 @@ b5e117f94811c4c65cfd99885b0f23e82cabf25529b2a867f8dec5efdbcef98441d32b5b89e96c96
 f565a31b007db408ef96db3f7d003f465d1db765fb84b50a1f82b449d49949dd4fafa2b374889621a5c431c1d6e758797dfce76e34199282aa2fbe03bbf5aa38  qt-musl-thread-stacksize.patch
 0ef2adce746a0ee121f04aab8ad9e2e338f996286d045a2bffb20e57c37e9432f22cd0b574fbe06f19b928749c35f3d51d9b3a49967b51e89c3440240f110c35  remove-glibc-check.patch
 f40f42a33e8d8c9a4129a2e40f3177d1ffc4d1fc28ceda7b8ffab9c8d14cdcca8d0e804c55257a2932e772f89fcf6e7401fe3398a70a045835add6d9c1ba7bb3  fix-chromium-build.patch
+0120075f4fed3fa16c6301737a0dbe241c41762d406213958203e0a756cc8969ac093d841d7a010d00a167637f8abf9b679785dcccf11843f7720921928d5a20  mipsel-no-dav1d.patch
+63fff8877b0cca9e42245f0d6dbf2a0f68ee07b16846c30ce9dbd88b0c9ab65ad23d5951dc549b8bf95556c3d32435109f540e3d8af979f4f9a3c529185fa105  mips64el-bad-define.patch
+0907c45992b08045de0e6ac92dbc33a1825fe7e41e3ab23057c403eb8459e10cb576cc1b50f4b2760bcc13fd8b24eed809e9cb771d5baad8e357b08727f28737  breakpad-getcontext.patch
+66bb02b716c4fcce83e39c40516e2df5169ef9130d72146a6264652cf4f14dbd9c8a04f6cf4dea40ca572513a3680bc19ff72a1f940cff90689eec186556449b  qt-musl-fix-mips_reg.patch
+cdb8d7cd38470e419f89769469606d2b58acee5e0131378a10ddd2692369af928fa97b662a5bee6838de6b086d896792beb83a00596c946b72daff077074557a  mips64el-crashpad.patch
+407d49ca97103f8f65871f51ac1b57ed9a45e0c864c5d73b677b82ad97fef51b8428355beed0877a4947c5cf7d71e46734732017e0d0d9a48471932ddd8a4234  mipsel-linux-5.patch
+418855ff40c5beb3b343fb87dafd83b87b318105ff1f2e05a749b29a2f2b40342fba3e3a976275044ace5f8167cff014eb47e6470dafa1942761c2bd1a5f083d  mips64el-kernel_stat64.patch
 "

@@ -1,0 +1,16 @@
+diff -Nur sbsigntools-0.9.4-orig/configure.ac sbsigntools-0.9.4/configure.ac
+--- sbsigntools-0.9.4-orig/configure.ac	2021-11-28 16:40:21.349956886 +0800
++++ sbsigntools-0.9.4/configure.ac	2021-11-28 16:46:51.180296481 +0800
+@@ -65,6 +65,12 @@
+ 
+ dnl gnu-efi headers require extra include dirs
+ EFI_ARCH=$(uname -m | sed 's/i.86/ia32/;s/arm.*/arm/')
++if test "$little_endian" = "1" ; then
++case ${EFI_ARCH} in
++       mips64) EFI_ARCH="mips64el" ;;
++       mips)   EFI_ARCH="mipsel" ;;
++esac
++fi
+ AM_CONDITIONAL(TEST_BINARY_FORMAT, [ test "$EFI_ARCH" = "arm" -o "$EFI_ARCH" = "aarch64" ])
+ 
+ ##

@@ -105,13 +105,6 @@ mips*)		_libitm=false ;;
 riscv64)	_libitm=false ;;
 esac
 
-# Internal libffi fails to build on MIPS at the moment, need to
-# investigate further.  We disable LANG_GO on mips64 as it requires
-# the internal libffi.
-case "$CTARGET_ARCH" in
-mips*)		LANG_GO=false ;;
-esac
-
 # Fortran uses libquadmath if toolchain has __float128
 # currently on x86, x86_64 and ia64
 _libquadmath=$LANG_FORTRAN
@@ -214,6 +207,7 @@ source="https://dev.alpinelinux.org/~nenolod/gcc-${pkgver}.tar.xz
 	0040-configure-Add-enable-autolink-libatomic-use-in-LINK_.patch
 	0041-Use-generic-errstr.go-implementation-on-musl.patch
 	0042-configure-fix-detection-of-atomic-builtins-in-libato.patch
+	libffi-mips.patch
 	"
 
 # we build out-of-tree
@@ -261,8 +255,8 @@ build() {
 	armv7-*-*-*eabihf)	_arch_configure="--with-arch=armv7-a --with-tune=generic-armv7-a --with-fpu=vfpv3-d16 --with-float=hard --with-abi=aapcs-linux --with-mode=thumb";;
 	mips-*-*-*)		_arch_configure="--with-arch=mips32 --with-mips-plt --with-float=soft --with-abi=32";;
 	mips64-*-*-*)		_arch_configure="--with-arch=mips3 --with-tune=mips64 --with-mips-plt --with-float=soft --with-abi=64";;
-	mips64el-*-*-*)		_arch_configure="--with-arch=mips3 --with-tune=mips64 --with-mips-plt --with-float=soft --with-abi=64";;
-	mipsel-*-*-*)		_arch_configure="--with-arch=mips32 --with-mips-plt --with-float=soft --with-abi=32";;
+	mips64el-*-*-*)		_arch_configure="--with-arch=mips3 --with-tune=mips64 --with-mips-plt --with-float=hard --with-abi=64";;
+	mipsel-*-*-*)		_arch_configure="--with-arch=mips32 --with-mips-plt --with-float=hard --with-fp=32 --with-abi=32";;
 	powerpc-*-*-*)		_arch_configure="--enable-secureplt --enable-decimal-float=no";;
 	powerpc64*-*-*-*)	_arch_configure="--with-abi=elfv2 --enable-secureplt --enable-decimal-float=no --enable-targets=powerpcle-linux";;
 	i486-*-*-*)		_arch_configure="--with-arch=i486 --with-tune=generic --enable-cld";;
@@ -272,7 +266,7 @@ build() {
 	esac
 
 	case "$CTARGET_ARCH" in
-	mips*)	_hash_style_configure="--with-linker-hash-style=sysv" ;;
+	mips*)	_hash_style_configure="--with-linker-hash-style=both" ;;
 	*)	_hash_style_configure="--with-linker-hash-style=gnu" ;;
 	esac
 
@@ -705,4 +699,5 @@ dfec489d78a0921cdd9a6a1b35a14566f565413e2f4f0467db37f0650e28be9482111bdfe9327428
 3963bac9cd0f8c442599a5e983f033798266e20e9f7ba72c023724e0917a0ae750856d15e0e9a527f6f60e735ddfa66f8f3e300de47e54cad6c440ddc0403081  0040-configure-Add-enable-autolink-libatomic-use-in-LINK_.patch
 9f82ce02f355ae38952d17512fc962886f485e06d9ae2ef57f13ccc3f7b298d7e9921f8867b86d7d1fee442df887ba4ee3983521bfa91248872110a1b6c070aa  0041-Use-generic-errstr.go-implementation-on-musl.patch
 40168210e381c329a7ff3e332dedadfa0c60e9da3251c29e660aeeae478da5c5988dc9144a9e6be178202d1d15e2dfa273f5034a861054786ef7cfd4f56c2745  0042-configure-fix-detection-of-atomic-builtins-in-libato.patch
+e849b09977875092959266c0ac8edb1bf722c37771fb4c77f816592300f037dfd866e45d840a6632e9527760042a5320a7eb9f3e694b044114fa0a60794cdbf8  libffi-mips.patch
 "

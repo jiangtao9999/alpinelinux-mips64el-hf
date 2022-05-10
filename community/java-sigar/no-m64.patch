@@ -1,0 +1,19 @@
+Description: Removing cc -m64 flag to fix build on mips64el, mips64, aarch64
+ and riscv64 (Closes: #997807). Thanks Aurelien Jarno.
+Author: Andrius Merkys <merkys@debian.org>
+--- a/bindings/java/hyperic_jni/src/org/hyperic/jni/ArchNameTask.java
++++ b/bindings/java/hyperic_jni/src/org/hyperic/jni/ArchNameTask.java
+@@ -74,11 +74,11 @@
+ 
+         if (ArchName.is64()) {
+             getProject().setProperty("jni.arch64", "true");
+-            if (ArchLoader.IS_LINUX) {
++            /* if (ArchLoader.IS_LINUX) {
+                 if (!osArch.equals("ia64")) {
+                     getProject().setProperty("jni.gccm", "-m64");
+                 }
+-            }
++            } */
+         }
+         else {
+             if (ArchLoader.IS_LINUX && osArch.equals("s390")) {

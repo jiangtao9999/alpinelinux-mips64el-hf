@@ -12,6 +12,7 @@ options="!check" # No test suite from upstream
 subpackages="$pkgname-doc"
 source="http://iozone.org/src/current/iozone$_pkgver.tar
 	https://www.iozone.org/docs/Iozone_License.txt
+	fix-mips64.patch
 	"
 builddir="$srcdir/${pkgname}$_pkgver/"
 
@@ -25,6 +26,7 @@ build() {
 		armhf) target="linux-arm" ;;
 		s390x) target="linux-S390X" ;;
 		ppc64le) target="linux-powerpc64" ;;
+		mips64el) target="generic" ;;
 		*) msg "Unable to determine architecture from (CARCH=$CARCH)" ; return 1 ;;
 	esac
 
@@ -46,4 +48,5 @@ package() {
 sha512sums="
 171bf02cb7b9fd121fd229ff551d24b2f70bbc22e051b5ad1792a9b617e8fb672dd17120658987115dea1017dddd56ccdf61f14c5930a09a6bd65b9ac0c3249f  iozone3_492.tar
 9589952c15cde6701f239b6031996e504fd62f70ef1e63938544ca8ecf7e38b53ff731919e48285a9354080120b74fcdd9d548ada9a719368726e67b536e6fda  Iozone_License.txt
+ed8df264c73f3af1404ccbcf0dfa16a3ad759d238b915aa8e0e062617d6a780f2f0406a8a010cc7f7a158cdae59ea57568d1c8a0af3fab27266a39e0eb76521a  fix-mips64.patch
 "

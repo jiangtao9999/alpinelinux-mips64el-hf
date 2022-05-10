@@ -9,7 +9,8 @@ url="https://github.com/libretro/beetle-saturn-libretro"
 arch="all !mips !mips64" # fails to build on mips
 license="GPL-2.0-only"
 makedepends="zlib-dev"
-source="$pkgname-$_commit.tar.gz::https://github.com/libretro/beetle-saturn-libretro/archive/$_commit.tar.gz"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/beetle-saturn-libretro/archive/$_commit.tar.gz
+	libretro-beetle-saturn-fix-mips.patch"
 builddir="$srcdir/beetle-saturn-libretro-$_commit"
 options="!check" # No tests
 
@@ -22,4 +23,5 @@ package() {
 	install -Dm644 mednafen_saturn_libretro.so "$pkgdir"/usr/lib/libretro/mednafen_saturn_libretro.so
 }
 
-sha512sums="c1a23fef93a3e38ff81e62c4e355b3be6cd5a74cb6abf21075dc6bb5e0fb6fcd588d8e28e0d77d627473c5f37bc29022a911b45481e513b4fa7f2284e47eec1c  libretro-beetle-saturn-f7515829166660a61c6692160bb2b2d2633df9fc.tar.gz"
+sha512sums="c1a23fef93a3e38ff81e62c4e355b3be6cd5a74cb6abf21075dc6bb5e0fb6fcd588d8e28e0d77d627473c5f37bc29022a911b45481e513b4fa7f2284e47eec1c  libretro-beetle-saturn-f7515829166660a61c6692160bb2b2d2633df9fc.tar.gz
+80a5b65713e718f8cc78cd9c186d1a9685f598e2019dd5715d8bb5383c0baa56d3ad9788240949c601b9ad3736214340732a124f04d0077688ee61c2e7420465  libretro-beetle-saturn-fix-mips.patch"

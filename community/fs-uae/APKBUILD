@@ -21,7 +21,7 @@ build() {
 			export CFLAGS="$CFLAGS -g -O2 -U__ALTIVEC__"
 			export CXXFLAGS="$CXXFLAGS -D__STRICT_ANSI__ -g -O2 -U__ALTIVEC__"
 			;;
-		riscv64)
+		riscv64|mips64el)
 			_jitoptions="--disable-jit"
 			;;
 	esac

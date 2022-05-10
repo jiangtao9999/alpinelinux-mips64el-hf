@@ -1,0 +1,17 @@
+--- flatpak-1.12.2-orig/common/flatpak-syscalls-private.h
++++ flatpak-1.12.2/common/flatpak-syscalls-private.h
+@@ -21,11 +21,11 @@
+ #include <sys/syscall.h>
+ 
+ #if defined(_MIPS_SIM)
+-# if _MIPS_SIM == _MIPS_SIM_ABI32
++# if _MIPS_SIM == _ABIO32
+ #   define FLATPAK_MISSING_SYSCALL_BASE 4000
+-# elif _MIPS_SIM == _MIPS_SIM_ABI64
++# elif _MIPS_SIM == _ABI64
+ #   define FLATPAK_MISSING_SYSCALL_BASE 5000
+-# elif _MIPS_SIM == _MIPS_SIM_NABI32
++# elif _MIPS_SIM == _ABIN32
+ #   define FLATPAK_MISSING_SYSCALL_BASE 6000
+ # else
+ #   error "Unknown MIPS ABI"

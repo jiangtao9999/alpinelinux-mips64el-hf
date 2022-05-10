@@ -12,7 +12,8 @@ depends_dev=""
 makedepends="$depends_dev libtool automake autoconf"
 install=""
 subpackages=""
-source="https://github.com/toots/shine/releases/download/$pkgver/shine-$pkgver.tar.gz"
+source="https://github.com/toots/shine/releases/download/$pkgver/shine-$pkgver.tar.gz
+	fix-mips64.patch"
 
 builddir="$srcdir"/shine-$pkgver
 build() {
@@ -27,4 +28,5 @@ package() {
 	make DESTDIR="$pkgdir" install
 }
 
-sha512sums="ecd186eba299581e220fada2d3cc92ccbf69d8fe4db539b1d21ee565ef706fbbff015c013f9bb477b3326a71d06b5f6cbfed3371e1d75d62d642729245ec714d  shine-3.1.1.tar.gz"
+sha512sums="ecd186eba299581e220fada2d3cc92ccbf69d8fe4db539b1d21ee565ef706fbbff015c013f9bb477b3326a71d06b5f6cbfed3371e1d75d62d642729245ec714d  shine-3.1.1.tar.gz
+96c184a2e6d9d59d4d56c6ad223799f511c0fa442db43eb944803ed01562d0f5972d62a780f91b007a1d0c5422de97d0c1b6ba921d68313bec89e253362dbac2  fix-mips64.patch"

@@ -23,6 +23,8 @@ source="$pkgname-$pkgver.tar.gz::https://git.sr.ht/~kennylevinsen/seatd/archive/
 #     - CVE-2021-41387
 
 build() {
+	# https://todo.sr.ht/~kennylevinsen/seatd/10
+	[ "$CARCH" = "mips64el" ] && export CFLAGS="$CFLAGS -Wno-error=overflow"
 	abuild-meson \
 		-Dlibseat-logind=elogind \
 		-Dman-pages=enabled \

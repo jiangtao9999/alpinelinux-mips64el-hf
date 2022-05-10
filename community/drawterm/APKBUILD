@@ -11,7 +11,8 @@ options="!check" # upstream does not have a test suite
 makedepends="linux-headers libx11-dev libxt-dev"
 subpackages="$pkgname-dbg"
 source="https://dev.alpinelinux.org/archive/drawterm/drawterm-$pkgver.tar.gz
-	respect-env.patch"
+	respect-env.patch
+	fix-mips.patch"
 
 _srcurl="https://code.9front.org/hg/$pkgname"
 _srcrev="80a4267e62de"
@@ -21,6 +22,7 @@ prepare() {
 	if [ "$CARCH" = "ppc64le" ]; then
 		ln -s posix-power posix-ppc64le
 	fi
+	ln -s posix-mips posix-mips64
 }
 
 snapshot() {
@@ -51,4 +53,5 @@ package() {
 }
 
 sha512sums="97e0299497316e4d9799bd4e0ad6dec29e638559d13bb7f1dee3c30003201fa52d4ef704aff7baec611993262d0c96517ae1095092dac86aa66d7661f4d56f02  drawterm-0_hg20210414.tar.gz
-abbef7eb9291f2a5479fe9a77ba5e1924b53797ae7a2505e46c502242d594ab6d7b77a0f97bb50ce2e58742fac01269c75887e9ebd835d2ed2afd68dccb8f44a  respect-env.patch"
+abbef7eb9291f2a5479fe9a77ba5e1924b53797ae7a2505e46c502242d594ab6d7b77a0f97bb50ce2e58742fac01269c75887e9ebd835d2ed2afd68dccb8f44a  respect-env.patch
+fca7310bf39cd18401cb1a61bbff25390ac87a754d585b4ef5d966b0d0015d946b51595813c3bd0140af694ecc129482b9b9a34ad2ebbe348c676ca3aea3fb7f  fix-mips.patch"

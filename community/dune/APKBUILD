@@ -6,7 +6,7 @@ pkgrel=1
 pkgdesc="A composable build system for OCaml (formerly Jbuilder)"
 url="https://github.com/ocaml/dune"
 # mips64 and riscv64 blocked by ocaml
-arch="all !mips64 !riscv64"
+arch="all !mips64 !mips64el !riscv64"
 license="Apache-2.0"
 checkdepends="bash"
 makedepends="ocaml ocaml-compiler-libs ocaml-findlib-dev"

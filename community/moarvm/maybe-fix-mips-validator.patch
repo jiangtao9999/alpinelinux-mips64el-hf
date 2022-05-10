@@ -1,0 +1,17 @@
+Description: this seems to fix intermittent validator problems on big endian
+  archs, see https://github.com/rakudo/rakudo/issues/1711
+Bug: https://github.com/rakudo/rakudo/issues/1711
+Author: Robert Lemmen <robertle@semistable.com>
+--- a/src/core/validation.c
++++ b/src/core/validation.c
+@@ -671,8 +671,8 @@
+     val->loc_count = fb->num_locals;
+     val->loc_types = fb->local_types;
+     val->bc_size   = fb->bytecode_size;
+-    val->src_cur_op = fb->bytecode;
+-    val->src_bc_end = fb->bytecode + fb->bytecode_size;
++    val->src_cur_op = fb->orig_bytecode;
++    val->src_bc_end = fb->orig_bytecode + fb->bytecode_size;
+     val->labels    = MVM_calloc(1, fb->bytecode_size);
+     val->cur_info  = NULL;
+     val->cur_mark  = NULL;

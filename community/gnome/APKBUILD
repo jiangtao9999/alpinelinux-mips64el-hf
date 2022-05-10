@@ -21,10 +21,10 @@ depends="
 	gnome-online-accounts
 	gnome-online-miners
 	gnome-remote-desktop
-	gnome-shell
+	$( [ "$CARCH" = "mips64el" ] || echo gnome-shell )
 	gnome-shell-extensions
 	gnome-user-docs
-	gnome-tour
+	$( [ "$CARCH" = "mips64el" ] || echo gnome-tour )
 	gsettings-desktop-schemas
 	gvfs
 	iio-sensor-proxy

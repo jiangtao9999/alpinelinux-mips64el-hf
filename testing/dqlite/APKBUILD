@@ -8,7 +8,7 @@ url="https://dqlite.io/"
 arch="all"
 license="Apache"
 depends="raft"
-makedepends="libuv-dev sqlite-dev sqlite-replication-dev
+makedepends="libuv-dev sqlite-dev $( [ "$CARCH" = "mips64el" ] || echo sqlite-replication-dev )
 raft-dev autoconf automake libtool"
 subpackages="$pkgname-static $pkgname-dev $pkgname-doc"
 source="$pkgname-$pkgver.tar.gz::https://github.com/canonical/dqlite/archive/v$pkgver.tar.gz"

@@ -6,7 +6,8 @@ pkgrel=3
 pkgdesc="terminal UI for tshark, inspired by Wireshark"
 url="https://termshark.io"
 license="MIT"
-arch="all !armhf" # no tshark on armhf
+# mips64el: termios_linux.go: attr.{I,O}speed undefined
+arch="all !armhf !mips64el" # no tshark on armhf
 depends="tshark"
 makedepends="go"
 options="net"

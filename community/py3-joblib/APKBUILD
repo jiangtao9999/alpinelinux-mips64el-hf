@@ -8,6 +8,7 @@ options="net" # Net access required for tests, https://github.com/joblib/joblib/
 url="http://joblib.readthedocs.org/"
 # mips64 and s390x blocked by py3-distributed
 arch="noarch !mips64 !s390x"
+[ "$CARCH" = "mips64el" ] && options="!check" # test_child_raises_parent_exits_cleanly[multiprocessing]
 license="BSD-3-Clause"
 depends="
 	py3-cloudpickle

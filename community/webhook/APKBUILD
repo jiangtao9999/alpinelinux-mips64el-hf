@@ -14,6 +14,7 @@ export GOPATH="$srcdir"
 
 build() {
 	mkdir -p bin
+	unset GOFLAGS
 	go build -o bin github.com/adnanh/webhook/...
 }
 

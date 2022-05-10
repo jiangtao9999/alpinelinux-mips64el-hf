@@ -1,0 +1,245 @@
+diff -Nrui jdk9u-2e265b4b8622-orig/common/autoconf/platform.m4 jdk9u-2e265b4b8622/common/autoconf/platform.m4
+--- jdk9u-2e265b4b8622-orig/common/autoconf/platform.m4	2020-02-08 17:54:12.890646688 +0800
++++ jdk9u-2e265b4b8622/common/autoconf/platform.m4	2020-02-08 18:01:17.738270033 +0800
+@@ -54,6 +54,18 @@
+       VAR_CPU_BITS=64
+       VAR_CPU_ENDIAN=little
+       ;;
++    mipsel)
++      VAR_CPU=mipsel
++      VAR_CPU_ARCH=mipsel
++      VAR_CPU_BITS=32
++      VAR_CPU_ENDIAN=little
++      ;;
++    mips64el)
++      VAR_CPU=mips64el
++      VAR_CPU_ARCH=mips64el
++      VAR_CPU_BITS=64
++      VAR_CPU_ENDIAN=little
++      ;;
+     powerpc)
+       VAR_CPU=ppc
+       VAR_CPU_ARCH=ppc
+diff -Nrui jdk9u-2e265b4b8622-orig/hotspot/src/cpu/zero/vm/cppInterpreter_zero.cpp jdk9u-2e265b4b8622/hotspot/src/cpu/zero/vm/cppInterpreter_zero.cpp
+--- jdk9u-2e265b4b8622-orig/hotspot/src/cpu/zero/vm/cppInterpreter_zero.cpp	2020-02-08 17:54:13.136934602 +0800
++++ jdk9u-2e265b4b8622/hotspot/src/cpu/zero/vm/cppInterpreter_zero.cpp	2020-02-08 18:06:37.824204750 +0800
+@@ -369,7 +369,7 @@
+   ThreadStateTransition::transition_from_java(thread, _thread_in_native);
+ 
+   // Make the call
+-  intptr_t result[4 - LogBytesPerWord];
++  intptr_t result[4 - LogBytesPerWord] __attribute__((__aligned__(__alignof__(double))));
+   ffi_call(handler->cif(), (void (*)()) function, result, arguments);
+ 
+   // Change the thread state back to _thread_in_Java.
+diff -Nrui jdk9u-2e265b4b8622-orig/hotspot/src/os/linux/vm/jsig.c jdk9u-2e265b4b8622/hotspot/src/os/linux/vm/jsig.c
+--- jdk9u-2e265b4b8622-orig/hotspot/src/os/linux/vm/jsig.c	2020-02-08 22:47:28.543088417 +0800
++++ jdk9u-2e265b4b8622/hotspot/src/os/linux/vm/jsig.c	2020-02-08 23:18:36.180765375 +0800
+@@ -41,13 +41,8 @@
+ #define true 1
+ #define false 0
+ 
+-#define MASK(sig) ((uint64_t)1 << (sig-1))  // 0 is not a signal.
+-// Check whether all signals fit into jvmsigs. -1 as MASK shifts by -1.
+-#if (64 < NSIG-1)
+-#error "Not all signals can be encoded in jvmsigs. Adapt its type!"
+-#endif
+ static struct sigaction sact[NSIG]; /* saved signal handlers */
+-static uint64_t jvmsigs = 0; /* signals used by jvm */
++static sigset_t jvmsigs; /* signals used by jvm */
+ 
+ /* used to synchronize the installation of signal handlers */
+ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+@@ -110,7 +105,7 @@
+ 
+   signal_lock();
+ 
+-  sigused = (sig < NSIG) && ((MASK(sig) & jvmsigs) != 0);
++  sigused = (sig < NSIG) && sigismember(&jvmsigs, sig);
+   if (jvm_signal_installed && sigused) {
+     /* jvm has installed its signal handler for this signal. */
+     /* Save the handler. Don't really install it. */
+@@ -127,7 +122,7 @@
+     save_signal_handler(sig, oldhandler);
+ 
+     /* Record the signals used by jvm */
+-    jvmsigs |= MASK(sig);
++    sigaddset(&jvmsigs, sig);
+ 
+     signal_unlock();
+     return oldhandler;
+@@ -168,7 +163,7 @@
+ 
+   signal_lock();
+ 
+-  sigused = (sig < NSIG) && ((MASK(sig) & jvmsigs) != 0);
++  sigused = (sig < NSIG) && sigismember(&jvmsigs, sig);
+   if (jvm_signal_installed && sigused) {
+     /* jvm has installed its signal handler for this signal. */
+     /* Save the handler. Don't really install it. */
+@@ -191,7 +186,7 @@
+     }
+ 
+     /* Record the signals used by jvm */
+-    jvmsigs |= MASK(sig);
++    sigaddset(&jvmsigs, sig);
+ 
+     signal_unlock();
+     return res;
+@@ -223,7 +218,7 @@
+ 
+ struct sigaction *JVM_get_signal_action(int sig) {
+   /* Does race condition make sense here? */
+-  if ((MASK(sig) & jvmsigs) != 0) {
++  if (sigismember(&jvmsigs, sig)) {
+     return &sact[sig];
+   }
+   return NULL;
+diff -Nrui jdk9u-2e265b4b8622-orig/hotspot/src/os/linux/vm/os_linux.cpp jdk9u-2e265b4b8622/hotspot/src/os/linux/vm/os_linux.cpp
+--- jdk9u-2e265b4b8622-orig/hotspot/src/os/linux/vm/os_linux.cpp	2020-02-08 22:47:28.543088417 +0800
++++ jdk9u-2e265b4b8622/hotspot/src/os/linux/vm/os_linux.cpp	2020-02-08 23:20:42.366138418 +0800
+@@ -4237,14 +4237,16 @@
+ 
+ // For signal-chaining
+ struct sigaction sigact[NSIG];
+-uint64_t sigs = 0;
+-#if (64 < NSIG-1)
+-#error "Not all signals can be encoded in sigs. Adapt its type!"
+-#endif
++sigset_t sigs;
+ bool os::Linux::libjsig_is_loaded = false;
+ typedef struct sigaction *(*get_signal_t)(int);
+ get_signal_t os::Linux::get_signal_action = NULL;
+ 
++static __attribute__((constructor)) void sigs_init()
++{
++    sigemptyset(&sigs);
++}
++
+ struct sigaction* os::Linux::get_chained_signal_action(int sig) {
+   struct sigaction *actp = NULL;
+ 
+@@ -4319,7 +4321,7 @@
+ }
+ 
+ struct sigaction* os::Linux::get_preinstalled_handler(int sig) {
+-  if ((((uint64_t)1 << (sig-1)) & sigs) != 0) {
++  if (sigismember(&sigs, sig)) {
+     return &sigact[sig];
+   }
+   return NULL;
+@@ -4328,7 +4330,7 @@
+ void os::Linux::save_preinstalled_handler(int sig, struct sigaction& oldAct) {
+   assert(sig > 0 && sig < NSIG, "vm signal out of expected range");
+   sigact[sig] = oldAct;
+-  sigs |= (uint64_t)1 << (sig-1);
++  sigaddset(&sigs, sig);
+ }
+ 
+ // for diagnostic
+--- jdk9u-jdk-9.0.4+12/common/autoconf/generated-configure.sh.orig
++++ jdk9u-jdk-9.0.4+12/common/autoconf/generated-configure.sh
+@@ -15770,6 +15770,18 @@
+       VAR_CPU_BITS=64
+       VAR_CPU_ENDIAN=little
+       ;;
++    mipsel)
++      VAR_CPU=mipsel
++      VAR_CPU_ARCH=mipsel
++      VAR_CPU_BITS=32
++      VAR_CPU_ENDIAN=little
++      ;;
++    mips64el)
++      VAR_CPU=mips64el
++      VAR_CPU_ARCH=mips64el
++      VAR_CPU_BITS=64
++      VAR_CPU_ENDIAN=little
++      ;;
+     powerpc)
+       VAR_CPU=ppc
+       VAR_CPU_ARCH=ppc
+@@ -15906,6 +15918,18 @@
+     aarch64)
+       VAR_CPU=aarch64
+       VAR_CPU_ARCH=aarch64
++      VAR_CPU_BITS=64
++      VAR_CPU_ENDIAN=little
++      ;;
++    mipsel)
++      VAR_CPU=mipsel
++      VAR_CPU_ARCH=mipsel
++      VAR_CPU_BITS=32
++      VAR_CPU_ENDIAN=little
++      ;;
++    mips64el)
++      VAR_CPU=mips64el
++      VAR_CPU_ARCH=mips64el
+       VAR_CPU_BITS=64
+       VAR_CPU_ENDIAN=little
+       ;;
+--- jdk9u-jdk-9.0.4+12/common/autoconf/buildjdk-spec.gmk.in.orig	2022-02-17 20:39:21.875285980 +0800
++++ jdk9u-jdk-9.0.4+12/common/autoconf/buildjdk-spec.gmk.in	2022-02-17 20:53:07.962577242 +0800
+@@ -50,29 +50,29 @@
+ 
+ OPENJDK_BUILD_CPU_LEGACY := @OPENJDK_BUILD_CPU_LEGACY@
+ OPENJDK_BUILD_CPU_LEGACY_LIB := @OPENJDK_BUILD_CPU_LEGACY_LIB@
+-OPENJDK_TARGET_CPU := @OPENJDK_BUILD_CPU@
+-OPENJDK_TARGET_CPU_ARCH := @OPENJDK_BUILD_CPU_ARCH@
+-OPENJDK_TARGET_CPU_BITS := @OPENJDK_BUILD_CPU_BITS@
+-OPENJDK_TARGET_CPU_ENDIAN := @OPENJDK_BUILD_CPU_ENDIAN@
+-OPENJDK_TARGET_CPU_LEGACY := @OPENJDK_BUILD_CPU_LEGACY@
+-
+-HOTSPOT_TARGET_OS := @HOTSPOT_BUILD_OS@
+-HOTSPOT_TARGET_OS_TYPE := @HOTSPOT_BUILD_OS_TYPE@
+-HOTSPOT_TARGET_CPU := @HOTSPOT_BUILD_CPU@
+-HOTSPOT_TARGET_CPU_ARCH := @HOTSPOT_BUILD_CPU_ARCH@
+-HOTSPOT_TARGET_CPU_DEFINE := @HOTSPOT_BUILD_CPU_DEFINE@
+-
+-CFLAGS_JDKLIB := @OPENJDK_BUILD_CFLAGS_JDKLIB@
+-CXXFLAGS_JDKLIB := @OPENJDK_BUILD_CXXFLAGS_JDKLIB@
+-LDFLAGS_JDKLIB := @OPENJDK_BUILD_LDFLAGS_JDKLIB@
+-CFLAGS_JDKEXE := @OPENJDK_BUILD_CFLAGS_JDKEXE@
+-CXXFLAGS_JDKEXE := @OPENJDK_BUILD_CXXFLAGS_JDKEXE@
+-LDFLAGS_JDKEXE := @OPENJDK_BUILD_LDFLAGS_JDKEXE@
+-
+-JVM_CFLAGS := @OPENJDK_BUILD_JVM_CFLAGS@
+-JVM_LDFLAGS := @OPENJDK_BUILD_JVM_LDFLAGS@
+-JVM_ASFLAGS := @OPENJDK_BUILD_JVM_ASFLAGS@
+-JVM_LIBS := @OPENJDK_BUILD_JVM_LIBS@
++OPENJDK_TARGET_CPU := @OPENJDK_TARGET_CPU@
++OPENJDK_TARGET_CPU_ARCH := @OPENJDK_TARGET_CPU_ARCH@
++OPENJDK_TARGET_CPU_BITS := @OPENJDK_TARGET_CPU_BITS@
++OPENJDK_TARGET_CPU_ENDIAN := @OPENJDK_TARGET_CPU_ENDIAN@
++OPENJDK_TARGET_CPU_LEGACY := @OPENJDK_TARGET_CPU_LEGACY@
++
++HOTSPOT_TARGET_OS := @HOTSPOT_TARGET_OS@
++HOTSPOT_TARGET_OS_TYPE := @HOTSPOT_TARGET_OS_TYPE@
++HOTSPOT_TARGET_CPU := @HOTSPOT_TARGET_CPU@
++HOTSPOT_TARGET_CPU_ARCH := @HOTSPOT_TARGET_CPU_ARCH@
++HOTSPOT_TARGET_CPU_DEFINE := @HOTSPOT_TARGET_CPU_DEFINE@
++
++CFLAGS_JDKLIB := @CFLAGS_JDKLIB@
++CXXFLAGS_JDKLIB := @CXXFLAGS_JDKLIB@
++LDFLAGS_JDKLIB := @LDFLAGS_JDKLIB@
++CFLAGS_JDKEXE := @CFLAGS_JDKEXE@
++CXXFLAGS_JDKEXE := @CXXFLAGS_JDKEXE@
++LDFLAGS_JDKEXE := @LDFLAGS_JDKEXE@
++
++JVM_CFLAGS := @JVM_CFLAGS@
++JVM_LDFLAGS := @JVM_LDFLAGS@
++JVM_ASFLAGS := @JVM_ASFLAGS@
++JVM_LIBS := @JVM_LIBS@
+ 
+ # The compiler for the build platform is likely not warning compatible with the official
+ # compiler.
+@@ -85,8 +85,8 @@
+ # Control wether Hotspot builds gtest tests
+ BUILD_GTEST := false
+ 
+-JVM_VARIANTS := server
+-JVM_VARIANT_MAIN := server
++JVM_VARIANTS := @JVM_VARIANTS@
++JVM_VARIANT_MAIN := @JVM_VARIANT_MAIN@
+ 
+ # Some users still set EXTRA_*FLAGS on the make command line. Must
+ # make sure to override that when building buildjdk.

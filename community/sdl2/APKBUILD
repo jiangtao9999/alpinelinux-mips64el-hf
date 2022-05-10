@@ -63,10 +63,11 @@ build() {
 	if [ "$CBUILD" != "$CHOST" ]; then
 		CMAKE_CROSSOPTS="-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_HOST_SYSTEM_NAME=Linux"
 	fi
+	# -DCMAKE_BUILD_TYPE=MinSizeRel : https://gitlab.alpinelinux.org/alpine/aports/-/issues/13287
 	cmake -B build \
 		-DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_INSTALL_LIBDIR=lib \
-		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_BUILD_TYPE=MinSizeRel \
 		-DBUILD_SHARED_LIBS=True \
 		-DSDL_TEST=OFF \
 		-DALSA=ON \

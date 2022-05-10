@@ -16,6 +16,9 @@ builddir="$srcdir/FBNeo-$_commit"
 options="!check" # No tests
 
 build() {
+	[ "$CARCH" = "mips64el" ] && \
+		export CFLAGS="$CFLAGS -Umips" \
+		export CXXFLAGS="$CXXFLAGS -Umips"
 	rm -rf src/dep/libs/zlib
 	make -C src/burner/libretro
 }

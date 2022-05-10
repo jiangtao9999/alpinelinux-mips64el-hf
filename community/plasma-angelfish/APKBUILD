@@ -20,7 +20,7 @@ depends="
 	"
 makedepends="
 	extra-cmake-modules
-	corrosion
+	$( [ "$CARCH" = "mips64el" ] || echo corrosion )
 	kdeclarative-dev
 	ki18n-dev
 	kio-dev

@@ -68,6 +68,7 @@ options="!check"
 source="https://linuxcontainers.org/downloads/lxd/lxd-$pkgver.tar.gz
 	$pkgname.confd
 	$pkgname.initd
+	lxd-fix-mips.patch
 	"
 ldpath="/usr/lib/lxd"
 sonameprefix="$pkgname:"
@@ -78,6 +79,9 @@ build() {
 	export CGO_LDFLAGS="-lintl $LDFLAGS"
 	export CGO_LDFLAGS_ALLOW="(-Wl,-wrap,pthread_create)|(-Wl,-z,now)"
 	export GO111MODULE=on
+
+	[ "$CARCH" = "mips64el" ] && export GOFLAGS="$( echo $GOFLAGS | sed 's|-buildmode=pie|-buildmode=exe|' )"
+	export GOFLAGS="$( echo $GOFLAGS | sed 's|-buildmode=exe||g' )"
 
 	mkdir -p bin
 	go build -v -tags "netgo" -ldflags '-extldflags "-static -lm -ldl -lz -lpthread -lz -lintl -lraft -ldqlite -luv -lseccomp -lcap"' -o bin/ ./lxd-p2c/...
@@ -136,4 +140,5 @@ sha512sums="
 af8639e93f719a6aa1e37e7dafb5c221230470eb7a565422e6d1f6540e1d4250c00549831a17abbf3d4252bd473b71469bbbc93c7afcde68704d6a401967ed72  lxd-4.20.tar.gz
 1bbb26a61b3812e6eb4c3cb7db6c2d9adb43195f96f317d6bba1ace6a97f1faed0677a12c3827002bc147edba9b355f0e7ead3960d254a131b25fb8c060ea8d0  lxd.confd
 ebf9608ea3db25b456a557c81838c6a793adf5f490bd64e1f3dc6951bad619188cb0170f0a794b086adbd128267b4339ab46c1b6a815a4ae7f3a6566b7854d97  lxd.initd
+f6f2dc9b0221f6e1db98156de4ea425c631aef80f1607b528b636a65b002a25fe9262f34b833ce817cb2314ff70f8b591b28c15b68a557af5f599a32afacd129  lxd-fix-mips.patch
 "

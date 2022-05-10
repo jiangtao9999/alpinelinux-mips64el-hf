@@ -14,7 +14,7 @@ source="https://pypi.python.org/packages/source/z/zict/zict-$pkgver.tar.gz"
 builddir="$srcdir/zict-$pkgver"
 
 case "$CARCH" in
-mips64) options="!check" ;; # XXX: Runs out of memory
+mips64*) options="!check" ;; # XXX: Runs out of memory
 esac
 
 build() {

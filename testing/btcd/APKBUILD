@@ -13,6 +13,7 @@ builddir="$srcdir/$pkgname-$_pkgver"
 
 build() {
 	mkdir bin
+	unset GOFLAGS
 	go build -trimpath -ldflags="-s -w" -v -o bin . ./cmd/...
 }
 

@@ -1,0 +1,14 @@
+--- texlive-20210325-source/libs/luajit-orig/configure	2021-11-23 21:25:43.926801583 +0800
++++ texlive-20210325-source/libs/luajit/configure	2021-11-23 21:27:09.342987074 +0800
+@@ -14213,6 +14213,11 @@
+ else
+   echo '-DLJ_ARCH_ENDIAN=LUAJIT_BE' >>native_flags
+ fi
++elif grep 'LJ_TARGET_MIPS64 ' conftest.i >/dev/null 2>&1; then :
++  LJARCH=mips64
++         if grep 'MIPSEL ' conftest.i >/dev/null 2>&1; then :
++  echo '-D__MIPSEL__=1' >>native_flags
++fi
+ elif grep 'LJ_TARGET_MIPS ' conftest.i >/dev/null 2>&1; then :
+   LJARCH=mips
+          if grep 'MIPSEL ' conftest.i >/dev/null 2>&1; then :

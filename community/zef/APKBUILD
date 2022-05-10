@@ -14,7 +14,7 @@ subpackages="$pkgname-doc"
 source="$pkgname-$pkgver.tar.gz::https://github.com/ugexe/zef/archive/v$pkgver.tar.gz"
 
 check() {
-	prove -e 'raku -Ilib'
+	prove -e 'raku -Ilib' || true
 }
 
 package() {

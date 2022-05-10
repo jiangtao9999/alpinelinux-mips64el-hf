@@ -1,0 +1,11 @@
+--- qtwebengine-349db5edcb67574f646eca7b336b9571b9777816/src/3rdparty/chromium/third_party/breakpad/breakpad/src/client/linux/minidump_writer/linux_core_dumper.ccorig	2021-11-12 16:28:00.930677943 +0800
++++ qtwebengine-349db5edcb67574f646eca7b336b9571b9777816/src/3rdparty/chromium/third_party/breakpad/breakpad/src/client/linux/minidump_writer/linux_core_dumper.cc	2021-11-12 16:43:16.495958175 +0800
+@@ -198,7 +198,7 @@
+         info.tgid = status->pr_pgrp;
+         info.ppid = status->pr_ppid;
+ #if defined(__mips__)
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) || 1
+         for (int i = EF_R0; i <= EF_R31; i++)
+           info.mcontext.gregs[i - EF_R0] = status->pr_reg[i];
+ #else  // __ANDROID__

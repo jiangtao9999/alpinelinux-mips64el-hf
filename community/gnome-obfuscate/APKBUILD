@@ -6,7 +6,7 @@ pkgrel=1
 pkgdesc="Censor private information"
 url="https://gitlab.gnome.org/World/obfuscate"
 # s390x, mips64 and riscv64 blocked by cargo/rust
-arch="all !s390x !mips64 !riscv64"
+arch="all !s390x !mips64 !mips64el !riscv64"
 license="MIT"
 makedepends="meson cargo gtk+3.0-dev"
 checkdepends="desktop-file-utils appstream-glib"

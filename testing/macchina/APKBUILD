@@ -6,7 +6,7 @@ pkgrel=0
 pkgdesc="System information fetcher, with an (unhealthy) emphasis on performance"
 url="https://github.com/Macchina-CLI/macchina"
 # s390x, mips64 and riscv64 blocked by cargo
-arch="all !s390x !mips64 !riscv64"
+arch="all !s390x !mips64 !mips64el !riscv64"
 license="MIT"
 makedepends="cargo"
 options="net"

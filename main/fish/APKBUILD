@@ -16,6 +16,7 @@ install="$pkgname.post-install $pkgname.post-upgrade $pkgname.pre-deinstall"
 subpackages="$pkgname-dev $pkgname-doc $pkgname-tools::noarch"
 source="https://github.com/fish-shell/fish-shell/releases/download/$pkgver/fish-$pkgver.tar.xz
 	README.alpine
+	fish-3.3.1-drop-test.patch
 	"
 
 # temp allow textrels on riscv64
@@ -80,4 +81,5 @@ tools() {
 sha512sums="
 fc50ca44fab3f2d942284d4f714150f7ccf1e49c73da36f8d4ae4a33a9b3280f98bed15848839f5d443b4274fd0ff90174bafa6a8e9a4da226dda63d7766a660  fish-3.3.1.tar.xz
 c28cef48e3d9cde4956d36192dc221e63eca89282a937e2683578ac0958d98a9c54420aea4f1d91d516f5ee2c74589a75865a973305421e1ad0a9e70854dff4f  README.alpine
+8d47f484d4a4400105c4750a59656184cda56615706a942a9a0b3706e11169af2741a578f3ef1e5b763029fb02aa38f3c7bed392ad223038e01d00760d2aaaa7  fish-3.3.1-drop-test.patch
 "

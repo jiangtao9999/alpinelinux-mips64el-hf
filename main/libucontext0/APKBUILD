@@ -13,6 +13,7 @@ builddir="$srcdir"/libucontext-$pkgver
 case "$CTARGET_ARCH" in
 	arm*)		LIBUCONTEXT_ARCH="arm" ;;
 	ppc64le)	LIBUCONTEXT_ARCH="ppc64" ;;
+	mips64el)	LIBUCONTEXT_ARCH="mips64" ;;
 	*)		LIBUCONTEXT_ARCH="$CTARGET_ARCH" ;;
 esac
 

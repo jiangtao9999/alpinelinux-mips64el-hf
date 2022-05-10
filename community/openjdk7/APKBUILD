@@ -39,6 +39,7 @@ arm*)		_jarch=arm
 		options="$options textrels";;
 s390x)		_jarch=s390x;;
 ppc64le)	_jarch=ppc64le;;
+mips64el)	_jarch=mips64;;
 esac
 
 _install_base=/usr/lib/jvm/java-1.7-openjdk

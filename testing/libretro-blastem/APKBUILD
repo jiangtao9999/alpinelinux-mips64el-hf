@@ -16,6 +16,9 @@ builddir="$srcdir/blastem-$_commit"
 options="!check" # No tests
 
 build() {
+	[ "$CARCH" = "mips64el" ] && sed -i -e 's|-m64|-mabi=64|' \
+					    -e 's|-m32|-mabi=32|' \
+					Makefile*
 	rm -rf zlib
 	make -f Makefile.libretro HOST_ZLIB=1
 }

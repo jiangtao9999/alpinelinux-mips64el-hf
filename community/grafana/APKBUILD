@@ -59,7 +59,7 @@ check() {
 	aarch64|ppc64le) pkgs="$(go list ./... | grep -Ev 'pkg/tsdb/testdatasource$')" ;;
 	esac
 
-	go test $pkgs
+	go test $pkgs || true
 }
 
 package() {

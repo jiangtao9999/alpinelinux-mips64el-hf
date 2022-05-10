@@ -6,7 +6,7 @@ TARGET_ARCH="$1"
 SUDO_APK=abuild-apk
 
 # optional cross build packages
-: ${KERNEL_PKG=linux-firmware linux-lts}
+#: ${KERNEL_PKG=linux-firmware linux-lts}
 
 # get abuild configurables
 [ -e /usr/share/abuild/functions.sh ] || (echo "abuild not found" ; exit 1)
@@ -125,10 +125,10 @@ for PKG in fortify-headers linux-headers musl libc-dev pkgconf zlib \
 	   lzip abuild ncurses libedit openssh \
 	   libcap-ng util-linux libaio lvm2 popt xz \
 	   json-c argon2 cryptsetup zstd kmod lddtree mkinitfs \
-	   community/go libffi community/ghc \
+	   community/go libffi \
 	   brotli libev c-ares cunit nghttp2 curl \
 	   pcre libssh2 community/http-parser community/libgit2 \
-	   libxml2 pax-utils llvm11 community/rust \
+	   libxml2 pax-utils llvm11 \
 	   $KERNEL_PKG ; do
 
 	if [ "$NEEDS_LIBATOMIC" = "yes" ]; then

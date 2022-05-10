@@ -1,0 +1,37 @@
+--- kopia-0.9.5-orig/fs/localfs/local_fs_32bit.go
++++ kopia-0.9.5/fs/localfs/local_fs_32bit.go
+@@ -1,6 +1,6 @@
+-//go:build !windows && ((!amd64 && !arm64 && !arm && !ppc64le && !s390x && !386 && !riscv64) || darwin || openbsd)
++//go:build !windows && ((!amd64 && !arm64 && !arm && !ppc64le && !s390x && !386 && !riscv64 && !mips64le) || darwin || openbsd)
+ // +build !windows
+-// +build !amd64,!arm64,!arm,!ppc64le,!s390x,!386,!riscv64 darwin openbsd
++// +build !amd64,!arm64,!arm,!ppc64le,!s390x,!386,!riscv64,!mips64le darwin openbsd
+ 
+ package localfs
+ 
+--- kopia-0.9.5-orig/fs/localfs/local_fs_64bit.go
++++ kopia-0.9.5/fs/localfs/local_fs_64bit.go
+@@ -1,8 +1,8 @@
+-//go:build !windows && !openbsd && !darwin && (amd64 || arm64 || arm || ppc64le || s390x || 386 || riscv64)
++//go:build !windows && !openbsd && !darwin && (amd64 || arm64 || arm || ppc64le || s390x || 386 || riscv64 || mips64le)
+ // +build !windows
+ // +build !openbsd
+ // +build !darwin
+-// +build amd64 arm64 arm ppc64le s390x 386 riscv64
++// +build amd64 arm64 arm ppc64le s390x 386 riscv64 mips64le
+ 
+ package localfs
+ 
+--- kopia-0.9.5-orig/fs/localfs/local_fs_nonwindows.go
++++ kopia-0.9.5/fs/localfs/local_fs_nonwindows.go
+@@ -24,8 +24,8 @@
+ 	var oi fs.DeviceInfo
+ 	if stat, ok := fi.Sys().(*syscall.Stat_t); ok {
+ 		// not making a separate type for 32-bit platforms here..
+-		oi.Dev = platformSpecificWidenDev(stat.Dev)
+-		oi.Rdev = platformSpecificWidenDev(stat.Rdev)
++		oi.Dev = platformSpecificWidenDev(uint64(stat.Dev))
++		oi.Rdev = platformSpecificWidenDev(uint64(stat.Rdev))
+ 	}
+ 
+ 	return oi

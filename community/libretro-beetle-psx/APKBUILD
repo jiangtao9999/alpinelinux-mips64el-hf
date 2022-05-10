@@ -9,7 +9,8 @@ url="https://github.com/libretro/beetle-psx-libretro"
 pkgdesc="Standalone port/fork of Mednafen PSX to the Libretro API"
 license="GPL-2.0-or-later"
 makedepends="mesa-dev"
-source="$pkgname-$_commit.tar.gz::https://github.com/libretro/beetle-psx-libretro/archive/$_commit.tar.gz"
+source="$pkgname-$_commit.tar.gz::https://github.com/libretro/beetle-psx-libretro/archive/$_commit.tar.gz
+	fix-mips.patch"
 subpackages="$pkgname-hw"
 builddir="$srcdir/beetle-psx-libretro-$_commit"
 options="!check" # No tests
@@ -38,4 +39,5 @@ hw() {
 		"$subpkgdir"/usr/lib/libretro/mednafen_psx_hw_libretro.so
 }
 
-sha512sums="257b56297b61f1c6b6d375df621113ccd03df27768e96c3d5f10ffddab95923d833ce5da5fdd909948d4b134402efb6c4f300e85f792a8fb46f6379741ca7e76  libretro-beetle-psx-89a74ee2d0e2295408a23796c42ae6dbcf6a165f.tar.gz"
+sha512sums="257b56297b61f1c6b6d375df621113ccd03df27768e96c3d5f10ffddab95923d833ce5da5fdd909948d4b134402efb6c4f300e85f792a8fb46f6379741ca7e76  libretro-beetle-psx-89a74ee2d0e2295408a23796c42ae6dbcf6a165f.tar.gz
+28ac150fd12e789c24bd25d87333d4b293f08d1386f7fae13494d5f107c439a92a980ac5052a55fd23b6eb648040ff8d8e3f748c71c160cfd4951b2c205a7553  fix-mips.patch"

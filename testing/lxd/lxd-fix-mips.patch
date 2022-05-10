@@ -1,0 +1,11 @@
+--- lxd-4.20-orig/lxd/instance/drivers/driver_lxc.go
++++ lxd-4.20/lxd/instance/drivers/driver_lxc.go
+@@ -7121,7 +7121,7 @@
+ 					return nil, errors.Wrapf(err, "Failed to stat %s", dev["source"])
+ 				}
+ 
+-				backingFilePath := fmt.Sprintf("/sys/dev/block/%d:%d/loop/backing_file", unix.Major(stat.Dev), unix.Minor(stat.Dev))
++				backingFilePath := fmt.Sprintf("/sys/dev/block/%d:%d/loop/backing_file", unix.Major(uint64(stat.Dev)), unix.Minor(uint64(stat.Dev)))
+ 
+ 				if shared.PathExists(backingFilePath) {
+ 					// Read backing file

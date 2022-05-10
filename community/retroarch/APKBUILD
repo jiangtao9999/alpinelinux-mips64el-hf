@@ -19,6 +19,7 @@ makedepends="linux-headers mesa-dev qt5-qtbase-dev wayland-dev wayland-protocols
 	ffmpeg-dev libxkbcommon-dev eudev-dev vulkan-loader-dev"
 source="$pkgname-$pkgver.tar.gz::https://github.com/libretro/retroarch/archive/v$pkgver.tar.gz
 	config.patch
+	fix-mips.patch
 	"
 subpackages="$pkgname-doc"
 builddir="$srcdir/RetroArch-$pkgver"
@@ -48,4 +49,5 @@ package() {
 sha512sums="
 0404f90b983da209d7d04f5e74166f7abb79ad1844549cc3d538aa77e900dec9c40e1b84c08505e0f5052e596057dfac94bf2432200466aa4de8a558147b47f1  retroarch-1.9.13.tar.gz
 0b3a8e1fe318d783a5a34606da187d086f8ad9b543cc496c9c6d527dca40d0078a66a6ccb11b1aaf3519a37ac93c8790af0d916c628ae9286066c0a84308fa15  config.patch
+42161726de0ebecf526493feb4cced7fb67f5697a0aac84ddb02eef93c6ab11fd0459ac7b760f6efcf71e1fdffef242b4973aa6cc893b1e24b1a25cb7488137d  fix-mips.patch
 "

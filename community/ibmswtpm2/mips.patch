@@ -1,0 +1,16 @@
+--- src-orig/LibSupport.h
++++ src/LibSupport.h
+@@ -71,11 +71,13 @@
+     || defined(_WIN64) || defined(_M_X64)		 		\
+     || defined(_M_ARM64) || defined(__aarch64__) 			\
+     || defined(__powerpc64__) || defined(__PPC64__) || defined(__ppc64__) \
++    || defined(__mips64) \
+     || defined(__s390x__)
+ #       define RADIX_BITS                      64
+ #   elif defined(__i386__) || defined(__i386) || defined(i386)		\
+     || defined(_WIN32) || defined(_M_IX86)				\
+     || defined(_M_ARM) || defined(__arm__) || defined(__thumb__)	\
++    || defined(__mips__) \
+     || defined(__powerpc__) || defined(__PPC__)
+ #       define RADIX_BITS                      32
+ #   elif defined(__riscv)

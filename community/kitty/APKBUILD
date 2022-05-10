@@ -35,6 +35,7 @@ subpackages="$pkgname-wayland $pkgname-x11"
 source="$pkgname-$pkgver.tar.gz::https://github.com/kovidgoyal/kitty/archive/v$pkgver.tar.gz
 	fix-ppc64le-build-ioctl-with-musl.patch
 	disable-docs.patch
+	fix-mips64el.patch
 	"
 
 prepare() {
@@ -81,4 +82,5 @@ sha512sums="
 d05c6a2ebd4e103e0b352139db6db3bfb06162374d6373f970d20608f43de6a34a9cf761457760d564c6d8ba0380afdd7dc2d06cd58502b167fe4afb2074b284  kitty-0.23.1.tar.gz
 330f56f5fd60607c57f4f2cffdf33768b3af9e4c3e271a60a05cc3c653d70f7402af91ba0cdfe0257c8b4779884a6440eb52496078bce11799aaa1829ced9245  fix-ppc64le-build-ioctl-with-musl.patch
 20f32d69bc3ecef2b705a52876e46190926d7151d07edfc3d808f6e069add311add401db95186f05ca39fe6ccaf5b8642813a9cf5626020c10dde407f852d47b  disable-docs.patch
+cfed22520d240d949c9a064238ad1cc082e5e561bd5bc9e6c5c4bb6f6ee48e98588d7977ce314ec230c11d29f212e478806dea297703f9595a2d02a1bcad43fc  fix-mips64el.patch
 "

@@ -10,7 +10,8 @@ arch="all !riscv64"
 license="Artistic-2.0"
 makedepends="perl libffi-dev"
 subpackages="$pkgname-dev $pkgname-doc"
-source="http://moarvm.org/releases/MoarVM-$pkgver.tar.gz"
+source="http://moarvm.org/releases/MoarVM-$pkgver.tar.gz
+	maybe-fix-mips-validator.patch"
 builddir="$srcdir"/MoarVM-"$pkgver"
 options="!check" # No tests
 
@@ -41,4 +42,5 @@ doc() {
 	done
 }
 
-sha512sums="a376d0388d9e53b9f07a960ab23ddf8e35379a6dff168d2f726c0f05431804bf4e09b0a2a0eab9a39b9df493030e384e9680a7654bdf9e5c129a6c70aead833d  MoarVM-2021.10.tar.gz"
+sha512sums="a376d0388d9e53b9f07a960ab23ddf8e35379a6dff168d2f726c0f05431804bf4e09b0a2a0eab9a39b9df493030e384e9680a7654bdf9e5c129a6c70aead833d  MoarVM-2021.10.tar.gz
+7915cacd0db3410acf41bb2f37fea42cf7a3bdcf06ad606f34ed4e6066f3330b8b2de94228fa2e4f303685b63917d7bc7335407d728372cb85f6b9680791e7e3  maybe-fix-mips-validator.patch"

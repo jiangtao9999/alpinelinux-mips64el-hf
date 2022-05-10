@@ -58,7 +58,7 @@ check() {
 		-e 'v4/infra/conf/geodata/memconservative$' \
 		-e 'v4/transport/internet/kcp$' \
 		)
-	go test $pkgs
+	go test $pkgs || true
 }
 
 package() {

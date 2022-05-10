@@ -6,7 +6,7 @@ pkgrel=0
 pkgdesc="GNOME Tour & Greeter"
 url="https://gitlab.gnome.org/GNOME/gnome-tour"
 # s390x, mips64 and riscv64 blocked by cargo
-arch="all !s390x !mips64 !riscv64"
+arch="all !s390x !mips64 !mips64el !riscv64"
 license="GPL-3.0-or-later"
 makedepends="meson cargo glib-dev gtk+3.0-dev libhandy1-dev"
 checkdepends="appstream-glib desktop-file-utils"

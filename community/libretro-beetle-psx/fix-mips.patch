@@ -1,0 +1,11 @@
+--- beetle-psx-libretro-89a74ee2d0e2295408a23796c42ae6dbcf6a165f/libretro-common/rthreads/rthreads.c.orig
++++ beetle-psx-libretro-89a74ee2d0e2295408a23796c42ae6dbcf6a165f/libretro-common/rthreads/rthreads.c
+@@ -854,7 +854,7 @@
+    int tickms = clock();
+    now.tv_sec = tickms/1000;
+    now.tv_nsec = tickms * 1000;
+-#elif defined(__mips__) || defined(VITA) || defined(_3DS)
++#elif defined(VITA) || defined(_3DS)
+    struct timeval tm;
+ 
+    gettimeofday(&tm, NULL);

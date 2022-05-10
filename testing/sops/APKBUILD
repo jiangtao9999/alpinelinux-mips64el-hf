@@ -6,7 +6,8 @@ pkgrel=0
 pkgdesc="Simple and flexible tool for managing secrets"
 url="https://github.com/mozilla/sops"
 license="MPL-2.0"
-arch="all"
+# mips64el: ../pkg/mod/github.com/ory/dockertest@v3.3.4+incompatible/docker/pkg/system/stat_linux.go:11:3: cannot use s.Rdev (type uint32) as type uint64 in field value
+arch="all !mips64el" 
 makedepends="go"
 source="https://github.com/mozilla/sops/archive/v$pkgver/sops-$pkgver.tar.gz
 	skip-hcvault-tests.patch

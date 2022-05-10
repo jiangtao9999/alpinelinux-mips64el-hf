@@ -7,7 +7,7 @@ pkgrel=1
 pkgdesc="High performance Network IDS, IPS and Network Security Monitoring engine"
 url="https://suricata-ids.org/"
 # s390x and mips lacks rust support
-arch="all !s390x !mips !mips64 !riscv64"
+arch="all !s390x !mips !mips64 !mips64el !riscv64"
 license="GPL-2.0-only"
 makedepends="
 	autoconf

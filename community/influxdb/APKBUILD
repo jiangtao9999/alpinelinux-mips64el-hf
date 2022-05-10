@@ -10,7 +10,8 @@ url="https://www.influxdata.com/time-series-platform/influxdb/"
 # many tests fail on x86, it's unclear whether it works at all
 # armhf has no ci
 # mips64 and riscv64 blocked by boltdb dependency
-arch="all !x86 !armhf !mips64 !riscv64"
+# mips64el: attr.{I,O}speed undefined
+arch="all !x86 !armhf !mips64 !mips64el !riscv64"
 license="MIT"
 makedepends="go asciidoc xmlto"
 install="$pkgname.pre-install"

@@ -30,7 +30,7 @@ build() {
 
 check() {
 	case "$CARCH" in
-		arm*|x86)
+		arm*|x86|mips64el)
 			go list -mod=readonly . | xargs -t -n4 \
 			go test -mod=readonly -timeout=2m -parallel=4
 			;;

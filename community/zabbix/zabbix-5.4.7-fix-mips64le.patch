@@ -1,0 +1,37 @@
+--- zabbix-5.4.7-orig/src/go/plugins/vfs/dev/dev_linux.go
++++ zabbix-5.4.7/src/go/plugins/vfs/dev/dev_linux.go
+@@ -70,7 +70,7 @@
+ 				dev := &devRecord{Name: entry.Name()}
+ 				if sysfs {
+ 					rdev := stat.Sys().(*syscall.Stat_t).Rdev
+-					dirname := fmt.Sprintf("%s%d:%d/", sysBlkdevLocation, unix.Major(rdev), unix.Minor(rdev))
++					dirname := fmt.Sprintf("%s%d:%d/", sysBlkdevLocation, unix.Major(uint64(rdev)), unix.Minor(uint64(rdev)))
+ 
+ 					if lstat, tmperr := os.Lstat(devname); tmperr == nil {
+ 						filename := dirname + "/device/type"
+@@ -146,7 +146,7 @@
+ 			return
+ 		}
+ 		rdev := stat.Sys().(*syscall.Stat_t).Rdev
+-		if uint64(unix.Major(rdev)) == major && uint64(unix.Minor(rdev)) == minor {
++		if uint64(unix.Major(uint64(rdev))) == major && uint64(unix.Minor(uint64(rdev))) == minor {
+ 			return fields[2], nil
+ 		}
+ 	}
+@@ -190,7 +190,7 @@
+ 		}
+ 		var stat os.FileInfo
+ 		if stat, err = os.Stat(name); err == nil {
+-			rdev = stat.Sys().(*syscall.Stat_t).Rdev
++			rdev = uint64(stat.Sys().(*syscall.Stat_t).Rdev)
+ 		}
+ 	}
+ 
+--- zabbix-5.4.7-orig/src/go/plugins/system/uname/uname_int8.go
++++ zabbix-5.4.7/src/go/plugins/system/uname/uname_int8.go
+@@ -1,4 +1,4 @@
+-// +build linux,386 linux,amd64 linux,arm64
++// +build linux,386 linux,amd64 linux,arm64 linux,mips64le
+ 
+ /*
+ ** Zabbix

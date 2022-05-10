@@ -7,7 +7,7 @@ pkgver=0.119
 pkgrel=6
 pkgdesc="Application development toolkit for controlling system-wide privileges"
 url="https://www.freedesktop.org/wiki/Software/polkit/"
-arch="all !mips !mips64 !s390x !riscv64" # Rust
+arch="all !mips !mips64 !mips64el !s390x !riscv64" # Rust
 license="GPL-2.0-or-later"
 options="suid !check"  # Needs a functioning dbus daemon
 depends="$pkgname-common=$pkgver-r$pkgrel $pkgname-libs=$pkgver-r$pkgrel"

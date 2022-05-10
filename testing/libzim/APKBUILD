@@ -6,6 +6,7 @@ pkgrel=2
 pkgdesc="Reference implementation of the ZIM file format"
 url="https://openzim.org/"
 arch="all !mips !mips64" # tests crash
+[ "$CARCH" = "mips64el" ] && options="!check" # time out, not clean /tmp
 license="GPL-2.0-or-later"
 makedepends="
 	icu-dev

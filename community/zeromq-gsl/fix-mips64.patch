@@ -1,0 +1,22 @@
+--- gsl-4.1.5-orig/src/prelude.h
++++ gsl-4.1.5/src/prelude.h
+@@ -91,7 +91,7 @@
+ 
+ #if (defined (__64BIT__) || defined (__x86_64__) || defined (__AARCH64EL__) \
+     || defined (__PPC64__) || defined (__powerpc64__) || defined (__ppc64__) \
+-    || defined (__s390x__))
++    || defined (__s390x__) || defined (__mips64))
+ #    define __IS_64BIT__                /*  May have 64-bit OS/compiler      */
+ #else
+ #    define __IS_32BIT__                /*  Else assume 32-bit OS/compiler   */
+--- gsl-4.1.5-orig/src/sfl.h
++++ gsl-4.1.5/src/sfl.h
+@@ -130,7 +130,7 @@
+ 
+ #if (defined (__64BIT__) || defined (__x86_64__) || defined (__AARCH64EL__) \
+     || defined (__PPC64__) || defined (__powerpc64__) || defined (__ppc64__) \
+-    || defined (__s390x__))
++    || defined (__s390x__) || defined (__mips64))
+ #    define __IS_64BIT__                /*  May have 64-bit OS/compiler      */
+ #else
+ #    define __IS_32BIT__                /*  Else assume 32-bit OS/compiler   */

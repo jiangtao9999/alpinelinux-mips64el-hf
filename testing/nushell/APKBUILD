@@ -6,7 +6,7 @@ pkgrel=1
 pkgdesc="A new type of shell"
 url="https://www.nushell.sh"
 # s390x, mips, mips64: limited by cargo
-arch="all !s390x !mips !mips64 !riscv64"
+arch="all !s390x !mips !mips64 !mips64el !riscv64"
 license="MIT"
 makedepends="cargo pkgconf openssl1.1-compat-dev libx11-dev libxcb-dev libgit2-dev python3"
 install="$pkgname.post-install $pkgname.post-upgrade $pkgname.pre-deinstall"
